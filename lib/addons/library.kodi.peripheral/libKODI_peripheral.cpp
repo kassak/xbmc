@@ -69,6 +69,20 @@ DLLEXPORT void PERIPHERAL_refresh_button_maps(AddonCB* frontend, CB_PeripheralLi
   return cb->RefreshButtonMaps(frontend->addonData, deviceName ? deviceName : "");
 }
 
+DLLEXPORT void PERIPHERAL_media_inserted(AddonCB* frontend, CB_PeripheralLib* cb, const void* metadata)
+{
+  if (frontend == NULL || cb == NULL)
+    return;
+  return cb->MediaInserted(frontend->addonData, metadata);
+}
+
+DLLEXPORT void PERIPHERAL_media_removed(AddonCB* frontend, CB_PeripheralLib* cb, const void* metadata)
+{
+  if (frontend == NULL || cb == NULL)
+    return;
+  return cb->MediaRemoved(frontend->addonData, metadata);
+}
+
 #ifdef __cplusplus
 }
 #endif

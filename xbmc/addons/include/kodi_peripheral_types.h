@@ -253,6 +253,15 @@ extern "C"
 
   // TODO: Mouse, light gun, multitouch
 
+  /// @name Media Reader types
+  ///{
+  typedef struct MEDIA_READER_INFO
+  {
+    PERIPHERAL_INFO      peripheral_info;    /*!< @brief inherited info */
+    char*                system;             /*!< @brief system type of the media reader */
+  } ATTRIBUTE_PACKED MEDIA_READER_INFO;
+  ///}
+
   /*!
    * @brief Structure to transfer the methods from kodi_peripheral_dll.h to the frontend
    */
@@ -273,6 +282,13 @@ extern "C"
     PERIPHERAL_ERROR (__cdecl* GetButtonMap)(const JOYSTICK_INFO*, const char*, unsigned int*, JOYSTICK_FEATURE**);
     void             (__cdecl* FreeButtonMap)(unsigned int, JOYSTICK_FEATURE*);
     PERIPHERAL_ERROR (__cdecl* MapJoystickFeature)(const JOYSTICK_INFO*, const char*, JOYSTICK_FEATURE*);
+    ///}
+
+    /// @name Media reader operations
+    ///{
+    PERIPHERAL_ERROR (__cdecl* GetMediaReaderInfo)(unsigned int, MEDIA_READER_INFO*);
+    void             (__cdecl* FreeMediaReaderInfo)(MEDIA_READER_INFO*);
+    PERIPHERAL_ERROR (__cdecl* EjectMedia)(unsigned int);
     ///}
   } PeripheralAddon;
 

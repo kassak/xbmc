@@ -23,6 +23,7 @@
 #include "kodi_peripheral_types.h"
 
 #define PERIPHERAL_ADDON_JOYSTICKS // TODO
+#define PERIPHERAL_ADDON_MEDIA_READER // TODO
 
 #ifdef __cplusplus
 extern "C"
@@ -158,6 +159,40 @@ extern "C"
 #endif
   ///}
 
+  /// @name Media reader operations
+  /*!
+   * @note #define PERIPHERAL_ADDON_MEDIA_READER before including xbmc_peripheral_dll.h
+   * in the add-on if the add-on provides media readers and add
+   * provides_media_readers="true" to the xbmc.peripheral extension point node
+   * in addon.xml.
+   */
+  ///{
+#ifdef PERIPHERAL_ADDON_MEDIA_READER
+  /*!
+   * @brief Get the media reader metadata from a metadata file
+   * @param The handle for the metadata, must be freed by MediaFreeMetadata()
+   * @remarks Valid implementation required if HARDWARE_ADDON_MEDIA_READER is defined
+   */
+  PERIPHERAL_ERROR GetMediaReaderInfo(unsigned int index, MEDIA_READER_INFO* metadata);
+
+  /*!
+   * @brief Free a metadata struct allocated by the add-on
+   * @param metadata The metadata struct to free
+   * @remarks Valid implementation required if PERIPHERAL_ADDON_MEDIA_READER is defined
+   */
+  void FreeMediaReaderInfo(MEDIA_READER_INFO* metadata);
+
+  /*!
+   * @brief Eject the specified peripheral index
+   * @param index The peripheral index
+   * @remarks Optional, in which case PERIPHERAL_ERROR_NOT_IMPLEMENTED should be returned.
+   */
+  PERIPHERAL_ERROR EjectMedia(unsigned int index);
+
+  // TODO: Functions to open, close, read, seek and get position for media
+#endif
+  ///}
+
   /*!
    * Called by the frontend to assign the function pointers of this add-on to
    * pClient. Note that get_addon() is defined here, so it will be available in
@@ -179,6 +214,12 @@ extern "C"
     pClient->GetButtonMap                   = GetButtonMap;
     pClient->FreeButtonMap                  = FreeButtonMap;
     pClient->MapJoystickFeature             = MapJoystickFeature;
+#endif
+
+#ifdef PERIPHERAL_ADDON_MEDIA_READER
+    pClient->GetMediaReaderInfo             = GetMediaReaderInfo;
+    pClient->FreeMediaReaderInfo            = FreeMediaReaderInfo;
+    pClient->EjectMedia                     = EjectMedia;
 #endif
   }
 

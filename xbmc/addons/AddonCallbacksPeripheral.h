@@ -44,6 +44,8 @@ public:
 
   static void TriggerScan(void* addonData);
   static void RefreshButtonMaps(void* addonData, const char* deviceName);
+  static void MediaInserted(void* addonData, const void* metadata);
+  static void MediaRemoved(void* addonData, const void* metadata);
 
 private:
   static PERIPHERALS::CPeripheralAddon* GetPeripheralAddon(void* addonData, const char* strFunction);

@@ -39,6 +39,8 @@ CAddonCallbacksPeripheral::CAddonCallbacksPeripheral(CAddon* addon)
   /* write XBMC peripheral specific add-on function addresses to callback table */
   m_callbacks->TriggerScan               = TriggerScan;
   m_callbacks->RefreshButtonMaps         = RefreshButtonMaps;
+  m_callbacks->MediaInserted             = MediaInserted;
+  m_callbacks->MediaRemoved              = MediaRemoved;
 }
 
 CAddonCallbacksPeripheral::~CAddonCallbacksPeripheral()
@@ -72,5 +74,26 @@ void CAddonCallbacksPeripheral::RefreshButtonMaps(void* addonData, const char* d
 
   peripheralAddon->RefreshButtonMaps(deviceName ? deviceName : "");
 }
+
+void CAddonCallbacksPeripheral::MediaInserted(void* addonData, const void* metadata)
+{
+  CPeripheralAddon *addon = GetPeripheralAddon(addonData, __FUNCTION__);
+  if (!addon)
+  {
+    CLog::Log(LOGERROR, "HARDWARE - %s - invalid handler data", __FUNCTION__);
+    return;
+  }
+
+  // TODO
+}
+
+void CAddonCallbacksPeripheral::MediaRemoved(void* addonData, const void* metadata)
+{
+  CPeripheralAddon *addon = GetPeripheralAddon(addonData, __FUNCTION__);
+  if (!addon)
+  {
+    CLog::Log(LOGERROR, "HARDWARE - %s - invalid handler data", __FUNCTION__);
+    return;
+  }
 
 }; /* namespace ADDON */

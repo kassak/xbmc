@@ -87,6 +87,10 @@ namespace PERIPHERALS
     void UnregisterButtonMap(IJoystickButtonMap* buttonMap);
     void RefreshButtonMaps(const std::string& strDeviceName = "", const std::string& strControllerId = "");
 
+    /** @name Media reader methods */
+    //@{
+    //@}
+
     static const char* ToString(PERIPHERAL_ERROR error);
 
   protected:
