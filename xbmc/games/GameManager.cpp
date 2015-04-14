@@ -124,8 +124,6 @@ bool CGameManager::UpdateAddons()
   {
     CSingleLock lock(m_critSection);
 
-    m_failedControllers.clear();
-
     for (VECADDONS::const_iterator it = controllers.begin(); it != controllers.end(); it++)
     {
       const GameControllerPtr& controller = std::dynamic_pointer_cast<CGameController>(*it);
@@ -133,20 +131,22 @@ bool CGameManager::UpdateAddons()
       if (!controller)
         continue;
 
-      GameControllerPtr dummy;
-      if (GetController(controller->ID(), dummy))
+      if (m_controllers.find(controller->ID()) != m_controllers.end())
         continue; // Already registered
 
-      if (controller->LoadLayout())
+      if (!controller->LoadLayout())
       {
-        m_controllers[controller->ID()] = controller;
-        CLog::Log(LOGDEBUG, "GameManager: Registered controller %s", controller->ID().c_str());
+        CLog::Log(LOGERROR, "Failed to load controller %s", controller->ID().c_str());
+        continue;
       }
-      else
+
+      if (controller->Layout().FeatureCount() == 0)
       {
-        m_failedControllers[controller->ID()] = controller;
-        CLog::Log(LOGERROR, "GameManager: Failed to register controller %s", controller->ID().c_str());
+        CLog::Log(LOGERROR, "Controller %s: no features!", controller->ID().c_str());
+        continue;
       }
+
+      m_controllers[controller->ID()] = controller;
     }
 
     // Check if add-ons have been removed
@@ -249,13 +249,6 @@ bool CGameManager::GetController(const std::string& strControllerId, GameControl
   if (it != m_controllers.end())
   {
     addon = it->second;
-    return true;
-  }
-
-  ControllerMap::const_iterator itFailed = m_failedControllers.find(strControllerId);
-  if (itFailed != m_failedControllers.end())
-  {
-    addon = itFailed->second;
     return true;
   }
 

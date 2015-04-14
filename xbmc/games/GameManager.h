@@ -117,7 +117,6 @@ namespace GAME
 
     GameClientMap         m_gameClients;
     ControllerMap         m_controllers;
-    ControllerMap         m_failedControllers;
     std::set<std::string> m_gameExtensions;
     CGameFileAutoLauncher m_fileLauncher;
     CCriticalSection      m_critSection;
