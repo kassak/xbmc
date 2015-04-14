@@ -443,7 +443,7 @@ unsigned int CGameClient::RewindFrames(unsigned int frames)
 
 bool CGameClient::OpenPort(unsigned int port)
 {
-  std::vector<GameControllerPtr> controllers = GetControllers();
+  GameControllerVector controllers = GetControllers();
   if (!controllers.empty()) // TODO: Choose controller
   {
     if (port >= m_controllers.size())
@@ -511,9 +511,9 @@ void CGameClient::UpdatePort(unsigned int port, const GameControllerPtr& control
   }
 }
 
-std::vector<GameControllerPtr> CGameClient::GetControllers(void) const
+GameControllerVector CGameClient::GetControllers(void) const
 {
-  std::vector<GameControllerPtr> controllers;
+  GameControllerVector controllers;
 
   const ADDONDEPS& dependencies = GetDeps();
   for (ADDONDEPS::const_iterator it = dependencies.begin(); it != dependencies.end(); ++it)

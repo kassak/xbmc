@@ -174,7 +174,7 @@ private:
   bool InitSerialization();
 
   void ClearPorts(void);
-  std::vector<GameControllerPtr> GetControllers(void) const;
+  GameControllerVector GetControllers(void) const;
 
   // Helper functions
   static std::vector<std::string> ParseExtensions(const std::string& strExtensionList);
