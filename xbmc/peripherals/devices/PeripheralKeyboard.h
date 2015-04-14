@@ -46,7 +46,8 @@ namespace PERIPHERALS
     virtual void OnKeyRelease(const CKey& key);
 
   private:
-    typedef std::vector<std::pair<IJoystickDriverHandler*, IKeyboardHandler*> > KeyboardHandlerVector;
+    typedef std::pair<IJoystickDriverHandler*, IKeyboardHandler*> KeyboardHandlerHandle;
+    typedef std::vector<KeyboardHandlerHandle>                    KeyboardHandlerVector;
 
     KeyboardHandlerVector m_keyboardHandlers;
     CCriticalSection      m_handlerMutex;
