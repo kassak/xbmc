@@ -83,7 +83,7 @@ bool CGameControllerFeature::Deserialize(const TiXmlElement* pElement)
 
   // Label
   std::string strLabel = XMLUtils::GetAttribute(pElement, LAYOUT_XML_ATTR_FEATURE_LABEL);
-  if (strLabel.empty())
+  if (m_type != FEATURE_KEY && strLabel.empty())
   {
     CLog::Log(LOGERROR, "<%s> tag has no \"%s\" attribute", strType.c_str(), LAYOUT_XML_ATTR_FEATURE_LABEL);
     return false;
