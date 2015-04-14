@@ -21,6 +21,7 @@
 #include "PeripheralAddon.h"
 #include "AddonJoystickButtonMap.h"
 #include "addons/AddonManager.h"
+#include "filesystem/Directory.h"
 #include "filesystem/SpecialProtocol.h"
 #include "games/addons/GameController.h"
 #include "input/joysticks/IJoystickButtonMap.h"
@@ -39,6 +40,7 @@
 
 using namespace GAME;
 using namespace PERIPHERALS;
+using namespace XFILE;
 
 #define JOYSTICK_KEYBOARD_PROVIDER  "application"
 
@@ -102,6 +104,10 @@ ADDON_STATUS CPeripheralAddon::CreateAddon(void)
 
   /* reset all properties to defaults */
   ResetProperties();
+
+  /* create directory for user data */
+  if (!CDirectory::Exists(m_strUserPath))
+    CDirectory::Create(m_strUserPath);
 
   /* initialise the add-on */
   CLog::Log(LOGDEBUG, "PERIPHERAL - %s - creating peripheral add-on instance '%s'", __FUNCTION__, Name().c_str());
