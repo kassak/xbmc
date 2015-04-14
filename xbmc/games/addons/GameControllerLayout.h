@@ -44,7 +44,7 @@ public:
 
   const std::vector<CGameControllerFeature>& Features(void) const { return m_features; }
 
-  unsigned int FeatureCount(FeatureType type, ButtonType buttonType = BUTTON_UNKNOWN) const;
+  unsigned int FeatureCount(FeatureType type = FEATURE_UNKNOWN, ButtonType buttonType = BUTTON_UNKNOWN) const;
 
   bool Deserialize(const TiXmlElement* pLayoutElement);
 

@@ -36,8 +36,16 @@ struct FeatureTypeEqual
 
   bool operator()(const CGameControllerFeature& feature) const
   {
+    if (type == FEATURE_UNKNOWN)
+      return true; // Match all feature types
+
     if (type == FEATURE_BUTTON && feature.Type() == FEATURE_BUTTON)
-      return buttonType == BUTTON_UNKNOWN || buttonType == feature.ButtonType();
+    {
+      if (buttonType == BUTTON_UNKNOWN)
+        return true; // Match all button types
+
+      return buttonType == feature.ButtonType();
+    }
 
     return type == feature.Type();
   }
@@ -58,7 +66,8 @@ void CGameControllerLayout::Reset(void)
   m_features.clear();
 }
 
-unsigned int CGameControllerLayout::FeatureCount(FeatureType type, ButtonType buttonType /* = BUTTON_UNKNOWN */) const
+unsigned int CGameControllerLayout::FeatureCount(FeatureType type       /* = FEATURE_UNKNOWN */,
+                                                 ButtonType  buttonType /* = BUTTON_UNKNOWN */) const
 {
   return std::count_if(m_features.begin(), m_features.end(), FeatureTypeEqual(type, buttonType));
 }
