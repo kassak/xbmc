@@ -614,7 +614,7 @@ const GameControllerPtr& CPeripheralAddon::GetGameController(const std::string& 
   if (ADDON::CAddonMgr::Get().GetAddon(strControllerId, addon, ADDON::ADDON_GAME_CONTROLLER))
   {
     GameControllerPtr controller = std::dynamic_pointer_cast<CGameController>(addon);
-    if (controller && controller->LoadLayout())
+    if (controller)
     {
       GameControllerPtr& controllerRef = m_gameControllers[strControllerId];
       controllerRef = controller;

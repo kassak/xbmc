@@ -522,7 +522,7 @@ GameControllerVector CGameClient::GetControllers(void) const
     if (CAddonMgr::Get().GetAddon(it->first, addon, ADDON_GAME_CONTROLLER))
     {
       GameControllerPtr controller = std::dynamic_pointer_cast<CGameController>(addon);
-      if (controller && controller->LoadLayout())
+      if (controller)
         controllers.push_back(controller);
     }
   }

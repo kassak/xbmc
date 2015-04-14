@@ -135,6 +135,9 @@ bool CGameManager::UpdateAddons()
       if (itController != m_controllers.end())
         continue; // Already registered
 
+      if (!controller->LoadLayout())
+        continue;
+
       m_controllers[controller->ID()] = controller;
 
       CLog::Log(LOGDEBUG, "GameManager: Registered controller %s", controller->ID().c_str());

@@ -188,17 +188,21 @@ bool CGUIWindowGameControllers::LoadController(const GameControllerPtr& controll
 {
   if (controller)
   {
+    bool bFound = false;
+
     for (GameControllerVector::const_iterator it = m_controllers.begin(); it != m_controllers.end(); ++it)
     {
       if ((*it)->ID() == controller->ID())
-        return true; // Already loaded
+      {
+        bFound = true;
+        break;
+      }
     }
 
-    if (controller->LoadLayout())
-    {
+    if (!bFound)
       m_controllers.push_back(controller);
-      return true;
-    }
+
+    return true;
   }
 
   return false;

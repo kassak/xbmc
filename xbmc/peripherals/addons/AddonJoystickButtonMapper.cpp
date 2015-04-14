@@ -124,7 +124,7 @@ const std::string& CAddonJoystickButtonMapper::GetFeatureName(unsigned int featu
   if (!m_controller && CAddonMgr::Get().GetAddon(m_strControllerId, addon, ADDON_GAME_CONTROLLER))
     m_controller = std::dynamic_pointer_cast<CGameController>(addon);
 
-  if (m_controller && m_controller->LoadLayout())
+  if (m_controller)
   {
     const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
     if (featureIndex < features.size())
