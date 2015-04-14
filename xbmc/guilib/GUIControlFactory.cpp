@@ -112,7 +112,7 @@ static const ControlMapping controls[] =
     {"scrollbar",         CGUIControl::GUICONTROL_SCROLLBAR},
     {"multiselect",       CGUIControl::GUICONTROL_MULTISELECT},
     {"focusplane",        CGUIControl::GUICONTROL_FOCUSPLANE},
-    {"gameperipheral",    CGUIControl::GUICONTROL_GAMECONTROLLER},
+    {"gamecontroller",    CGUIControl::GUICONTROL_GAMECONTROLLER},
     {"list",              CGUIControl::GUICONTAINER_LIST},
     {"wraplist",          CGUIControl::GUICONTAINER_WRAPLIST},
     {"fixedlist",         CGUIControl::GUICONTAINER_FIXEDLIST},

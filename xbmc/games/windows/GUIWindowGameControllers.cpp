@@ -86,7 +86,7 @@ bool CGUIJoystickInputHandler::OnAccelerometerMotion(unsigned int featureIndex, 
 // --- CGUIWindowGameControllers -----------------------------------------------
 
 CGUIWindowGameControllers::CGUIWindowGameControllers(void) :
-  CGUIWindow(WINDOW_GAME_PERIPHERALS, "GameControllers.xml"),
+  CGUIWindow(WINDOW_GAME_CONTROLLERS, "GameControllers.xml"),
   m_selectedItem(-1)
 {
 }

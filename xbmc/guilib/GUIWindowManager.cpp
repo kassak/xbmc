@@ -405,7 +405,7 @@ bool CGUIWindowManager::DestroyWindows()
     Delete(WINDOW_PICTURES);
     Delete(WINDOW_WEATHER);
     Delete(WINDOW_GAMES);
-    Delete(WINDOW_GAME_PERIPHERALS);
+    Delete(WINDOW_GAME_CONTROLLERS);
     Delete(WINDOW_DIALOG_CONTROLLER_INPUT);
 
     Delete(WINDOW_SETTINGS_MYPICTURES);
