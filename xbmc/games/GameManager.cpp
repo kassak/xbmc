@@ -275,6 +275,17 @@ void CGameManager::GetGameClientIDs(const CFileItem& file, std::vector<std::stri
   }
 }
 
+std::string CGameManager::GetFeatureName(const std::string& strControllerId, unsigned int featureIndex) const
+{
+  CSingleLock lock(m_critSection);
+
+  GameControllerPtr controller;
+  if (GetController(strControllerId, controller) && featureIndex < controller->Layout().FeatureCount())
+    return controller->Layout().Features()[featureIndex].Name();
+
+  return "";
+}
+
 void CGameManager::GetExtensions(std::vector<std::string> &exts) const
 {
   CSingleLock lock(m_critSection);

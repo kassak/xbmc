@@ -79,6 +79,8 @@ namespace GAME
      */
     void GetGameClientIDs(const CFileItem& file, std::vector<std::string>& candidates) const;
 
+    std::string GetFeatureName(const std::string& strControllerId, unsigned int featureIndex) const;
+
     /**
      * Get a list of valid game client extensions (as determined by the tag in
      * addon.xml). Includes game clients in remote repositories.

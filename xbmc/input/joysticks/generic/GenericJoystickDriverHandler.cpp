@@ -20,6 +20,7 @@
 
 #include "GenericJoystickDriverHandler.h"
 #include "DigitalAnalogButtonConverter.h"
+#include "games/GameManager.h"
 #include "input/joysticks/IJoystickButtonMap.h"
 #include "input/joysticks/IJoystickInputHandler.h"
 #include "input/joysticks/JoystickDriverPrimitive.h"
@@ -51,8 +52,10 @@ bool CGenericJoystickDriverHandler::OnButtonMotion(unsigned int buttonIndex, boo
   unsigned int feature;
   if (m_buttonMap->GetFeature(CJoystickDriverPrimitive(buttonIndex), feature))
   {
-    CLog::Log(LOGDEBUG, "CGenericJoystickDriverHandler: %s feature %u %s",
-              m_handler->ControllerID().c_str(), feature, bPressed ? "pressed" : "released");
+    CLog::Log(LOGDEBUG, "CGenericJoystickDriverHandler: %s feature [ %s ] %s",
+              m_handler->ControllerID().c_str(),
+              GAME::CGameManager::Get().GetFeatureName(m_handler->ControllerID(), feature).c_str(),
+              bPressed ? "pressed" : "released");
 
     char& wasPressed = m_buttonStates[buttonIndex];
 
@@ -104,8 +107,11 @@ bool CGenericJoystickDriverHandler::ProcessHatDirection(int index,
       if (bActivated)
         bHandled = true;
 
-      CLog::Log(LOGDEBUG, "CGenericJoystickDriverHandler: %s feature %u %s",
-                m_handler->ControllerID().c_str(), feature, bActivated ? "activated" : "deactivated");
+      CLog::Log(LOGDEBUG, "CGenericJoystickDriverHandler: %s feature [ %s ] %s from hat",
+                m_handler->ControllerID().c_str(),
+                GAME::CGameManager::Get().GetFeatureName(m_handler->ControllerID(), feature).c_str(),
+                bActivated ? "activated" : "deactivated");
+
       m_handler->OnButtonPress(feature, bActivated);
     }
   }
