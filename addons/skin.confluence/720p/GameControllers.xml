@@ -33,7 +33,7 @@
 				<left>100</left>
 				<top>75</top>
 				<width>480</width>
-				<height>260</height>
+				<height>286</height>
 				<include>VisibleFadeEffect</include>
 				<include>Window_OpenClose_Animation</include>
 			</control>
