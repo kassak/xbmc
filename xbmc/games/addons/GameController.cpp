@@ -41,12 +41,14 @@ CCircle CGameController::Scale(const CCircle& focusArea, float layoutWidth, floa
 */
 
 CGameController::CGameController(const ADDON::AddonProps &addonprops)
-  : CAddon(addonprops)
+  : CAddon(addonprops),
+    m_bLoaded(false)
 {
 }
 
 CGameController::CGameController(const cp_extension_t *ext)
-  : CAddon(ext)
+  : CAddon(ext),
+    m_bLoaded(false)
 {
 }
 
