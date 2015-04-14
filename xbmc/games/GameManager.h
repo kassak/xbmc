@@ -63,6 +63,8 @@ namespace GAME
 
     virtual bool GetClient(const std::string& strClientId, GameClientPtr& addon) const;
 
+    bool GetController(const std::string& strControllerId, GameControllerPtr& controller) const;
+
     /**
      * Resolve a file item to a list of game client IDs.
      *
@@ -105,9 +107,14 @@ namespace GAME
     virtual bool UpdateAddons();
     void UpdateExtensions();
 
-    typedef std::map<std::string, GameClientPtr> GameClientMap;
+    typedef std::string                           GameClientID;
+    typedef std::map<GameClientID, GameClientPtr> GameClientMap;
+
+    typedef std::string                               ControllerID;
+    typedef std::map<ControllerID, GameControllerPtr> ControllerMap;
 
     GameClientMap         m_gameClients;
+    ControllerMap         m_controllers;
     std::set<std::string> m_gameExtensions;
     CGameFileAutoLauncher m_fileLauncher;
     CCriticalSection      m_critSection;

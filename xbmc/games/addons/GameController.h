@@ -37,6 +37,9 @@ public:
 
   static const GameControllerPtr EmptyPtr;
 
+  // implementation of CAddon
+  virtual ADDON::AddonPtr GetRunningInstance(void) const;
+
   std::string Label(void);
   std::string ImagePath(void) const;
   std::string OverlayPath(void) const;
@@ -47,6 +50,7 @@ public:
 
 private:
   CGameControllerLayout m_layout;
+  bool                  m_bLoaded;
 };
 
 }

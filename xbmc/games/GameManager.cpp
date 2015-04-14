@@ -63,8 +63,23 @@ static const PortMapping ports[] =
 };
 */
 
+// --- AddonIdEqual ------------------------------------------------------------
 
-/* static */
+namespace GAME
+{
+  struct AddonIdEqual
+  {
+    AddonIdEqual(const std::string& strId) : m_strId(strId) { }
+
+    bool operator()(const AddonPtr& addon) const { return addon && addon->ID() == m_strId; }
+
+  private:
+    const std::string m_strId;
+  };
+}
+
+// --- CGameManager ------------------------------------------------------------
+
 CGameManager& CGameManager::Get()
 {
   static CGameManager gameManagerInstance;
@@ -103,6 +118,44 @@ bool CGameManager::UpdateAddons()
         CAddonMgr::Get().DisableAddon((*it)->ID());
     }
   }
+
+  VECADDONS controllers;
+  if (CAddonMgr::Get().GetAddons(ADDON_GAME_CONTROLLER, controllers, true))
+  {
+    CSingleLock lock(m_critSection);
+
+    for (VECADDONS::const_iterator it = controllers.begin(); it != controllers.end(); it++)
+    {
+      const GameControllerPtr& controller = std::dynamic_pointer_cast<CGameController>(*it);
+
+      if (!controller)
+        continue;
+
+      ControllerMap::const_iterator itController = m_controllers.find(controller->ID());
+      if (itController != m_controllers.end())
+        continue; // Already registered
+
+      m_controllers[controller->ID()] = controller;
+
+      CLog::Log(LOGDEBUG, "GameManager: Registered controller %s", controller->ID().c_str());
+    }
+
+    // Check if add-ons have been removed
+    if (controllers.size() < m_controllers.size())
+    {
+      for (ControllerMap::const_iterator it = m_controllers.begin(); it != m_controllers.end(); ++it)
+      {
+        bool bFound = std::count_if(controllers.begin(), controllers.end(), AddonIdEqual(it->first)) > 0;
+
+        if (!bFound)
+        {
+          m_controllers.erase(it);
+          it = m_controllers.begin();
+        }
+      }
+    }
+  }
+
   return true;
 }
 
@@ -177,6 +230,19 @@ bool CGameManager::GetClient(const std::string& strClientId, GameClientPtr& addo
   if (itr != m_gameClients.end())
   {
     addon = itr->second;
+    return true;
+  }
+  return false;
+}
+
+bool CGameManager::GetController(const std::string& strControllerId, GameControllerPtr& addon) const
+{
+  CSingleLock lock(m_critSection);
+
+  ControllerMap::const_iterator it = m_controllers.find(strControllerId);
+  if (it != m_controllers.end())
+  {
+    addon = it->second;
     return true;
   }
   return false;

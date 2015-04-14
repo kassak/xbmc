@@ -20,6 +20,7 @@
 
 #include "GameController.h"
 #include "games/GameDefinitions.h"
+#include "games/GameManager.h"
 #include "utils/log.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
@@ -49,6 +50,15 @@ CGameController::CGameController(const cp_extension_t *ext)
 {
 }
 
+ADDON::AddonPtr CGameController::GetRunningInstance(void) const
+{
+  GameControllerPtr controller;
+  if (CGameManager::Get().GetController(ID(), controller))
+    return std::dynamic_pointer_cast<CAddon>(controller);
+
+  return CAddon::GetRunningInstance();
+}
+
 std::string CGameController::Label(void)
 {
   if (m_layout.Label() > 0)
@@ -72,26 +82,29 @@ std::string CGameController::OverlayPath(void) const
 
 bool CGameController::LoadLayout(void)
 {
-  std::string strLayoutXmlPath = LibPath();
-
-  CXBMCTinyXML xmlDoc;
-  if (!xmlDoc.LoadFile(strLayoutXmlPath))
+  if (!m_bLoaded)
   {
-    CLog::Log(LOGDEBUG, "Unable to load %s: %s at line %d", strLayoutXmlPath.c_str(), xmlDoc.ErrorDesc(), xmlDoc.ErrorRow());
-    return false;
+    std::string strLayoutXmlPath = LibPath();
+
+    CXBMCTinyXML xmlDoc;
+    if (!xmlDoc.LoadFile(strLayoutXmlPath))
+    {
+      CLog::Log(LOGDEBUG, "Unable to load %s: %s at line %d", strLayoutXmlPath.c_str(), xmlDoc.ErrorDesc(), xmlDoc.ErrorRow());
+      return false;
+    }
+
+    TiXmlElement* pRootElement = xmlDoc.RootElement();
+    if (!pRootElement || pRootElement->NoChildren() || pRootElement->ValueStr() != LAYOUT_XML_ROOT)
+    {
+      CLog::Log(LOGERROR, "%s: Can't find root <%s> tag", strLayoutXmlPath.c_str(), LAYOUT_XML_ROOT);
+      return false;
+    }
+
+    CLog::Log(LOGINFO, "Loading controller layout %s", strLayoutXmlPath.c_str());
+
+    if (m_layout.Deserialize(pRootElement))
+      m_bLoaded = true;
   }
 
-  TiXmlElement* pRootElement = xmlDoc.RootElement();
-  if (!pRootElement || pRootElement->NoChildren() || pRootElement->ValueStr() != LAYOUT_XML_ROOT)
-  {
-    CLog::Log(LOGERROR, "%s: Can't find root <%s> tag", strLayoutXmlPath.c_str(), LAYOUT_XML_ROOT);
-    return false;
-  }
-
-  CLog::Log(LOGINFO, "Loading controller layout %s", strLayoutXmlPath.c_str());
-
-  if (!m_layout.Deserialize(pRootElement))
-    return false;
-
-  return true;
+  return m_bLoaded;
 }

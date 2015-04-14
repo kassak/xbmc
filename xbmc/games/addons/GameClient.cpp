@@ -444,7 +444,7 @@ unsigned int CGameClient::RewindFrames(unsigned int frames)
 bool CGameClient::OpenPort(unsigned int port)
 {
   std::vector<GameControllerPtr> controllers = GetControllers();
-  if (!controllers.empty() && controllers[0]->LoadLayout()) // TODO: Choose controller
+  if (!controllers.empty()) // TODO: Choose controller
   {
     if (port >= m_controllers.size())
       m_controllers.resize(port + 1);
@@ -520,7 +520,11 @@ std::vector<GameControllerPtr> CGameClient::GetControllers(void) const
   {
     AddonPtr addon;
     if (CAddonMgr::Get().GetAddon(it->first, addon, ADDON_GAME_CONTROLLER))
-      controllers.push_back(std::dynamic_pointer_cast<CGameController>(addon));
+    {
+      GameControllerPtr controller = std::dynamic_pointer_cast<CGameController>(addon);
+      if (controller && controller->LoadLayout())
+        controllers.push_back(controller);
+    }
   }
 
   return controllers;
