@@ -52,9 +52,9 @@ namespace PERIPHERALS
     static JOYSTICK_DRIVER_HAT_DIRECTION      ToHatDirection(HatDirection dir);
     static JOYSTICK_DRIVER_SEMIAXIS_DIRECTION ToSemiAxisDirection(SemiAxisDirection dir);
 
-    CPeripheral* const              m_device;
-    const PeripheralAddonPtr        m_addon;
-    const std::string               m_strControllerId;
-    mutable GAME::GameControllerPtr m_controller; // Loaded on demand
+    CPeripheral* const       m_device;
+    const PeripheralAddonPtr m_addon;
+    const std::string        m_strControllerId;
+    GAME::GameControllerPtr  m_controller;
   };
 }

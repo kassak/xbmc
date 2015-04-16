@@ -37,17 +37,23 @@ CAddonJoystickButtonMapper::CAddonJoystickButtonMapper(CPeripheral* device, cons
 
 bool CAddonJoystickButtonMapper::Load(void)
 {
-  return m_addon.get() != NULL;
+  if (m_addon)
+  {
+    AddonPtr addon;
+    if (CAddonMgr::Get().GetAddon(m_strControllerId, addon, ADDON_GAME_CONTROLLER))
+      m_controller = std::dynamic_pointer_cast<CGameController>(addon);
+  }
+
+  return m_controller.get() != NULL;
 }
 
 bool CAddonJoystickButtonMapper::MapButton(unsigned int featureIndex, const CJoystickDriverPrimitive& primitive)
 {
   bool retVal(false);
 
-  if (m_addon)
+  const std::string& strFeatureName = GetFeatureName(featureIndex);
+  if (!strFeatureName.empty())
   {
-    const std::string& strFeatureName = GetFeatureName(featureIndex);
-
     switch (primitive.Type())
     {
       case DriverPrimitiveTypeButton:
@@ -82,10 +88,9 @@ bool CAddonJoystickButtonMapper::MapAnalogStick(unsigned int featureIndex,
 {
   bool retVal(false);
 
-  if (m_addon)
+  const std::string& strFeatureName = GetFeatureName(featureIndex);
+  if (!strFeatureName.empty())
   {
-    const std::string& strFeatureName = GetFeatureName(featureIndex);
-
     ADDON::DriverAnalogStick driverAnalogStick(featureIndex, strFeatureName,
                                                horizIndex, horizInverted,
                                                vertIndex,  vertInverted);
@@ -103,10 +108,9 @@ bool CAddonJoystickButtonMapper::MapAccelerometer(unsigned int featureIndex,
 {
   bool retVal(false);
 
-  if (m_addon)
+  const std::string& strFeatureName = GetFeatureName(featureIndex);
+  if (!strFeatureName.empty())
   {
-    const std::string& strFeatureName = GetFeatureName(featureIndex);
-
     ADDON::DriverAccelerometer driverAccelerometer(featureIndex, strFeatureName,
                                                    xIndex, xInverted,
                                                    yIndex, yInverted,
@@ -120,10 +124,6 @@ bool CAddonJoystickButtonMapper::MapAccelerometer(unsigned int featureIndex,
 
 const std::string& CAddonJoystickButtonMapper::GetFeatureName(unsigned int featureIndex) const
 {
-  AddonPtr addon;
-  if (!m_controller && CAddonMgr::Get().GetAddon(m_strControllerId, addon, ADDON_GAME_CONTROLLER))
-    m_controller = std::dynamic_pointer_cast<CGameController>(addon);
-
   if (m_controller)
   {
     const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
