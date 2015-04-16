@@ -18,36 +18,35 @@
  *
  */
 
-#include "AddonJoystickButtonMapper.h"
+#include "AddonJoystickButtonMapWO.h"
 #include "addons/AddonManager.h"
 #include "addons/include/kodi_peripheral_utils.hpp"
 #include "games/addons/GameController.h"
-#include "peripherals/Peripherals.h"
 
 using namespace ADDON;
 using namespace GAME;
 using namespace PERIPHERALS;
 
-CAddonJoystickButtonMapper::CAddonJoystickButtonMapper(CPeripheral* device, const std::string& strControllerId)
+CAddonJoystickButtonMapWO::CAddonJoystickButtonMapWO(CPeripheral* device, const PeripheralAddonPtr& addon, const std::string& strControllerId)
   : m_device(device),
-    m_addon(g_peripherals.GetAddon(device)),
+    m_addon(addon),
     m_strControllerId(strControllerId)
 {
 }
 
-bool CAddonJoystickButtonMapper::Load(void)
+bool CAddonJoystickButtonMapWO::Load(void)
 {
-  if (m_addon)
+  if (!m_controller)
   {
     AddonPtr addon;
     if (CAddonMgr::Get().GetAddon(m_strControllerId, addon, ADDON_GAME_CONTROLLER))
       m_controller = std::dynamic_pointer_cast<CGameController>(addon);
   }
 
-  return m_controller.get() != NULL;
+  return m_addon.get() != NULL && m_controller.get() != NULL;
 }
 
-bool CAddonJoystickButtonMapper::MapButton(unsigned int featureIndex, const CJoystickDriverPrimitive& primitive)
+bool CAddonJoystickButtonMapWO::MapButton(unsigned int featureIndex, const CJoystickDriverPrimitive& primitive)
 {
   bool retVal(false);
 
@@ -82,7 +81,7 @@ bool CAddonJoystickButtonMapper::MapButton(unsigned int featureIndex, const CJoy
   return retVal;
 }
 
-bool CAddonJoystickButtonMapper::MapAnalogStick(unsigned int featureIndex,
+bool CAddonJoystickButtonMapWO::MapAnalogStick(unsigned int featureIndex,
                                                 int horizIndex, bool horizInverted,
                                                 int vertIndex,  bool vertInverted)
 {
@@ -101,7 +100,7 @@ bool CAddonJoystickButtonMapper::MapAnalogStick(unsigned int featureIndex,
   return retVal;
 }
 
-bool CAddonJoystickButtonMapper::MapAccelerometer(unsigned int featureIndex,
+bool CAddonJoystickButtonMapWO::MapAccelerometer(unsigned int featureIndex,
                                                   int xIndex, bool xInverted,
                                                   int yIndex, bool yInverted,
                                                   int zIndex, bool zInverted)
@@ -122,7 +121,7 @@ bool CAddonJoystickButtonMapper::MapAccelerometer(unsigned int featureIndex,
   return retVal;
 }
 
-const std::string& CAddonJoystickButtonMapper::GetFeatureName(unsigned int featureIndex) const
+const std::string& CAddonJoystickButtonMapWO::GetFeatureName(unsigned int featureIndex) const
 {
   if (m_controller)
   {
@@ -135,7 +134,7 @@ const std::string& CAddonJoystickButtonMapper::GetFeatureName(unsigned int featu
   return empty;
 }
 
-JOYSTICK_DRIVER_HAT_DIRECTION CAddonJoystickButtonMapper::ToHatDirection(HatDirection dir)
+JOYSTICK_DRIVER_HAT_DIRECTION CAddonJoystickButtonMapWO::ToHatDirection(HatDirection dir)
 {
   switch (dir)
   {
@@ -148,7 +147,7 @@ JOYSTICK_DRIVER_HAT_DIRECTION CAddonJoystickButtonMapper::ToHatDirection(HatDire
   return JOYSTICK_DRIVER_HAT_UNKNOWN;
 }
 
-JOYSTICK_DRIVER_SEMIAXIS_DIRECTION CAddonJoystickButtonMapper::ToSemiAxisDirection(SemiAxisDirection dir)
+JOYSTICK_DRIVER_SEMIAXIS_DIRECTION CAddonJoystickButtonMapWO::ToSemiAxisDirection(SemiAxisDirection dir)
 {
   switch (dir)
   {

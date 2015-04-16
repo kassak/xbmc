@@ -27,10 +27,8 @@
 #include "guilib/GUIFocusPlane.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
-#include "input/joysticks/JoystickDriverPrimitive.h"
 #include "input/Key.h"
 #include "peripherals/Peripherals.h"
-#include "peripherals/addons/AddonJoystickButtonMapper.h" // TODO
 #include "peripherals/devices/Peripheral.h"
 #include "utils/log.h"
 #include "utils/StringUtils.h"
@@ -185,10 +183,8 @@ bool CGUIDialogControllerInput::OnButton(PERIPHERALS::CPeripheral* device, unsig
 {
   if (IsPrompting())
   {
-    CAddonJoystickButtonMapper mapper(device, m_controller->ID()); // TODO
-
-    if (mapper.Load())
-      mapper.MapButton(m_promptIndex, CJoystickDriverPrimitive(buttonIndex));
+    // TODO
+    //mapper->MapButton(m_promptIndex, CJoystickDriverPrimitive(buttonIndex));
 
     CancelPrompt();
 
@@ -202,10 +198,8 @@ bool CGUIDialogControllerInput::OnHat(PERIPHERALS::CPeripheral* device, unsigned
 {
   if (IsPrompting())
   {
-    CAddonJoystickButtonMapper mapper(device, m_controller->ID()); // TODO
-
-    if (mapper.Load())
-      mapper.MapButton(m_promptIndex, CJoystickDriverPrimitive(hatIndex, direction));
+    // TODO
+    //mapper->MapButton(m_promptIndex, CJoystickDriverPrimitive(hatIndex, direction));
 
     CancelPrompt();
 
