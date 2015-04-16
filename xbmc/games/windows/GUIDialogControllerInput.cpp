@@ -51,14 +51,6 @@ CGUIJoystickDriverHandler::CGUIJoystickDriverHandler(CGUIDialogControllerInput* 
     m_device(device)
 {
   assert(m_dialog);
-  assert(m_device);
-
-  m_device->RegisterJoystickDriverHandler(this);
-}
-
-CGUIJoystickDriverHandler::~CGUIJoystickDriverHandler(void)
-{
-  m_device->UnregisterJoystickDriverHandler(this);
 }
 
 bool CGUIJoystickDriverHandler::OnButtonMotion(unsigned int buttonIndex, bool bPressed)
@@ -390,16 +382,44 @@ CGUIButtonControl* CGUIDialogControllerInput::MakeButton(const std::string& strL
 
 void CGUIDialogControllerInput::AddDriverHandlers(void)
 {
+  // TODO: not thread-safe, peripheral object may be deleted in another thread
   std::vector<CPeripheral*> peripherals = ScanPeripherals();
+
   for (std::vector<CPeripheral*>::iterator it = peripherals.begin(); it != peripherals.end(); ++it)
-    m_driverHandlers.push_back(new CGUIJoystickDriverHandler(this, *it));
+  {
+    CGUIJoystickDriverHandler* handler = new CGUIJoystickDriverHandler(this, *it);
+    m_driverHandlers.push_back(handler);
+    (*it)->RegisterJoystickDriverHandler(handler);
+  }
 }
 
 void CGUIDialogControllerInput::ClearDriverHandlers(void)
 {
+  // TODO: not thread-safe, peripheral object may be deleted in another thread
+  std::vector<CPeripheral*> peripherals = ScanPeripherals();
+
+  for (std::vector<CPeripheral*>::iterator it = peripherals.begin(); it != peripherals.end(); ++it)
+  {
+    CGUIJoystickDriverHandler* handler = GetDriverHandler(*it);
+    if (handler)
+      (*it)->UnregisterJoystickDriverHandler(handler);
+  }
+
   for (std::vector<CGUIJoystickDriverHandler*>::iterator it = m_driverHandlers.begin(); it != m_driverHandlers.end(); ++it)
     delete *it;
+
   m_driverHandlers.clear();
+}
+
+CGUIJoystickDriverHandler* CGUIDialogControllerInput::GetDriverHandler(CPeripheral* peripheral) const
+{
+  for (std::vector<CGUIJoystickDriverHandler*>::const_iterator it = m_driverHandlers.begin(); it != m_driverHandlers.end(); ++it)
+  {
+    if ((*it)->Device() == peripheral)
+      return *it;
+  }
+
+  return NULL;
 }
 
 std::vector<CPeripheral*> CGUIDialogControllerInput::ScanPeripherals(void)

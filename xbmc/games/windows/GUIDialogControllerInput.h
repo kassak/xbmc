@@ -38,13 +38,16 @@ class CGUIJoystickDriverHandler : public IJoystickDriverHandler
 public:
   CGUIJoystickDriverHandler(CGUIDialogControllerInput* dialog, PERIPHERALS::CPeripheral* device);
 
-  virtual ~CGUIJoystickDriverHandler(void);
+  virtual ~CGUIJoystickDriverHandler(void) { }
 
   // Implementation of IJoystickDriverHandler
   virtual bool OnButtonMotion(unsigned int buttonIndex, bool bPressed);
   virtual bool OnHatMotion(unsigned int hatIndex, HatDirection direction);
   virtual bool OnAxisMotion(unsigned int axisIndex, float position);
   virtual void ProcessAxisMotions(void) { }
+
+  // Do not dereference
+  PERIPHERALS::CPeripheral* Device(void) const { return m_device; }
 
 private:
   CGUIDialogControllerInput* const m_dialog;
@@ -97,6 +100,7 @@ private:
 
   void AddDriverHandlers(void);
   void ClearDriverHandlers(void);
+  CGUIJoystickDriverHandler* GetDriverHandler(PERIPHERALS::CPeripheral* peripheral) const;
   std::vector<PERIPHERALS::CPeripheral*> ScanPeripherals(void);
 
   GAME::GameControllerPtr m_controller;
