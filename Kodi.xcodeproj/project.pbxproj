@@ -289,9 +289,6 @@
 		5EE4F9171A9FF2AE002E20F8 /* CueInfoLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5EB3113A1A978B9B00551907 /* CueInfoLoader.cpp */; };
 		5EE4F9181A9FF36F002E20F8 /* CueInfoLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5EB3113A1A978B9B00551907 /* CueInfoLoader.cpp */; };
 		5EF801001A97892A0035AA4D /* ReplayGain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5EF800FE1A97892A0035AA4D /* ReplayGain.cpp */; };
-		683B99381AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 683B99361AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp */; };
-		683B99391AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 683B99361AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp */; };
-		683B993A1AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 683B99361AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp */; };
 		683B993F1AD1FF6200FCD1C7 /* GameTranslator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 683B993E1AD1FF6200FCD1C7 /* GameTranslator.cpp */; };
 		683B99401AD1FF6200FCD1C7 /* GameTranslator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 683B993E1AD1FF6200FCD1C7 /* GameTranslator.cpp */; };
 		683B99411AD1FF6200FCD1C7 /* GameTranslator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 683B993E1AD1FF6200FCD1C7 /* GameTranslator.cpp */; };
@@ -322,6 +319,15 @@
 		684984841ACC97E500F47419 /* GUIGameController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6849847F1ACC97E500F47419 /* GUIGameController.cpp */; };
 		684984851ACC97E500F47419 /* GUIGameController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6849847F1ACC97E500F47419 /* GUIGameController.cpp */; };
 		684984861ACC97E500F47419 /* GUIGameController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6849847F1ACC97E500F47419 /* GUIGameController.cpp */; };
+		686263621AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6862635E1AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp */; };
+		686263631AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6862635E1AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp */; };
+		686263641AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6862635E1AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp */; };
+		686263651AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 686263601AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp */; };
+		686263661AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 686263601AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp */; };
+		686263671AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 686263601AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp */; };
+		6862636A1AE068D900CE83FE /* AddonJoystickButtonMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 686263681AE068D900CE83FE /* AddonJoystickButtonMap.cpp */; };
+		6862636B1AE068D900CE83FE /* AddonJoystickButtonMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 686263681AE068D900CE83FE /* AddonJoystickButtonMap.cpp */; };
+		6862636C1AE068D900CE83FE /* AddonJoystickButtonMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 686263681AE068D900CE83FE /* AddonJoystickButtonMap.cpp */; };
 		6869DE9F1ACC813B005F33E1 /* GameInfoTag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6869DE9B1ACC813B005F33E1 /* GameInfoTag.cpp */; };
 		6869DEA01ACC813B005F33E1 /* GameInfoTag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6869DE9B1ACC813B005F33E1 /* GameInfoTag.cpp */; };
 		6869DEA11ACC813B005F33E1 /* GameInfoTag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6869DE9B1ACC813B005F33E1 /* GameInfoTag.cpp */; };
@@ -385,9 +391,6 @@
 		68D279971ACC6D9000B25E88 /* PortManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68D279951ACC6D9000B25E88 /* PortManager.cpp */; };
 		68D279981ACC6D9000B25E88 /* PortManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68D279951ACC6D9000B25E88 /* PortManager.cpp */; };
 		68D279991ACC6D9000B25E88 /* PortManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68D279951ACC6D9000B25E88 /* PortManager.cpp */; };
-		68D279A11ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68D2799B1ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp */; };
-		68D279A21ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68D2799B1ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp */; };
-		68D279A31ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68D2799B1ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp */; };
 		68D279A41ACC6DBF00B25E88 /* AddonJoystickDriverHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68D2799D1ACC6DBF00B25E88 /* AddonJoystickDriverHandler.cpp */; };
 		68D279A51ACC6DBF00B25E88 /* AddonJoystickDriverHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68D2799D1ACC6DBF00B25E88 /* AddonJoystickDriverHandler.cpp */; };
 		68D279A61ACC6DBF00B25E88 /* AddonJoystickDriverHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68D2799D1ACC6DBF00B25E88 /* AddonJoystickDriverHandler.cpp */; };
@@ -3771,9 +3774,6 @@
 		5EF800FE1A97892A0035AA4D /* ReplayGain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ReplayGain.cpp; sourceTree = "<group>"; };
 		5EF800FF1A97892A0035AA4D /* ReplayGain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplayGain.h; sourceTree = "<group>"; };
 		680B096F1ACC646D006B19A8 /* IKeyboardHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IKeyboardHandler.h; sourceTree = "<group>"; };
-		683B99361AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AddonJoystickButtonMapper.cpp; path = addons/AddonJoystickButtonMapper.cpp; sourceTree = "<group>"; };
-		683B99371AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AddonJoystickButtonMapper.h; path = addons/AddonJoystickButtonMapper.h; sourceTree = "<group>"; };
-		683B993B1AD0CAEB00FCD1C7 /* IJoystickButtonMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IJoystickButtonMapper.h; path = joysticks/IJoystickButtonMapper.h; sourceTree = "<group>"; };
 		683B993C1AD1F43800FCD1C7 /* GameDefinitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameDefinitions.h; path = games/GameDefinitions.h; sourceTree = "<group>"; };
 		683B993D1AD1F64100FCD1C7 /* GameTranslator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameTranslator.h; path = games/GameTranslator.h; sourceTree = "<group>"; };
 		683B993E1AD1FF6200FCD1C7 /* GameTranslator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameTranslator.cpp; path = games/GameTranslator.cpp; sourceTree = "<group>"; };
@@ -3795,6 +3795,12 @@
 		6849847E1ACC97E500F47419 /* GUIFocusPlane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIFocusPlane.h; sourceTree = "<group>"; };
 		6849847F1ACC97E500F47419 /* GUIGameController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIGameController.cpp; sourceTree = "<group>"; };
 		684984801ACC97E500F47419 /* GUIGameController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIGameController.h; sourceTree = "<group>"; };
+		6862635E1AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AddonJoystickButtonMapRO.cpp; path = addons/AddonJoystickButtonMapRO.cpp; sourceTree = "<group>"; };
+		6862635F1AE068AE00CE83FE /* AddonJoystickButtonMapRO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AddonJoystickButtonMapRO.h; path = addons/AddonJoystickButtonMapRO.h; sourceTree = "<group>"; };
+		686263601AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AddonJoystickButtonMapWO.cpp; path = addons/AddonJoystickButtonMapWO.cpp; sourceTree = "<group>"; };
+		686263611AE068AE00CE83FE /* AddonJoystickButtonMapWO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AddonJoystickButtonMapWO.h; path = addons/AddonJoystickButtonMapWO.h; sourceTree = "<group>"; };
+		686263681AE068D900CE83FE /* AddonJoystickButtonMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AddonJoystickButtonMap.cpp; path = addons/AddonJoystickButtonMap.cpp; sourceTree = "<group>"; };
+		686263691AE068D900CE83FE /* AddonJoystickButtonMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AddonJoystickButtonMap.h; path = addons/AddonJoystickButtonMap.h; sourceTree = "<group>"; };
 		6869DE9B1ACC813B005F33E1 /* GameInfoTag.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameInfoTag.cpp; path = games/tags/GameInfoTag.cpp; sourceTree = "<group>"; };
 		6869DE9C1ACC813B005F33E1 /* GameInfoTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameInfoTag.h; path = games/tags/GameInfoTag.h; sourceTree = "<group>"; };
 		6869DE9D1ACC813B005F33E1 /* GameInfoTagLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameInfoTagLoader.cpp; path = games/tags/GameInfoTagLoader.cpp; sourceTree = "<group>"; };
@@ -3842,8 +3848,6 @@
 		68CB84DB1ACC85C40015C5E7 /* AddonCallbacksPeripheral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddonCallbacksPeripheral.h; sourceTree = "<group>"; };
 		68D279951ACC6D9000B25E88 /* PortManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PortManager.cpp; sourceTree = "<group>"; };
 		68D279961ACC6D9000B25E88 /* PortManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PortManager.h; sourceTree = "<group>"; };
-		68D2799B1ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AddonJoystickButtonMap.cpp; path = addons/AddonJoystickButtonMap.cpp; sourceTree = "<group>"; };
-		68D2799C1ACC6DBF00B25E88 /* AddonJoystickButtonMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AddonJoystickButtonMap.h; path = addons/AddonJoystickButtonMap.h; sourceTree = "<group>"; };
 		68D2799D1ACC6DBF00B25E88 /* AddonJoystickDriverHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AddonJoystickDriverHandler.cpp; path = addons/AddonJoystickDriverHandler.cpp; sourceTree = "<group>"; };
 		68D2799E1ACC6DBF00B25E88 /* AddonJoystickDriverHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AddonJoystickDriverHandler.h; path = addons/AddonJoystickDriverHandler.h; sourceTree = "<group>"; };
 		68D2799F1ACC6DBF00B25E88 /* PeripheralAddon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PeripheralAddon.cpp; path = addons/PeripheralAddon.cpp; sourceTree = "<group>"; };
@@ -7206,7 +7210,6 @@
 			children = (
 				68AFC99B1ACC5E1000DD5173 /* generic */,
 				68AFC99C1ACC5E2000DD5173 /* IJoystickButtonMap.h */,
-				683B993B1AD0CAEB00FCD1C7 /* IJoystickButtonMapper.h */,
 				68AFC99D1ACC5E2000DD5173 /* IJoystickDriverHandler.h */,
 				68AFC99E1ACC5E2000DD5173 /* IJoystickInputHandler.h */,
 				68AFC99F1ACC5E2000DD5173 /* JoystickDriverPrimitive.cpp */,
@@ -7236,10 +7239,12 @@
 		68D2799A1ACC6DAF00B25E88 /* addons */ = {
 			isa = PBXGroup;
 			children = (
-				68D2799B1ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp */,
-				68D2799C1ACC6DBF00B25E88 /* AddonJoystickButtonMap.h */,
-				683B99361AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp */,
-				683B99371AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.h */,
+				686263681AE068D900CE83FE /* AddonJoystickButtonMap.cpp */,
+				686263691AE068D900CE83FE /* AddonJoystickButtonMap.h */,
+				6862635E1AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp */,
+				6862635F1AE068AE00CE83FE /* AddonJoystickButtonMapRO.h */,
+				686263601AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp */,
+				686263611AE068AE00CE83FE /* AddonJoystickButtonMapWO.h */,
 				68D2799D1ACC6DBF00B25E88 /* AddonJoystickDriverHandler.cpp */,
 				68D2799E1ACC6DBF00B25E88 /* AddonJoystickDriverHandler.h */,
 				68D2799F1ACC6DBF00B25E88 /* PeripheralAddon.cpp */,
@@ -10947,6 +10952,7 @@
 				7C45DBE910F325C400D4BBF3 /* DAVDirectory.cpp in Sources */,
 				F592568810FBF2E100D2C91D /* ConvolutionKernels.cpp in Sources */,
 				F5DC87E2110A287400EE1B15 /* RingBuffer.cpp in Sources */,
+				686263651AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp in Sources */,
 				F5F244651110DC6B009126C6 /* FileOperationJob.cpp in Sources */,
 				F5F245EE1112C9AB009126C6 /* FileUtils.cpp in Sources */,
 				68B7FC8A1ADC9EF6008DF666 /* GameController.cpp in Sources */,
@@ -11119,6 +11125,7 @@
 				F5AE40A413415D9E0004BD79 /* PlayerOperations.cpp in Sources */,
 				F5AE40A513415D9E0004BD79 /* PlaylistOperations.cpp in Sources */,
 				F5AE40A613415D9E0004BD79 /* SystemOperations.cpp in Sources */,
+				6862636A1AE068D900CE83FE /* AddonJoystickButtonMap.cpp in Sources */,
 				F5AE40A713415D9E0004BD79 /* VideoLibrary.cpp in Sources */,
 				F5AE40A813415D9E0004BD79 /* XBMCOperations.cpp in Sources */,
 				C84BF7341349BB74006D6FC9 /* JSONServiceDescription.cpp in Sources */,
@@ -11150,7 +11157,6 @@
 				DF448457140048A60069344B /* AirTunesServer.cpp in Sources */,
 				DF44845E140048C80069344B /* PipesManager.cpp in Sources */,
 				DF98D98C1434F47D00A6EBE1 /* SkinVariable.cpp in Sources */,
-				68D279A11ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp in Sources */,
 				F5E10537140AA38100175026 /* PeripheralBusUSB.cpp in Sources */,
 				F5E10538140AA38100175026 /* PeripheralBus.cpp in Sources */,
 				F5E1053B140AA38100175026 /* Peripheral.cpp in Sources */,
@@ -11260,6 +11266,7 @@
 				C84828E4156CFCD8005A996F /* GUIWindowPVRTimers.cpp in Sources */,
 				C84828F5156CFD5E005A996F /* Epg.cpp in Sources */,
 				C84828F6156CFD5E005A996F /* EpgContainer.cpp in Sources */,
+				686263621AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp in Sources */,
 				C84828F7156CFD5E005A996F /* EpgDatabase.cpp in Sources */,
 				C84828F8156CFD5E005A996F /* EpgInfoTag.cpp in Sources */,
 				C84828F9156CFD5E005A996F /* EpgSearchFilter.cpp in Sources */,
@@ -11540,7 +11547,6 @@
 				7CCDA821192756250074CF51 /* NptStreams.cpp in Sources */,
 				7CCDA82A192756250074CF51 /* NptStrings.cpp in Sources */,
 				7CCDA833192756250074CF51 /* NptSystem.cpp in Sources */,
-				683B99381AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp in Sources */,
 				7CCDA83C192756250074CF51 /* NptThreads.cpp in Sources */,
 				7CCDA845192756250074CF51 /* NptTime.cpp in Sources */,
 				7CCDA84E192756250074CF51 /* NptTls.cpp in Sources */,
@@ -11650,6 +11656,7 @@
 				DFF0F12C17528350002DA3A4 /* Skin.cpp in Sources */,
 				DFF0F12D17528350002DA3A4 /* Visualisation.cpp in Sources */,
 				DFF0F12E17528350002DA3A4 /* CDDARipJob.cpp in Sources */,
+				686263671AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp in Sources */,
 				DFF0F12F17528350002DA3A4 /* CDDARipper.cpp in Sources */,
 				DFF0F13017528350002DA3A4 /* Encoder.cpp in Sources */,
 				DFF0F13117528350002DA3A4 /* EncoderFFmpeg.cpp in Sources */,
@@ -11882,7 +11889,6 @@
 				DFF0F23117528350002DA3A4 /* NptXbmcFile.cpp in Sources */,
 				395C29D71A98A11C00EBC7AD /* WsgiErrorStream.cpp in Sources */,
 				DFF0F23417528350002DA3A4 /* PipeFile.cpp in Sources */,
-				68D279A31ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp in Sources */,
 				DFF0F23517528350002DA3A4 /* PipesManager.cpp in Sources */,
 				DFF0F23617528350002DA3A4 /* PlaylistDirectory.cpp in Sources */,
 				DFF0F23717528350002DA3A4 /* PlaylistFileDirectory.cpp in Sources */,
@@ -12064,7 +12070,6 @@
 				DFF0F2DC17528350002DA3A4 /* XBMCOperations.cpp in Sources */,
 				DFF0F2DD17528350002DA3A4 /* AddonModuleXbmc.cpp in Sources */,
 				DFF0F2DE17528350002DA3A4 /* AddonModuleXbmcaddon.cpp in Sources */,
-				683B993A1AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp in Sources */,
 				DFF0F2DF17528350002DA3A4 /* AddonModuleXbmcgui.cpp in Sources */,
 				DFF0F2E017528350002DA3A4 /* AddonModuleXbmcplugin.cpp in Sources */,
 				DFF0F2E117528350002DA3A4 /* AddonModuleXbmcvfs.cpp in Sources */,
@@ -12338,6 +12343,7 @@
 				DFF0F3EE17528350002DA3A4 /* SortUtils.cpp in Sources */,
 				DFF0F3EF17528350002DA3A4 /* Splash.cpp in Sources */,
 				DFF0F3F017528350002DA3A4 /* Stopwatch.cpp in Sources */,
+				6862636C1AE068D900CE83FE /* AddonJoystickButtonMap.cpp in Sources */,
 				DFF0F3F117528350002DA3A4 /* StreamDetails.cpp in Sources */,
 				DFF0F3F217528350002DA3A4 /* StreamUtils.cpp in Sources */,
 				DFF0F3F317528350002DA3A4 /* StringUtils.cpp in Sources */,
@@ -12434,6 +12440,7 @@
 				DFF0F45217528350002DA3A4 /* xbmc.cpp in Sources */,
 				DFF0F45317528350002DA3A4 /* XbmcContext.cpp in Sources */,
 				399442761A8DD920006C39E9 /* VideoLibraryMarkWatchedJob.cpp in Sources */,
+				686263641AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp in Sources */,
 				DFF0F45417528350002DA3A4 /* MouseStat.cpp in Sources */,
 				DFF0F45517528350002DA3A4 /* Addon.cpp in Sources */,
 				DFF0F45617528350002DA3A4 /* AddonCallback.cpp in Sources */,
@@ -12935,7 +12942,6 @@
 				E4991282174E5D9900741B6D /* DirectoryNodeAlbumRecentlyPlayed.cpp in Sources */,
 				E4991283174E5D9900741B6D /* DirectoryNodeAlbumRecentlyPlayedSong.cpp in Sources */,
 				E4991284174E5D9900741B6D /* DirectoryNodeAlbumTop100.cpp in Sources */,
-				683B99391AD0CADD00FCD1C7 /* AddonJoystickButtonMapper.cpp in Sources */,
 				E4991285174E5D9900741B6D /* DirectoryNodeAlbumTop100Song.cpp in Sources */,
 				395C2A051A9CD25100EBC7AD /* ContextItemAddonInvoker.cpp in Sources */,
 				E4991286174E5D9900741B6D /* DirectoryNodeArtist.cpp in Sources */,
@@ -13019,6 +13025,7 @@
 				68D279A81ACC6DBF00B25E88 /* PeripheralAddon.cpp in Sources */,
 				E49912CF174E5DA000741B6D /* DirectoryNodeTvShowsOverview.cpp in Sources */,
 				E49912D0174E5DA000741B6D /* QueryParams.cpp in Sources */,
+				686263631AE068AE00CE83FE /* AddonJoystickButtonMapRO.cpp in Sources */,
 				E49912D1174E5DA000741B6D /* VideoDatabaseDirectory.cpp in Sources */,
 				E49912D2174E5DA000741B6D /* VirtualDirectory.cpp in Sources */,
 				E49912D6174E5DA000741B6D /* ZeroconfDirectory.cpp in Sources */,
@@ -13047,6 +13054,7 @@
 				395C29C61A98A0E100EBC7AD /* ILanguageInvoker.cpp in Sources */,
 				E49912ED174E5DAD00741B6D /* GUIControlGroupList.cpp in Sources */,
 				E49912EE174E5DAD00741B6D /* GUIControlProfiler.cpp in Sources */,
+				686263661AE068AE00CE83FE /* AddonJoystickButtonMapWO.cpp in Sources */,
 				E49912EF174E5DAD00741B6D /* GUIDialog.cpp in Sources */,
 				E49912F0174E5DAD00741B6D /* GUIEditControl.cpp in Sources */,
 				E49912F1174E5DAD00741B6D /* GUIFadeLabelControl.cpp in Sources */,
@@ -13120,7 +13128,6 @@
 				E499132C174E5DAD00741B6D /* TextureDX.cpp in Sources */,
 				E499132D174E5DAD00741B6D /* TextureGL.cpp in Sources */,
 				E499132E174E5DAD00741B6D /* TextureManager.cpp in Sources */,
-				68D279A21ACC6DBF00B25E88 /* AddonJoystickButtonMap.cpp in Sources */,
 				E499132F174E5DAD00741B6D /* VisibleEffect.cpp in Sources */,
 				E4991330174E5DAD00741B6D /* XBTF.cpp in Sources */,
 				E4991331174E5DAD00741B6D /* XBTFReader.cpp in Sources */,
@@ -13331,6 +13338,7 @@
 				E499141A174E603C00741B6D /* GUIWindowSettings.cpp in Sources */,
 				E499141B174E603C00741B6D /* GUIWindowSettingsCategory.cpp in Sources */,
 				E499141C174E603C00741B6D /* GUIWindowSettingsScreenCalibration.cpp in Sources */,
+				6862636B1AE068D900CE83FE /* AddonJoystickButtonMap.cpp in Sources */,
 				E499141D174E603C00741B6D /* GUIWindowTestPattern.cpp in Sources */,
 				E499141E174E603C00741B6D /* AdvancedSettings.cpp in Sources */,
 				E499141F174E603C00741B6D /* DisplaySettings.cpp in Sources */,
