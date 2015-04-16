@@ -35,6 +35,7 @@ class CSettingsCategory;
 class TiXmlElement;
 class CAction;
 class CKey;
+class IJoystickButtonMapper;
 
 namespace PERIPHERALS
 {
@@ -210,6 +211,9 @@ namespace PERIPHERALS
     }
 
     virtual PeripheralAddonPtr GetAddon(const CPeripheral* device);
+
+    void RegisterJoystickButtonMapper(IJoystickButtonMapper* mapper);
+    void UnregisterJoystickButtonMapper(IJoystickButtonMapper* mapper);
 
     virtual void OnSettingChanged(const CSetting *setting);
     virtual void OnSettingAction(const CSetting *setting);

@@ -742,6 +742,28 @@ PeripheralAddonPtr CPeripherals::GetAddon(const CPeripheral* device)
   return addon;
 }
 
+void CPeripherals::RegisterJoystickButtonMapper(IJoystickButtonMapper* mapper)
+{
+  std::vector<CPeripheral*> peripherals;
+
+  GetPeripheralsWithFeature(peripherals, FEATURE_JOYSTICK);
+  GetPeripheralsWithFeature(peripherals, FEATURE_KEYBOARD);
+
+  for (std::vector<CPeripheral*>::iterator it = peripherals.begin(); it != peripherals.end(); ++it)
+    (*it)->RegisterJoystickButtonMapper(mapper);
+}
+
+void CPeripherals::UnregisterJoystickButtonMapper(IJoystickButtonMapper* mapper)
+{
+  std::vector<CPeripheral*> peripherals;
+
+  GetPeripheralsWithFeature(peripherals, FEATURE_JOYSTICK);
+  GetPeripheralsWithFeature(peripherals, FEATURE_KEYBOARD);
+
+  for (std::vector<CPeripheral*>::iterator it = peripherals.begin(); it != peripherals.end(); ++it)
+    (*it)->UnregisterJoystickButtonMapper(mapper);
+}
+
 void CPeripherals::OnSettingChanged(const CSetting *setting)
 {
   if (setting == NULL)

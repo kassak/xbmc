@@ -27,9 +27,10 @@
 #include "guilib/GUIFocusPlane.h"
 #include "guilib/GUIWindowManager.h"
 #include "guilib/WindowIDs.h"
+#include "input/joysticks/IJoystickButtonMap.h"
+#include "input/joysticks/JoystickDriverPrimitive.h"
 #include "input/Key.h"
 #include "peripherals/Peripherals.h"
-#include "peripherals/devices/Peripheral.h"
 #include "utils/log.h"
 #include "utils/StringUtils.h"
 
@@ -39,48 +40,6 @@ using namespace PERIPHERALS;
 #define GROUP_LIST             996
 #define BUTTON_TEMPLATE       1000
 #define BUTTON_START          1001
-
-#define AXIS_THRESHOLD  0.5f
-
-// --- CGUIJoystickDriverHandler -----------------------------------------------
-
-CGUIJoystickDriverHandler::CGUIJoystickDriverHandler(CGUIDialogControllerInput* dialog, CPeripheral* device)
-  : m_dialog(dialog),
-    m_device(device)
-{
-  assert(m_dialog);
-}
-
-bool CGUIJoystickDriverHandler::OnButtonMotion(unsigned int buttonIndex, bool bPressed)
-{
-  if (bPressed)
-    return m_dialog->OnButton(m_device, buttonIndex);
-
-  return false;
-}
-
-bool CGUIJoystickDriverHandler::OnHatMotion(unsigned int hatIndex, HatDirection direction)
-{
-  if (direction == HatDirectionUp    ||
-      direction == HatDirectionRight ||
-      direction == HatDirectionDown  ||
-      direction == HatDirectionLeft)
-  {
-    return m_dialog->OnHat(m_device, hatIndex, direction);
-  }
-
-  return false;
-}
-
-bool CGUIJoystickDriverHandler::OnAxisMotion(unsigned int axisIndex, float position)
-{
-  if (position >= AXIS_THRESHOLD)
-    return m_dialog->OnAxis(m_device, axisIndex);
-
-  return false;
-}
-
-// --- CGUIDialogControllerInput -----------------------------------------------
 
 CGUIDialogControllerInput::CGUIDialogControllerInput(void)
   : CGUIDialog(WINDOW_DIALOG_CONTROLLER_INPUT, "DialogControllerInput.xml"),
@@ -93,11 +52,11 @@ CGUIDialogControllerInput::CGUIDialogControllerInput(void)
 
 void CGUIDialogControllerInput::Process(void)
 {
-  AddDriverHandlers();
+  g_peripherals.RegisterJoystickButtonMapper(this);
 
   AbortableWait(m_inputEvent);
 
-  ClearDriverHandlers();
+  g_peripherals.UnregisterJoystickButtonMapper(this);
 }
 
 bool CGUIDialogControllerInput::OnMessage(CGUIMessage& message)
@@ -179,12 +138,19 @@ void CGUIDialogControllerInput::DoModal(const GameControllerPtr& controller, CGU
   CleanupButtons();
 }
 
-bool CGUIDialogControllerInput::OnButton(PERIPHERALS::CPeripheral* device, unsigned int buttonIndex)
+std::string CGUIDialogControllerInput::ControllerID(void) const
+{
+  if (m_controller)
+    return m_controller->ID();
+
+  return "";
+}
+
+bool CGUIDialogControllerInput::OnButton(IJoystickButtonMap* buttonMap, unsigned int buttonIndex)
 {
   if (IsPrompting())
   {
-    // TODO
-    //mapper->MapButton(m_promptIndex, CJoystickDriverPrimitive(buttonIndex));
+    buttonMap->MapButton(m_promptIndex, CJoystickDriverPrimitive(buttonIndex));
 
     CancelPrompt();
 
@@ -194,12 +160,11 @@ bool CGUIDialogControllerInput::OnButton(PERIPHERALS::CPeripheral* device, unsig
   return false;
 }
 
-bool CGUIDialogControllerInput::OnHat(PERIPHERALS::CPeripheral* device, unsigned int hatIndex, HatDirection direction)
+bool CGUIDialogControllerInput::OnHat(IJoystickButtonMap* buttonMap, unsigned int hatIndex, HatDirection direction)
 {
   if (IsPrompting())
   {
-    // TODO
-    //mapper->MapButton(m_promptIndex, CJoystickDriverPrimitive(hatIndex, direction));
+    buttonMap->MapButton(m_promptIndex, CJoystickDriverPrimitive(hatIndex, direction));
 
     CancelPrompt();
 
@@ -209,7 +174,7 @@ bool CGUIDialogControllerInput::OnHat(PERIPHERALS::CPeripheral* device, unsigned
   return false;
 }
 
-bool CGUIDialogControllerInput::OnAxis(PERIPHERALS::CPeripheral* device, unsigned int axisIndex)
+bool CGUIDialogControllerInput::OnAxis(IJoystickButtonMap* buttonMap, unsigned int axisIndex)
 {
   // TODO
   return false;
@@ -372,56 +337,4 @@ CGUIButtonControl* CGUIDialogControllerInput::MakeButton(const std::string& strL
   pButton->SetPosition(pButtonTemplate->GetXPosition(), pButtonTemplate->GetYPosition());
 
   return pButton;
-}
-
-void CGUIDialogControllerInput::AddDriverHandlers(void)
-{
-  // TODO: not thread-safe, peripheral object may be deleted in another thread
-  std::vector<CPeripheral*> peripherals = ScanPeripherals();
-
-  for (std::vector<CPeripheral*>::iterator it = peripherals.begin(); it != peripherals.end(); ++it)
-  {
-    CGUIJoystickDriverHandler* handler = new CGUIJoystickDriverHandler(this, *it);
-    m_driverHandlers.push_back(handler);
-    (*it)->RegisterJoystickDriverHandler(handler);
-  }
-}
-
-void CGUIDialogControllerInput::ClearDriverHandlers(void)
-{
-  // TODO: not thread-safe, peripheral object may be deleted in another thread
-  std::vector<CPeripheral*> peripherals = ScanPeripherals();
-
-  for (std::vector<CPeripheral*>::iterator it = peripherals.begin(); it != peripherals.end(); ++it)
-  {
-    CGUIJoystickDriverHandler* handler = GetDriverHandler(*it);
-    if (handler)
-      (*it)->UnregisterJoystickDriverHandler(handler);
-  }
-
-  for (std::vector<CGUIJoystickDriverHandler*>::iterator it = m_driverHandlers.begin(); it != m_driverHandlers.end(); ++it)
-    delete *it;
-
-  m_driverHandlers.clear();
-}
-
-CGUIJoystickDriverHandler* CGUIDialogControllerInput::GetDriverHandler(CPeripheral* peripheral) const
-{
-  for (std::vector<CGUIJoystickDriverHandler*>::const_iterator it = m_driverHandlers.begin(); it != m_driverHandlers.end(); ++it)
-  {
-    if ((*it)->Device() == peripheral)
-      return *it;
-  }
-
-  return NULL;
-}
-
-std::vector<CPeripheral*> CGUIDialogControllerInput::ScanPeripherals(void)
-{
-  std::vector<CPeripheral*> peripherals;
-
-  g_peripherals.GetPeripheralsWithFeature(peripherals, FEATURE_JOYSTICK);
-  g_peripherals.GetPeripheralsWithFeature(peripherals, FEATURE_KEYBOARD);
-
-  return peripherals;
 }

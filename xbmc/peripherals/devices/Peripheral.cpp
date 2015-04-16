@@ -20,6 +20,7 @@
 
 #include "Peripheral.h"
 #include "peripherals/Peripherals.h"
+#include "peripherals/addons/AddonJoystickButtonMapping.h"
 #include "peripherals/addons/AddonJoystickInputHandling.h"
 #include "utils/log.h"
 #include "utils/StringUtils.h"
@@ -545,6 +546,28 @@ void CPeripheral::UnregisterJoystickInputHandler(IJoystickInputHandler* handler)
     UnregisterJoystickDriverHandler(it->second);
     delete it->second;
     m_inputHandlers.erase(it);
+  }
+}
+
+void CPeripheral::RegisterJoystickButtonMapper(IJoystickButtonMapper* mapper)
+{
+  std::map<IJoystickButtonMapper*, IJoystickDriverHandler*>::iterator it = m_buttonMappers.find(mapper);
+  if (it == m_buttonMappers.end())
+  {
+    CAddonJoystickButtonMapping* addonMapping = new CAddonJoystickButtonMapping(this, mapper);
+    RegisterJoystickDriverHandler(addonMapping);
+    m_buttonMappers[mapper] = addonMapping;
+  }
+}
+
+void CPeripheral::UnregisterJoystickButtonMapper(IJoystickButtonMapper* mapper)
+{
+  std::map<IJoystickButtonMapper*, IJoystickDriverHandler*>::iterator it = m_buttonMappers.find(mapper);
+  if (it != m_buttonMappers.end())
+  {
+    UnregisterJoystickDriverHandler(it->second);
+    delete it->second;
+    m_buttonMappers.erase(it);
   }
 }
 

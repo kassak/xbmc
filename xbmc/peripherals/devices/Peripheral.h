@@ -26,6 +26,7 @@
 
 class TiXmlDocument;
 class CSetting;
+class IJoystickButtonMapper;
 class IJoystickDriverHandler;
 class IJoystickInputHandler;
 
@@ -171,6 +172,9 @@ namespace PERIPHERALS
     virtual void RegisterJoystickInputHandler(IJoystickInputHandler* handler);
     virtual void UnregisterJoystickInputHandler(IJoystickInputHandler* handler);
 
+    virtual void RegisterJoystickButtonMapper(IJoystickButtonMapper* mapper);
+    virtual void UnregisterJoystickButtonMapper(IJoystickButtonMapper* mapper);
+
   protected:
     virtual void ClearSettings(void);
 
@@ -194,5 +198,6 @@ namespace PERIPHERALS
     std::map<std::string, PeripheralDeviceSetting> m_settings;
     std::set<std::string>             m_changedSettings;
     std::map<IJoystickInputHandler*, IJoystickDriverHandler*> m_inputHandlers;
+    std::map<IJoystickButtonMapper*, IJoystickDriverHandler*> m_buttonMappers;
   };
 }
