@@ -20,9 +20,9 @@
  */
 
 #include "Peripheral.h"
+#include "input/joysticks/DefaultJoystickInputHandler.h"
 #include "input/joysticks/JoystickTypes.h"
 #include "input/joysticks/IJoystickDriverHandler.h"
-#include "input/joysticks/generic/DefaultJoystickInputHandler.h"
 #include "threads/CriticalSection.h"
 
 #include <string>
