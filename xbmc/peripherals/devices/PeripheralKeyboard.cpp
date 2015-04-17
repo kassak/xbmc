@@ -90,7 +90,7 @@ bool CPeripheralKeyboard::OnKeyPress(const CKey& key)
   bool bHandled = false;
 
   for (KeyboardHandlerVector::iterator it = m_keyboardHandlers.begin(); it != m_keyboardHandlers.end(); ++it)
-    bHandled |= it->second->OnKeyPress(key);
+    bHandled = bHandled || it->second->OnKeyPress(key);
 
   return bHandled;
 }
