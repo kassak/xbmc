@@ -611,6 +611,7 @@ void CPeripheralAddon::SetJoystickInfo(CPeripheralJoystick& joystick, const ADDO
 {
   joystick.SetDeviceName(joystickInfo.Name()); // TODO: Move to SetPeripheralInfo()
   joystick.SetProvider(joystickInfo.Provider());
+  joystick.SetRequestedPort(joystickInfo.RequestedPort());
   joystick.SetButtonCount(joystickInfo.ButtonCount());
   joystick.SetHatCount(joystickInfo.HatCount());
   joystick.SetAxisCount(joystickInfo.AxisCount());
