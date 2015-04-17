@@ -18,7 +18,7 @@
  *
  */
 
-#include "GenericJoystickDriverHandler.h"
+#include "GenericJoystickInputHandling.h"
 #include "DigitalAnalogButtonConverter.h"
 #include "games/GameManager.h"
 #include "input/joysticks/IJoystickButtonMap.h"
@@ -29,18 +29,18 @@
 
 #include <algorithm>
 
-CGenericJoystickDriverHandler::CGenericJoystickDriverHandler(IJoystickInputHandler* handler, IJoystickButtonMap* buttonMap)
+CGenericJoystickInputHandling::CGenericJoystickInputHandling(IJoystickInputHandler* handler, IJoystickButtonMap* buttonMap)
  : m_handler(new CDigitalAnalogButtonConverter(handler)),
    m_buttonMap(buttonMap)
 {
 }
 
-CGenericJoystickDriverHandler::~CGenericJoystickDriverHandler(void)
+CGenericJoystickInputHandling::~CGenericJoystickInputHandling(void)
 {
   delete m_handler;
 }
 
-bool CGenericJoystickDriverHandler::OnButtonMotion(unsigned int buttonIndex, bool bPressed)
+bool CGenericJoystickInputHandling::OnButtonMotion(unsigned int buttonIndex, bool bPressed)
 {
   const char pressed = bPressed ? 1 : 0;
 
@@ -52,7 +52,7 @@ bool CGenericJoystickDriverHandler::OnButtonMotion(unsigned int buttonIndex, boo
   unsigned int feature;
   if (m_buttonMap->GetFeature(CJoystickDriverPrimitive(buttonIndex), feature))
   {
-    CLog::Log(LOGDEBUG, "CGenericJoystickDriverHandler: %s feature [ %s ] %s",
+    CLog::Log(LOGDEBUG, "CGenericJoystickInputHandling: %s feature [ %s ] %s",
               m_handler->ControllerID().c_str(),
               GAME::CGameManager::Get().GetFeatureName(m_handler->ControllerID(), feature).c_str(),
               bPressed ? "pressed" : "released");
@@ -73,7 +73,7 @@ bool CGenericJoystickDriverHandler::OnButtonMotion(unsigned int buttonIndex, boo
   return bHandled;
 }
 
-bool CGenericJoystickDriverHandler::OnHatMotion(unsigned int hatIndex, HatDirection newDirection)
+bool CGenericJoystickInputHandling::OnHatMotion(unsigned int hatIndex, HatDirection newDirection)
 {
   if (m_hatStates.size() <= hatIndex)
     m_hatStates.resize(hatIndex + 1);
@@ -92,7 +92,7 @@ bool CGenericJoystickDriverHandler::OnHatMotion(unsigned int hatIndex, HatDirect
   return bHandled;
 }
 
-bool CGenericJoystickDriverHandler::ProcessHatDirection(int index,
+bool CGenericJoystickInputHandling::ProcessHatDirection(int index,
     HatDirection oldDir, HatDirection newDir, HatDirection targetDir)
 {
   bool bHandled = false;
@@ -107,7 +107,7 @@ bool CGenericJoystickDriverHandler::ProcessHatDirection(int index,
       if (bActivated)
         bHandled = true;
 
-      CLog::Log(LOGDEBUG, "CGenericJoystickDriverHandler: %s feature [ %s ] %s from hat",
+      CLog::Log(LOGDEBUG, "CGenericJoystickInputHandling: %s feature [ %s ] %s from hat",
                 m_handler->ControllerID().c_str(),
                 GAME::CGameManager::Get().GetFeatureName(m_handler->ControllerID(), feature).c_str(),
                 bActivated ? "activated" : "deactivated");
@@ -119,7 +119,7 @@ bool CGenericJoystickDriverHandler::ProcessHatDirection(int index,
   return false;
 }
 
-bool CGenericJoystickDriverHandler::OnAxisMotion(unsigned int axisIndex, float newPosition)
+bool CGenericJoystickInputHandling::OnAxisMotion(unsigned int axisIndex, float newPosition)
 {
   if (m_axisStates.size() <= axisIndex)
     m_axisStates.resize(axisIndex + 1);
@@ -184,7 +184,7 @@ bool CGenericJoystickDriverHandler::OnAxisMotion(unsigned int axisIndex, float n
   return bHandled;
 }
 
-void CGenericJoystickDriverHandler::ProcessAxisMotions(void)
+void CGenericJoystickInputHandling::ProcessAxisMotions(void)
 {
   std::vector<unsigned int> featuresToProcess;
   featuresToProcess.swap(m_featuresWithMotion);
@@ -216,7 +216,7 @@ void CGenericJoystickDriverHandler::ProcessAxisMotions(void)
   }
 }
 
-float CGenericJoystickDriverHandler::GetAxisState(int axisIndex) const
+float CGenericJoystickInputHandling::GetAxisState(int axisIndex) const
 {
   return (0 <= axisIndex && axisIndex < (int)m_axisStates.size()) ? m_axisStates[axisIndex] : 0;
 }

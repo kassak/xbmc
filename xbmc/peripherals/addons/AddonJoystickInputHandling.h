@@ -28,12 +28,12 @@ namespace PERIPHERALS
 {
   class CPeripheral;
 
-  class CAddonJoystickDriverHandler : public IJoystickDriverHandler
+  class CAddonJoystickInputHandling : public IJoystickDriverHandler
   {
   public:
-    CAddonJoystickDriverHandler(CPeripheral* peripheral, IJoystickInputHandler* handler);
+    CAddonJoystickInputHandling(CPeripheral* peripheral, IJoystickInputHandler* handler);
 
-    virtual ~CAddonJoystickDriverHandler(void);
+    virtual ~CAddonJoystickInputHandling(void);
 
     // implementation of IJoystickDriverHandler
     virtual bool OnButtonMotion(unsigned int buttonIndex, bool bPressed);

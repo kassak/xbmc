@@ -18,8 +18,8 @@
  *
  */
 
-#include "AddonJoystickDriverHandler.h"
-#include "input/joysticks/generic/GenericJoystickDriverHandler.h"
+#include "AddonJoystickInputHandling.h"
+#include "input/joysticks/generic/GenericJoystickInputHandling.h"
 #include "input/joysticks/IJoystickInputHandler.h"
 #include "peripherals/addons/AddonJoystickButtonMap.h"
 
@@ -29,23 +29,23 @@ using namespace PERIPHERALS;
   #define SATE_DELETE(x)  do { delete (x); (x) = NULL; } while (0)
 #endif
 
-CAddonJoystickDriverHandler::CAddonJoystickDriverHandler(CPeripheral* peripheral, IJoystickInputHandler* handler)
+CAddonJoystickInputHandling::CAddonJoystickInputHandling(CPeripheral* peripheral, IJoystickInputHandler* handler)
   : m_driverHandler(NULL)
 {
   m_buttonMap = new CAddonJoystickButtonMap(peripheral, handler->ControllerID());
   if (m_buttonMap->Load())
-    m_driverHandler = new CGenericJoystickDriverHandler(handler, m_buttonMap);
+    m_driverHandler = new CGenericJoystickInputHandling(handler, m_buttonMap);
   else
     SAFE_DELETE(m_buttonMap);
 }
 
-CAddonJoystickDriverHandler::~CAddonJoystickDriverHandler(void)
+CAddonJoystickInputHandling::~CAddonJoystickInputHandling(void)
 {
   delete m_driverHandler;
   delete m_buttonMap;
 }
 
-bool CAddonJoystickDriverHandler::OnButtonMotion(unsigned int buttonIndex, bool bPressed)
+bool CAddonJoystickInputHandling::OnButtonMotion(unsigned int buttonIndex, bool bPressed)
 {
   if (m_driverHandler)
     return m_driverHandler->OnButtonMotion(buttonIndex, bPressed);
@@ -53,7 +53,7 @@ bool CAddonJoystickDriverHandler::OnButtonMotion(unsigned int buttonIndex, bool 
   return false;
 }
 
-bool CAddonJoystickDriverHandler::OnHatMotion(unsigned int hatIndex, HatDirection direction)
+bool CAddonJoystickInputHandling::OnHatMotion(unsigned int hatIndex, HatDirection direction)
 {
   if (m_driverHandler)
     return m_driverHandler->OnHatMotion(hatIndex, direction);
@@ -61,7 +61,7 @@ bool CAddonJoystickDriverHandler::OnHatMotion(unsigned int hatIndex, HatDirectio
   return false;
 }
 
-bool CAddonJoystickDriverHandler::OnAxisMotion(unsigned int axisIndex, float position)
+bool CAddonJoystickInputHandling::OnAxisMotion(unsigned int axisIndex, float position)
 {
   if (m_driverHandler)
     return m_driverHandler->OnAxisMotion(axisIndex, position);
@@ -69,7 +69,7 @@ bool CAddonJoystickDriverHandler::OnAxisMotion(unsigned int axisIndex, float pos
   return false;
 }
 
-void CAddonJoystickDriverHandler::ProcessAxisMotions(void)
+void CAddonJoystickInputHandling::ProcessAxisMotions(void)
 {
   if (m_driverHandler)
     m_driverHandler->ProcessAxisMotions();

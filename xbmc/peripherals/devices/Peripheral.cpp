@@ -20,7 +20,7 @@
 
 #include "Peripheral.h"
 #include "peripherals/Peripherals.h"
-#include "peripherals/addons/AddonJoystickDriverHandler.h"
+#include "peripherals/addons/AddonJoystickInputHandling.h"
 #include "utils/log.h"
 #include "utils/StringUtils.h"
 #include "settings/lib/Setting.h"
@@ -532,7 +532,7 @@ void CPeripheral::RegisterJoystickInputHandler(IJoystickInputHandler* handler)
   std::map<IJoystickInputHandler*, IJoystickDriverHandler*>::iterator it = m_inputHandlers.find(handler);
   if (it == m_inputHandlers.end())
   {
-    m_inputHandlers[handler] = new CAddonJoystickDriverHandler(this, handler);
+    m_inputHandlers[handler] = new CAddonJoystickInputHandling(this, handler);
     RegisterJoystickDriverHandler(m_inputHandlers[handler]);
   }
 }

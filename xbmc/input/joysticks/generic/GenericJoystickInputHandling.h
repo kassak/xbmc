@@ -31,12 +31,12 @@ class IJoystickButtonMap;
  * \brief Generic implementation of IJoystickDriverHandler to translate raw
  *        actions into physical joystick features using the provided button map
  */
-class CGenericJoystickDriverHandler : public IJoystickDriverHandler
+class CGenericJoystickInputHandling : public IJoystickDriverHandler
 {
 public:
-  CGenericJoystickDriverHandler(IJoystickInputHandler* handler, IJoystickButtonMap* buttonMap);
+  CGenericJoystickInputHandling(IJoystickInputHandler* handler, IJoystickButtonMap* buttonMap);
 
-  virtual ~CGenericJoystickDriverHandler(void);
+  virtual ~CGenericJoystickInputHandling(void);
 
   // implementation of IJoystickDriverHandler
   virtual bool OnButtonMotion(unsigned int buttonIndex, bool bPressed);
