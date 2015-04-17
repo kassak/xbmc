@@ -461,11 +461,8 @@ bool CPeripheralAddon::SetJoystickProperties(unsigned int index, CPeripheralJoys
 
   if (retVal == PERIPHERAL_NO_ERROR)
   {
-    joystick.SetProvider(joystickStruct.provider);
-    joystick.SetRequestedPort(joystickStruct.requested_port);
-    joystick.SetButtonCount(joystickStruct.button_count);
-    joystick.SetHatCount(joystickStruct.hat_count);
-    joystick.SetAxisCount(joystickStruct.axis_count);
+    ADDON::Joystick addonJoystick(joystickStruct);
+    SetJoystickInfo(joystick, addonJoystick);
 
     try { m_pStruct->FreeJoystickInfo(&joystickStruct); }
     catch (std::exception &e) { LogException(e, "FreeJoystickInfo()"); }
@@ -608,6 +605,15 @@ void CPeripheralAddon::GetJoystickInfo(const CPeripheral* device, ADDON::Joystic
   {
     joystickInfo.SetProvider(JOYSTICK_KEYBOARD_PROVIDER);
   }
+}
+
+void CPeripheralAddon::SetJoystickInfo(CPeripheralJoystick& joystick, const ADDON::Joystick& joystickInfo)
+{
+  joystick.SetDeviceName(joystickInfo.Name()); // TODO: Move to SetPeripheralInfo()
+  joystick.SetProvider(joystickInfo.Provider());
+  joystick.SetButtonCount(joystickInfo.ButtonCount());
+  joystick.SetHatCount(joystickInfo.HatCount());
+  joystick.SetAxisCount(joystickInfo.AxisCount());
 }
 
 const GameControllerPtr& CPeripheralAddon::GetGameController(const std::string& strControllerId)

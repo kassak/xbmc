@@ -98,8 +98,11 @@ namespace PERIPHERALS
     virtual bool CheckAPIVersion(void);
 
   private:
-    static void GetJoystickInfo(const CPeripheral* device, ADDON::Joystick& joystickInfo);
     static void GetPeripheralInfo(const CPeripheral* device, ADDON::Peripheral& peripheralInfo);
+    //static void SetPeripheralInfo(CPeripheral* device, const ADDON::Peripheral& peripheralInfo); // TODO
+
+    static void GetJoystickInfo(const CPeripheral* device, ADDON::Joystick& joystickInfo);
+    static void SetJoystickInfo(CPeripheralJoystick& joystick, const ADDON::Joystick& joystickInfo);
 
     const GAME::GameControllerPtr& GetGameController(const std::string& strControllerId);
     int GetFeatureIndex(const std::string& strControllerId, const std::string& featureName);

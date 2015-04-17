@@ -231,11 +231,12 @@ namespace ADDON
    * Wrapper class providing additional joystick information not provided by
    * ADDON::Peripheral.
    */
-  class Joystick
+  class Joystick : public Peripheral
   {
   public:
     Joystick(const std::string& provider = "", const std::string& strName = "")
-    : m_provider(provider),
+    : Peripheral(PERIPHERAL_TYPE_JOYSTICK, strName),
+      m_provider(provider),
     m_requestedPort(NO_PORT_REQUESTED),
     m_buttonCount(0),
     m_hatCount(0),
@@ -249,7 +250,8 @@ namespace ADDON
     }
 
     Joystick(const JOYSTICK_INFO& info)
-    : m_provider(info.provider ? info.provider : ""),
+    : Peripheral(info.peripheral),
+      m_provider(info.provider ? info.provider : ""),
     m_requestedPort(info.requested_port),
     m_buttonCount(info.button_count),
     m_hatCount(info.hat_count),
@@ -257,10 +259,14 @@ namespace ADDON
     {
     }
 
+    virtual ~Joystick(void) { }
+
     Joystick& operator=(const Joystick& rhs)
     {
       if (this != &rhs)
       {
+        Peripheral::operator=(rhs);
+
         m_provider      = rhs.m_provider;
         m_requestedPort = rhs.m_requestedPort;
         m_buttonCount   = rhs.m_buttonCount;
@@ -284,6 +290,8 @@ namespace ADDON
 
     void ToStruct(JOYSTICK_INFO& info) const
     {
+      Peripheral::ToStruct(info.peripheral);
+
       info.provider       = new char[m_provider.size() + 1];
       info.requested_port = m_requestedPort;
       info.button_count   = m_buttonCount;
@@ -295,6 +303,8 @@ namespace ADDON
 
     static void FreeStruct(JOYSTICK_INFO& info)
     {
+      Peripheral::FreeStruct(info.peripheral);
+
       PERIPHERAL_SAFE_DELETE_ARRAY(info.provider);
     }
 

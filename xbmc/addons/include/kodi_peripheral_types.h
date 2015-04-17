@@ -50,10 +50,10 @@
 #endif
 
 /* current Peripheral API version */
-#define PERIPHERAL_API_VERSION "1.0.4"
+#define PERIPHERAL_API_VERSION "1.0.5"
 
 /* min. Peripheral API version */
-#define PERIPHERAL_MIN_API_VERSION "1.0.3"
+#define PERIPHERAL_MIN_API_VERSION "1.0.5"
 
 /* indicates a joystick has no preference for port number */
 #define NO_PORT_REQUESTED     (-1)
@@ -163,11 +163,12 @@ extern "C"
   ///{
   typedef struct JOYSTICK_INFO
   {
-    char*         provider;           /*!< @brief name of the driver or interface providing the joystick */
-    int           requested_port;     /*!< @brief requested port number (such as for 360 controllers), or NO_PORT_REQUESTED */
-    unsigned int  button_count;       /*!< @brief number of buttons reported by the driver */
-    unsigned int  hat_count;          /*!< @brief number of hats reported by the driver */
-    unsigned int  axis_count;         /*!< @brief number of axes reported by the driver */
+    PERIPHERAL_INFO peripheral;         /*!< @brief peripheral info for this joystick */
+    char*           provider;           /*!< @brief name of the driver or interface providing the joystick */
+    int             requested_port;     /*!< @brief requested port number (such as for 360 controllers), or NO_PORT_REQUESTED */
+    unsigned int    button_count;       /*!< @brief number of buttons reported by the driver */
+    unsigned int    hat_count;          /*!< @brief number of hats reported by the driver */
+    unsigned int    axis_count;         /*!< @brief number of axes reported by the driver */
   } ATTRIBUTE_PACKED JOYSTICK_INFO;
 
   typedef enum JOYSTICK_DRIVER_TYPE
