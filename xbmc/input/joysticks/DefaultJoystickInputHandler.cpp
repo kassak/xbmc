@@ -237,8 +237,8 @@ JoystickFeatureID CDefaultJoystickInputHandler::GetFeatureID(unsigned int featur
     case  9: return JoystickIDButtonLeftStick;
     case 10: return JoystickIDButtonRightStick;
     case 11: return JoystickIDButtonUp;
-    case 12: return JoystickIDButtonRight;
-    case 13: return JoystickIDButtonDown;
+    case 12: return JoystickIDButtonDown;
+    case 13: return JoystickIDButtonRight;
     case 14: return JoystickIDButtonLeft;
     case 15: return JoystickIDTriggerLeft;
     case 16: return JoystickIDTriggerRight;
