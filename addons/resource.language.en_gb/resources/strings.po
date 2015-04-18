@@ -16565,37 +16565,37 @@ msgctxt "#37033"
 msgid "Video playback related accessibility settings, e.g., "Prefer subtitles for the hearing impaired""
 msgstr ""
 
-#. Setting #37034 Settings -> Video -> Accessibility 
+#. Setting #37034 Settings -> Video -> Accessibility
 #: system/settings/settings.xml
 msgctxt "#37034"
 msgid "Prefer audio stream for the visually impaired"
 msgstr ""
 
-#. Description of setting #37034 Settings -> Video -> Accessibility 
+#. Description of setting #37034 Settings -> Video -> Accessibility
 #: system/settings/settings.xml
 msgctxt "#37035"
 msgid "Prefer the audio stream for the visually impaired to other audio streams of the same language"
 msgstr ""
 
-#. Setting #37036 Settings -> Video -> Accessibility 
+#. Setting #37036 Settings -> Video -> Accessibility
 #: system/settings/settings.xml
 msgctxt "#37036"
 msgid "Prefer audio stream for the hearing impaired"
 msgstr ""
 
-#. Description of setting #37036 Settings -> Video -> Accessibility 
+#. Description of setting #37036 Settings -> Video -> Accessibility
 #: system/settings/settings.xml
 msgctxt "#37037"
 msgid "Prefer the audio stream for the hearing impaired to other audio streams of the same language"
 msgstr ""
 
-#. Setting #37038 Settings -> Video -> Accessibility 
+#. Setting #37038 Settings -> Video -> Accessibility
 #: system/settings/settings.xml
 msgctxt "#37038"
 msgid "Prefer subtitles for the hearing impaired"
 msgstr ""
 
-#. Description of setting #37038 Settings -> Video -> Accessibility 
+#. Description of setting #37038 Settings -> Video -> Accessibility
 #: system/settings/settings.xml
 msgctxt "#37039"
 msgid "Prefer the subtitle stream for the hearing impaired to other subtitle streams of the same language"
