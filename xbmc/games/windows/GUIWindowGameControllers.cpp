@@ -21,6 +21,7 @@
 #include "GUIWindowGameControllers.h"
 #include "GUIDialogControllerInput.h"
 #include "addons/AddonManager.h"
+#include "dialogs/GUIDialogOK.h"
 #include "games/addons/GameController.h"
 #include "guilib/GUIGameController.h"
 #include "guilib/GUIFocusPlane.h"
@@ -29,6 +30,7 @@
 #include "guilib/WindowIDs.h"
 #include "input/joysticks/JoystickTypes.h"
 #include "input/Key.h"
+#include "peripherals/bus/PeripheralBusAddon.h"
 #include "peripherals/devices/PeripheralJoystick.h"
 #include "peripherals/Peripherals.h"
 #include "utils/log.h"
@@ -153,6 +155,21 @@ void CGUIWindowGameControllers::OnInitWindow()
 
   CGUIMessage msg(GUI_MSG_LABEL_BIND, GetID(), CONTROL_PERIPHERAL_LIST, 0, 0, &m_items);
   g_windowManager.SendMessage(msg);
+
+  // Check for button mapping support
+  CPeripheralBus* bus = g_peripherals.GetBusByType(PERIPHERAL_BUS_ADDON);
+  if (bus)
+  {
+    if (static_cast<CPeripheralBusAddon*>(bus)->GetAddonCount() == 0)
+    {
+      // TODO: Move the XML implementation of button map storage from add-on to
+      // Kodi while keeping support for add-on button-mapping
+
+      // "Joystick support not found"
+      // "Controller configuration is disabled. Install the proper joystick support add-on."
+      CGUIDialogOK::ShowAndGetInput(35011, 35012);
+    }
+  }
 }
 
 void CGUIWindowGameControllers::OnDeinitWindow(int nextWindowID)

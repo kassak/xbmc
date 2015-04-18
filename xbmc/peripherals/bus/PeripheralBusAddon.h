@@ -34,6 +34,7 @@ namespace PERIPHERALS
 
     bool GetAddon(const std::string &strId, ADDON::AddonPtr &addon) const;
     bool GetAddonWithButtonMap(const CPeripheral* device, PeripheralAddonPtr &addon) const;
+    unsigned int GetAddonCount(void) const;
 
     void ProcessEvents(void);
 
