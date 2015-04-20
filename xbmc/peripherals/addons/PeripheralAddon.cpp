@@ -481,12 +481,6 @@ bool CPeripheralAddon::GetButtonMap(const CPeripheral* device, const std::string
 
   PERIPHERAL_ERROR retVal;
 
-  ADDON::Peripheral peripheralInfo;
-  GetPeripheralInfo(device, peripheralInfo);
-
-  PERIPHERAL_INFO peripheralStruct;
-  peripheralInfo.ToStruct(peripheralStruct);
-
   ADDON::Joystick joystickInfo;
   GetJoystickInfo(device, joystickInfo);
 
@@ -496,8 +490,7 @@ bool CPeripheralAddon::GetButtonMap(const CPeripheral* device, const std::string
   unsigned int      featureCount = 0;
   JOYSTICK_FEATURE* pFeatures = NULL;
 
-  try { LogError(retVal = m_pStruct->GetButtonMap(&peripheralStruct, &joystickStruct,
-                                                  strControllerId.c_str(),
+  try { LogError(retVal = m_pStruct->GetButtonMap(&joystickStruct, strControllerId.c_str(),
                                                   &featureCount, &pFeatures), "GetButtonMap()"); }
   catch (std::exception &e) { LogException(e, "GetButtonMap()"); return false;  }
 
@@ -532,12 +525,6 @@ bool CPeripheralAddon::MapJoystickFeature(const CPeripheral* device, const std::
 
   PERIPHERAL_ERROR retVal;
 
-  ADDON::Peripheral peripheralInfo;
-  GetPeripheralInfo(device, peripheralInfo);
-
-  PERIPHERAL_INFO peripheralStruct;
-  peripheralInfo.ToStruct(peripheralStruct);
-
   ADDON::Joystick joystickInfo;
   GetJoystickInfo(device, joystickInfo);
 
@@ -547,8 +534,7 @@ bool CPeripheralAddon::MapJoystickFeature(const CPeripheral* device, const std::
   JOYSTICK_FEATURE featureStruct;
   feature->ToStruct(featureStruct);
 
-  try { LogError(retVal = m_pStruct->MapJoystickFeature(&peripheralStruct, &joystickStruct,
-                                                        strControllerId.c_str(),
+  try { LogError(retVal = m_pStruct->MapJoystickFeature(&joystickStruct, strControllerId.c_str(),
                                                         &featureStruct), "MapJoystickFeature()"); }
   catch (std::exception &e) { LogException(e, "MapJoystickFeature()"); return false;  }
 
@@ -593,6 +579,8 @@ void CPeripheralAddon::GetPeripheralInfo(const CPeripheral* device, ADDON::Perip
 
 void CPeripheralAddon::GetJoystickInfo(const CPeripheral* device, ADDON::Joystick& joystickInfo)
 {
+  GetPeripheralInfo(device, joystickInfo);
+
   if (device->Type() == PERIPHERAL_JOYSTICK)
   {
     const CPeripheralJoystick* joystick = static_cast<const CPeripheralJoystick*>(device);

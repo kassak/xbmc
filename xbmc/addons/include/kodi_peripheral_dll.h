@@ -126,7 +126,6 @@ extern "C"
 
   /*!
    * @brief Get the features that allow translation from the joystick to the given device
-   * @param peripheral    The device's peripheral properties; unknown values may be left at their default
    * @param joystick      The device's joystick properties; unknown values may be left at their default
    * @param controller_id The controller profile being requested
    * @param feature_count The number of features allocated for the features array
@@ -134,8 +133,7 @@ extern "C"
    * @return PERIPHERAL_NO_ERROR if successful; array must be freed using
    *         FreeButtonMap() in this case
    */
-  PERIPHERAL_ERROR GetButtonMap(const PERIPHERAL_INFO* peripheral, const JOYSTICK_INFO* joystick,
-                                const char* controller_id,
+  PERIPHERAL_ERROR GetButtonMap(const JOYSTICK_INFO* joystick, const char* controller_id,
                                 unsigned int* feature_count, JOYSTICK_FEATURE** features);
 
   /*!
@@ -150,14 +148,12 @@ extern "C"
 
   /*!
    * @brief Update joystick feature
-   * @param peripheral    The device's peripheral properties; unknown values may be left at their default
    * @param joystick      The device's joystick properties; unknown values may be left at their default
    * @param controller_id The controller profile being updated
    * @param feature       The feature's new driver value
    * @return PERIPHERAL_NO_ERROR if successful
    */
-  PERIPHERAL_ERROR MapJoystickFeature(const PERIPHERAL_INFO* peripheral, const JOYSTICK_INFO* joystick,
-                                      const char* controller_id,
+  PERIPHERAL_ERROR MapJoystickFeature(const JOYSTICK_INFO* joystick, const char* controller_id,
                                       JOYSTICK_FEATURE* feature);
 #endif
   ///}
@@ -182,7 +178,7 @@ extern "C"
     pClient->FreeJoystickInfo               = FreeJoystickInfo;
     pClient->GetButtonMap                   = GetButtonMap;
     pClient->FreeButtonMap                  = FreeButtonMap;
-    pClient->MapJoystickFeature          = MapJoystickFeature;
+    pClient->MapJoystickFeature             = MapJoystickFeature;
 #endif
   };
 
