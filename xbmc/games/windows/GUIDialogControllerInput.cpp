@@ -114,14 +114,6 @@ void CGUIDialogControllerInput::OnDeinitWindow(int nextWindowID)
   if (m_focusControl)
     m_focusControl->Unfocus();
 
-  // save selected item for next time
-  if (m_controller)
-  {
-    int iFocusedControl = GetFocusedControl(GROUP_LIST);
-    if (iFocusedControl >= BUTTON_START)
-      m_lastControlIds[m_controller] = iFocusedControl;
-  }
-
   CGUIDialog::OnDeinitWindow(nextWindowID);
 }
 
@@ -192,9 +184,16 @@ void CGUIDialogControllerInput::OnFocus(int iFocusedControl)
       CancelPrompt();
 
     if (0 <= iFocusedIndex && iFocusedIndex < (int)features.size())
+    {
       m_focusControl->SetFocus(features[iFocusedIndex].Geometry());
+
+      // Remember last selected control for this dialog's controller
+      m_lastControlIds[m_controller] = iFocusedControl;
+    }
     else
+    {
       m_focusControl->Unfocus();
+    }
   }
 }
 
