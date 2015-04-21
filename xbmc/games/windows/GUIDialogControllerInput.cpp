@@ -20,22 +20,16 @@
 
 #include "GUIDialogControllerInput.h"
 #include "games/addons/GameController.h"
+#include "games/windows/wizards/GUIControllerWizard.h"
 #include "guilib/Geometry.h"
 #include "guilib/GUIButtonControl.h"
 #include "guilib/GUIControl.h"
 #include "guilib/GUIControlGroupList.h"
 #include "guilib/GUIFocusPlane.h"
-#include "guilib/GUIWindowManager.h"
+#include "guilib/GUIMessage.h"
 #include "guilib/WindowIDs.h"
-#include "input/joysticks/IJoystickButtonMap.h"
-#include "input/joysticks/JoystickDriverPrimitive.h"
-#include "input/Key.h"
-#include "peripherals/Peripherals.h"
-#include "utils/log.h"
-#include "utils/StringUtils.h"
 
 using namespace GAME;
-using namespace PERIPHERALS;
 
 #define GROUP_LIST             996
 #define BUTTON_TEMPLATE       1000
@@ -43,20 +37,12 @@ using namespace PERIPHERALS;
 
 CGUIDialogControllerInput::CGUIDialogControllerInput(void)
   : CGUIDialog(WINDOW_DIALOG_CONTROLLER_INPUT, "DialogControllerInput.xml"),
-    CThread("CtrlrInput"),
     m_focusControl(NULL),
-    m_promptIndex(-1)
+    m_selectedFeature(0),
+    m_wizard(NULL)
 {
+  // initialize CGUIWindow
   m_loadType = KEEP_IN_MEMORY;
-}
-
-void CGUIDialogControllerInput::Process(void)
-{
-  g_peripherals.RegisterJoystickButtonMapper(this);
-
-  AbortableWait(m_inputEvent);
-
-  g_peripherals.UnregisterJoystickButtonMapper(this);
 }
 
 bool CGUIDialogControllerInput::OnMessage(CGUIMessage& message)
@@ -71,7 +57,7 @@ bool CGUIDialogControllerInput::OnMessage(CGUIMessage& message)
     }
     case GUI_MSG_FOCUSED:
     {
-      int focusedControl = message.GetControlId();
+      const int focusedControl = message.GetControlId();
       OnFocus(focusedControl);
       break;
     }
@@ -86,27 +72,14 @@ bool CGUIDialogControllerInput::OnMessage(CGUIMessage& message)
   return CGUIDialog::OnMessage(message);
 }
 
-bool CGUIDialogControllerInput::OnAction(const CAction& action)
-{
-  if (action.GetID() == ACTION_CONTEXT_MENU)
-  {
-    Close();
-    return true;
-  }
-
-  return CGUIDialog::OnAction(action);
-}
-
 void CGUIDialogControllerInput::OnInitWindow(void)
 {
   CGUIDialog::OnInitWindow();
 
-  // disable the template button control
+  // Disable the template button control
   CGUIButtonControl* pButtonTemplate = GetButtonTemplate();
   if (pButtonTemplate)
     pButtonTemplate->SetVisible(false);
-
-  SetFocusedControl(GROUP_LIST, m_lastControlID);
 }
 
 void CGUIDialogControllerInput::OnDeinitWindow(int nextWindowID)
@@ -117,40 +90,61 @@ void CGUIDialogControllerInput::OnDeinitWindow(int nextWindowID)
   CGUIDialog::OnDeinitWindow(nextWindowID);
 }
 
+void CGUIDialogControllerInput::Focus(unsigned int iFeature)
+{
+  //CGUIMessage msg(GUI_MSG_ITEM_SELECT, GetID(), GROUP_LIST, iFeature + BUTTON_START);
+  CGUIMessage msg(GUI_MSG_SETFOCUS, GetID(), iFeature + BUTTON_START);
+  OnMessage(msg);
+}
+
+void CGUIDialogControllerInput::SetLabel(unsigned int iFeature, const std::string& strLabel)
+{
+  SET_CONTROL_LABEL(iFeature + BUTTON_START, strLabel);
+}
+
+void CGUIDialogControllerInput::ResetLabel(unsigned int iFeature)
+{
+  if (m_controller)
+  {
+    const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
+
+    if (iFeature < features.size())
+    {
+      const std::string& strLabel = m_controller->GetString(features.at(iFeature).Label());
+      SET_CONTROL_LABEL(iFeature + BUTTON_START, strLabel);
+    }
+  }
+}
+
+void CGUIDialogControllerInput::End(void)
+{
+  Close();
+}
+
 void CGUIDialogControllerInput::DoModal(const GameControllerPtr& controller, CGUIFocusPlane* focusControl)
 {
   if (IsDialogRunning())
     return;
 
-  Initialize();
+  // Initialize CGUIWindow
+  if (!Initialize())
+    return;
 
   if (SetupButtons(controller, focusControl))
+  {
+    m_wizard = new CGUIControllerWizard(this, m_controller);
+    m_wizard->Run();
+
     CGUIDialog::DoModal();
 
-  CleanupButtons();
-}
+    delete m_wizard;
+    m_wizard = NULL;
 
-std::string CGUIDialogControllerInput::ControllerID(void) const
-{
-  if (m_controller)
-    return m_controller->ID();
-
-
-  return "";
-}
-
-bool CGUIDialogControllerInput::MapPrimitive(IJoystickButtonMap* buttonMap, const CJoystickDriverPrimitive& primitive)
-{
-  if (IsPrompting())
-  {
-    buttonMap->MapButton(m_promptIndex, primitive);
-
-    CancelPrompt();
-
-    return true;
+    m_controller = NULL;
+    m_focusControl = NULL;
   }
 
-  return false;
+  CleanupButtons();
 }
 
 void CGUIDialogControllerInput::OnFocus(int iFocusedControl)
@@ -159,20 +153,22 @@ void CGUIDialogControllerInput::OnFocus(int iFocusedControl)
   {
     const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
 
-    int iFocusedIndex = iFocusedControl - BUTTON_START;
-
-    if (IsPrompting() && iFocusedIndex != m_promptIndex)
-      CancelPrompt();
+    const int iFocusedIndex = iFocusedControl - BUTTON_START;
 
     if (0 <= iFocusedIndex && iFocusedIndex < (int)features.size())
     {
-      m_focusControl->SetFocus(features[iFocusedIndex].Geometry());
+      m_selectedFeature = iFocusedIndex;
 
-      // Remember last selected control for this dialog's controller
-      m_lastControlIds[m_controller] = iFocusedControl;
+      if (m_wizard)
+        m_wizard->OnFocus(m_selectedFeature);
+
+      m_focusControl->SetFocus(features[m_selectedFeature].Geometry());
     }
     else
     {
+      if (m_wizard)
+        m_wizard->Abort();
+
       m_focusControl->Unfocus();
     }
   }
@@ -180,70 +176,15 @@ void CGUIDialogControllerInput::OnFocus(int iFocusedControl)
 
 bool CGUIDialogControllerInput::OnClick(int iSelectedControl)
 {
-  if (m_controller && m_focusControl && iSelectedControl >= BUTTON_START)
+  const int iSelectedFeature = iSelectedControl - BUTTON_START;
+
+  if (m_wizard && iSelectedFeature == (int)m_selectedFeature)
   {
-    PromptForInput(iSelectedControl - BUTTON_START);
+    m_wizard->Run(m_selectedFeature);
     return true;
   }
 
   return false;
-}
-
-void CGUIDialogControllerInput::PromptForInput(unsigned int buttonIndex)
-{
-  if (IsPrompting())
-    return;
-
-  const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
-  if (buttonIndex < features.size())
-  {
-    const CGameControllerFeature& feature = features[buttonIndex];
-
-    // Update label
-    std::string promptMsg = g_localizeStrings.Get(35051); // "Press %s"
-    std::string prompt = StringUtils::Format(promptMsg.c_str(), m_controller->GetString(feature.Label()).c_str());
-    SET_CONTROL_LABEL(BUTTON_START + buttonIndex, prompt);
-
-    m_promptIndex = buttonIndex;
-
-    m_inputEvent.Reset();
-    Create();
-  }
-}
-
-void CGUIDialogControllerInput::CancelPrompt(void)
-{
-  m_inputEvent.Set();
-
-  if (!IsPrompting())
-    return;
-
-  const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
-  if (m_promptIndex < (int)features.size())
-  {
-    const CGameControllerFeature& feature = features[m_promptIndex];
-
-    // Change label back
-    SET_CONTROL_LABEL(BUTTON_START + m_promptIndex, m_controller->GetString(feature.Label()));
-
-    m_promptIndex = -1;
-  }
-}
-
-int CGUIDialogControllerInput::GetFocusedControl(int iControl)
-{
-  CGUIMessage msg(GUI_MSG_ITEM_SELECTED, GetID(), iControl);
-
-  if (CGUIWindow::OnMessage(msg))
-    return msg.GetParam1() >= 0 ? msg.GetParam1() : -1;
-
-  return -1;
-}
-
-void CGUIDialogControllerInput::SetFocusedControl(int iControl, int iFocusedControl)
-{
-  CGUIMessage msg(GUI_MSG_ITEM_SELECT, GetID(), iControl, iFocusedControl);
-  OnMessage(msg);
 }
 
 bool CGUIDialogControllerInput::SetupButtons(const GameControllerPtr& controller, CGUIFocusPlane* focusControl)
@@ -274,14 +215,11 @@ bool CGUIDialogControllerInput::SetupButtons(const GameControllerPtr& controller
   // Update our default control
   m_defaultControl = GROUP_LIST;
   m_lastControlID = BUTTON_START;
+  m_selectedFeature = 0;
 
+  // Success
   m_controller = controller;
   m_focusControl = focusControl;
-
-  // Restore last selected control
-  std::map<GameControllerPtr, unsigned int>::const_iterator it = m_lastControlIds.find(m_controller);
-  if (it != m_lastControlIds.end())
-    m_lastControlID = it->second;
 
   return true;
 }

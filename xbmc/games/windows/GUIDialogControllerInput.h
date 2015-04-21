@@ -21,21 +21,16 @@
  */
 
 #include "games/GameTypes.h"
+#include "games/windows/wizards/IGUIControllerWizard.h"
 #include "guilib/GUIDialog.h"
-#include "input/joysticks/IJoystickButtonMapper.h"
-#include "threads/Event.h"
-#include "threads/Thread.h"
 
-#include <map>
 #include <string>
-#include <vector>
 
 class CGUIButtonControl;
 class CGUIFocusPlane;
 
 class CGUIDialogControllerInput : public CGUIDialog,
-                                  protected CThread,
-                                  public IJoystickButtonMapper
+                                  public GAME::IGUIControllerWizardCallbacks
 {
 public:
   CGUIDialogControllerInput(void);
@@ -43,18 +38,16 @@ public:
 
   // implementation of CGUIControl
   virtual bool OnMessage(CGUIMessage& message);
-  virtual bool OnAction(const CAction& action);
+
+  // implementation of IGUIControllerWizardCallbacks
+  virtual void Focus(unsigned int iFeature);
+  virtual void SetLabel(unsigned int iFeature, const std::string& strLabel);
+  virtual void ResetLabel(unsigned int iFeature);
+  virtual void End(void);
 
   void DoModal(const GAME::GameControllerPtr& controller, CGUIFocusPlane* focusControl);
 
-  // Implementation of IJoystickButtonMapper
-  virtual std::string ControllerID(void) const;
-  virtual bool MapPrimitive(IJoystickButtonMap* buttonMap, const CJoystickDriverPrimitive& primitive);
-
 protected:
-  // implementation of CThread
-  virtual void Process(void);
-
   // implementation of CGUIWindow
   virtual void OnInitWindow(void);
   virtual void OnDeinitWindow(int nextWindowID);
@@ -63,23 +56,14 @@ protected:
   bool OnClick(int iSelectedControl);
 
 private:
-  void PromptForInput(unsigned int buttonIndex);
-  void CancelPrompt(void);
-  bool IsPrompting(void) const { return m_controller && m_promptIndex >= 0; }
-
-  int GetFocusedControl(int iControl);
-  void SetFocusedControl(int iControl, int iFocusedControl);
-
   bool SetupButtons(const GAME::GameControllerPtr& controller, CGUIFocusPlane* focusControl);
   void CleanupButtons(void);
 
   CGUIButtonControl* GetButtonTemplate(void);
   CGUIButtonControl* MakeButton(const std::string& strLabel, unsigned int id, CGUIButtonControl* pButtonTemplate);
 
-  GAME::GameControllerPtr m_controller;
-  CGUIFocusPlane*         m_focusControl;
-
-  std::map<GAME::GameControllerPtr, unsigned int> m_lastControlIds; // controller add-on ID -> last selected control ID
-  int                                             m_promptIndex; // Index of feature being prompted for input
-  CEvent                                          m_inputEvent;
+  GAME::GameControllerPtr     m_controller; // Active controller
+  CGUIFocusPlane*             m_focusControl;
+  unsigned int                m_selectedFeature;
+  GAME::IGUIControllerWizard* m_wizard;
 };
