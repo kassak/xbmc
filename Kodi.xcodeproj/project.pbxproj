@@ -364,6 +364,9 @@
 		689443A91ACC87CB007242E7 /* GameClientProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 689443A41ACC87CB007242E7 /* GameClientProperties.cpp */; };
 		689443AA1ACC87CB007242E7 /* GameClientProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 689443A41ACC87CB007242E7 /* GameClientProperties.cpp */; };
 		689443AB1ACC87CB007242E7 /* GameClientProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 689443A41ACC87CB007242E7 /* GameClientProperties.cpp */; };
+		68A70C6B1AE9BE7000C11CE6 /* GUIControllerWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68A70C671AE9BE7000C11CE6 /* GUIControllerWizard.cpp */; };
+		68A70C6C1AE9BE7000C11CE6 /* GUIControllerWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68A70C671AE9BE7000C11CE6 /* GUIControllerWizard.cpp */; };
+		68A70C6D1AE9BE7000C11CE6 /* GUIControllerWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68A70C671AE9BE7000C11CE6 /* GUIControllerWizard.cpp */; };
 		68AFC9A41ACC5E2000DD5173 /* JoystickDriverPrimitive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68AFC99F1ACC5E2000DD5173 /* JoystickDriverPrimitive.cpp */; };
 		68AFC9A51ACC5E2000DD5173 /* JoystickDriverPrimitive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68AFC99F1ACC5E2000DD5173 /* JoystickDriverPrimitive.cpp */; };
 		68AFC9A61ACC5E2000DD5173 /* JoystickDriverPrimitive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68AFC99F1ACC5E2000DD5173 /* JoystickDriverPrimitive.cpp */; };
@@ -3833,6 +3836,8 @@
 		689443A31ACC87CB007242E7 /* GameClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameClient.h; path = games/addons/GameClient.h; sourceTree = "<group>"; };
 		689443A41ACC87CB007242E7 /* GameClientProperties.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameClientProperties.cpp; path = games/addons/GameClientProperties.cpp; sourceTree = "<group>"; };
 		689443A51ACC87CB007242E7 /* GameClientProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameClientProperties.h; path = games/addons/GameClientProperties.h; sourceTree = "<group>"; };
+		68A70C671AE9BE7000C11CE6 /* GUIControllerWizard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GUIControllerWizard.cpp; path = games/windows/wizards/GUIControllerWizard.cpp; sourceTree = "<group>"; };
+		68A70C681AE9BE7000C11CE6 /* GUIControllerWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GUIControllerWizard.h; path = games/windows/wizards/GUIControllerWizard.h; sourceTree = "<group>"; };
 		68AFC99C1ACC5E2000DD5173 /* IJoystickButtonMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IJoystickButtonMap.h; path = joysticks/IJoystickButtonMap.h; sourceTree = "<group>"; };
 		68AFC99D1ACC5E2000DD5173 /* IJoystickDriverHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IJoystickDriverHandler.h; path = joysticks/IJoystickDriverHandler.h; sourceTree = "<group>"; };
 		68AFC99E1ACC5E2000DD5173 /* IJoystickInputHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IJoystickInputHandler.h; path = joysticks/IJoystickInputHandler.h; sourceTree = "<group>"; };
@@ -3847,6 +3852,7 @@
 		68AFC9AF1ACC5E2700DD5173 /* GenericJoystickInputHandling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericJoystickInputHandling.h; path = joysticks/generic/GenericJoystickInputHandling.h; sourceTree = "<group>"; };
 		68AFC9B01ACC5E2700DD5173 /* GenericJoystickKeyboardHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GenericJoystickKeyboardHandler.cpp; path = joysticks/generic/GenericJoystickKeyboardHandler.cpp; sourceTree = "<group>"; };
 		68AFC9B11ACC5E2700DD5173 /* GenericJoystickKeyboardHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericJoystickKeyboardHandler.h; path = joysticks/generic/GenericJoystickKeyboardHandler.h; sourceTree = "<group>"; };
+		68B4B8A91AE6F9E50000AD8B /* IGUIControllerWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IGUIControllerWizard.h; path = games/windows/wizards/IGUIControllerWizard.h; sourceTree = "<group>"; };
 		68B7FC841ADC9EF6008DF666 /* GameController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameController.cpp; path = games/addons/GameController.cpp; sourceTree = "<group>"; };
 		68B7FC851ADC9EF6008DF666 /* GameController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameController.h; path = games/addons/GameController.h; sourceTree = "<group>"; };
 		68B7FC861ADC9EF6008DF666 /* GameControllerFeature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameControllerFeature.cpp; path = games/addons/GameControllerFeature.cpp; sourceTree = "<group>"; };
@@ -7154,6 +7160,7 @@
 		684984681ACC979A00F47419 /* windows */ = {
 			isa = PBXGroup;
 			children = (
+				68B4B8A41AE6F9D30000AD8B /* wizards */,
 				684984691ACC97BD00F47419 /* GUIDialogControllerInput.cpp */,
 				6849846A1ACC97BD00F47419 /* GUIDialogControllerInput.h */,
 				6849846B1ACC97BD00F47419 /* GUIViewStateWindowGames.cpp */,
@@ -7248,6 +7255,16 @@
 				68AFC9B11ACC5E2700DD5173 /* GenericJoystickKeyboardHandler.h */,
 			);
 			name = generic;
+			sourceTree = "<group>";
+		};
+		68B4B8A41AE6F9D30000AD8B /* wizards */ = {
+			isa = PBXGroup;
+			children = (
+				68A70C671AE9BE7000C11CE6 /* GUIControllerWizard.cpp */,
+				68A70C681AE9BE7000C11CE6 /* GUIControllerWizard.h */,
+				68B4B8A91AE6F9E50000AD8B /* IGUIControllerWizard.h */,
+			);
+			name = wizards;
 			sourceTree = "<group>";
 		};
 		68D2799A1ACC6DAF00B25E88 /* addons */ = {
@@ -10927,6 +10944,7 @@
 				7CDAE9050FFCA3520040B25F /* DVDTSCorrection.cpp in Sources */,
 				E4DC97540FFE5BA8008E0C07 /* SAPDirectory.cpp in Sources */,
 				E4DC97550FFE5BA8008E0C07 /* SAPFile.cpp in Sources */,
+				68A70C6B1AE9BE7000C11CE6 /* GUIControllerWizard.cpp in Sources */,
 				7CDAEA7D1001CD6E0040B25F /* karaokelyricstextustar.cpp in Sources */,
 				F5D8D732102BB3B1004A11AB /* OverlayRendererGL.cpp in Sources */,
 				F5D8D733102BB3B1004A11AB /* OverlayRenderer.cpp in Sources */,
@@ -12653,6 +12671,7 @@
 				7CCDAA84192756250074CF51 /* NptPosixDynamicLibraries.cpp in Sources */,
 				7CCDAA87192756250074CF51 /* NptPosixEnvironment.cpp in Sources */,
 				7CCDAA8D192756250074CF51 /* NptPosixNetwork.cpp in Sources */,
+				68A70C6D1AE9BE7000C11CE6 /* GUIControllerWizard.cpp in Sources */,
 				7CCDAA90192756250074CF51 /* NptPosixQueue.cpp in Sources */,
 				7CCDAA99192756250074CF51 /* NptPosixSystem.cpp in Sources */,
 				7CCDAAA2192756250074CF51 /* NptPosixThreads.cpp in Sources */,
@@ -13521,6 +13540,7 @@
 				E4991537174E642900741B6D /* FileItem.cpp in Sources */,
 				6869DEA01ACC813B005F33E1 /* GameInfoTag.cpp in Sources */,
 				E4991538174E642900741B6D /* GUIInfoManager.cpp in Sources */,
+				68A70C6C1AE9BE7000C11CE6 /* GUIControllerWizard.cpp in Sources */,
 				E4991539174E642900741B6D /* GUILargeTextureManager.cpp in Sources */,
 				E499153A174E642900741B6D /* GUIPassword.cpp in Sources */,
 				395C29D91A98A11C00EBC7AD /* WsgiInputStream.cpp in Sources */,
