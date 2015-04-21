@@ -184,7 +184,7 @@ void CGUIDialogControllerInput::OnFocus(int iFocusedControl)
 {
   if (m_controller && m_focusControl)
   {
-    const std::vector<GAME::CGameControllerFeature>& features = m_controller->Layout().Features();
+    const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
 
     int iFocusedIndex = iFocusedControl - BUTTON_START;
 
@@ -214,10 +214,10 @@ void CGUIDialogControllerInput::PromptForInput(unsigned int buttonIndex)
   if (IsPrompting())
     return;
 
-  const std::vector<GAME::CGameControllerFeature>& features = m_controller->Layout().Features();
+  const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
   if (buttonIndex < features.size())
   {
-    const GAME::CGameControllerFeature& feature = features[buttonIndex];
+    const CGameControllerFeature& feature = features[buttonIndex];
 
     // Update label
     std::string promptMsg = g_localizeStrings.Get(35051); // "Press %s"
@@ -238,10 +238,10 @@ void CGUIDialogControllerInput::CancelPrompt(void)
   if (!IsPrompting())
     return;
 
-  const std::vector<GAME::CGameControllerFeature>& features = m_controller->Layout().Features();
+  const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
   if (m_promptIndex < (int)features.size())
   {
-    const GAME::CGameControllerFeature& feature = features[m_promptIndex];
+    const CGameControllerFeature& feature = features[m_promptIndex];
 
     // Change label back
     SET_CONTROL_LABEL(BUTTON_START + m_promptIndex, m_controller->GetString(feature.Label()));
@@ -277,10 +277,10 @@ bool CGUIDialogControllerInput::SetupButtons(const GameControllerPtr& controller
   if (!pButtonTemplate || !pGroupList)
     return false;
 
-  const std::vector<GAME::CGameControllerFeature>& features = controller->Layout().Features();
+  const std::vector<CGameControllerFeature>& features = controller->Layout().Features();
 
   unsigned int buttonId = BUTTON_START;
-  for (std::vector<GAME::CGameControllerFeature>::const_iterator it = features.begin(); it != features.end(); ++it)
+  for (std::vector<CGameControllerFeature>::const_iterator it = features.begin(); it != features.end(); ++it)
   {
     CGUIButtonControl* pButton = MakeButton(controller->GetString(it->Label()), buttonId++, pButtonTemplate);
 
@@ -299,7 +299,7 @@ bool CGUIDialogControllerInput::SetupButtons(const GameControllerPtr& controller
   m_focusControl = focusControl;
 
   // Restore last selected control
-  std::map<GAME::GameControllerPtr, unsigned int>::const_iterator it = m_lastControlIds.find(m_controller);
+  std::map<GameControllerPtr, unsigned int>::const_iterator it = m_lastControlIds.find(m_controller);
   if (it != m_lastControlIds.end())
     m_lastControlID = it->second;
 
