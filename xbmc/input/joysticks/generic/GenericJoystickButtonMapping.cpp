@@ -20,6 +20,7 @@
 
 #include "GenericJoystickButtonMapping.h"
 #include "input/joysticks/IJoystickButtonMapper.h"
+#include "input/joysticks/JoystickTranslator.h"
 
 #include <assert.h>
 
@@ -36,20 +37,21 @@ CGenericJoystickButtonMapping::CGenericJoystickButtonMapping(IJoystickButtonMapp
 bool CGenericJoystickButtonMapping::OnButtonMotion(unsigned int buttonIndex, bool bPressed)
 {
   if (bPressed)
-    return m_buttonMapper->OnButton(m_buttonMap, buttonIndex);
+  {
+    CJoystickDriverPrimitive buttonPrimitive(buttonIndex);
+
+    if (buttonPrimitive.IsValid())
+      return m_buttonMapper->MapPrimitive(m_buttonMap, buttonPrimitive);
+  }
 
   return false;
 }
 
 bool CGenericJoystickButtonMapping::OnHatMotion(unsigned int hatIndex, HatDirection direction)
 {
-  if (direction == HatDirectionUp    ||
-      direction == HatDirectionRight ||
-      direction == HatDirectionDown  ||
-      direction == HatDirectionLeft)
-  {
-    return m_buttonMapper->OnHat(m_buttonMap, hatIndex, direction);
-  }
+  CJoystickDriverPrimitive hatPrimtive(hatIndex, direction);
+  if (hatPrimtive.IsValid())
+    return m_buttonMapper->MapPrimitive(m_buttonMap, hatPrimtive);
 
   return false;
 }
@@ -57,7 +59,11 @@ bool CGenericJoystickButtonMapping::OnHatMotion(unsigned int hatIndex, HatDirect
 bool CGenericJoystickButtonMapping::OnAxisMotion(unsigned int axisIndex, float position)
 {
   if (position >= AXIS_THRESHOLD)
-    return m_buttonMapper->OnAxis(m_buttonMap, axisIndex);
+  {
+    CJoystickDriverPrimitive semiAxisPrimitive(axisIndex, CJoystickTranslator::GetDirection(position));
+    if (semiAxisPrimitive.IsValid())
+      return m_buttonMapper->MapPrimitive(m_buttonMap, semiAxisPrimitive);
+  }
 
   return false;
 }

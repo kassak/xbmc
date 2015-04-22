@@ -19,7 +19,7 @@
  */
 #pragma once
 
-#include "JoystickTypes.h"
+#include "input/joysticks/JoystickDriverPrimitive.h"
 
 #include <string>
 
@@ -46,29 +46,12 @@ public:
   virtual std::string ControllerID(void) const = 0;
 
   /*!
-   * \brief Handle button motion
+   * \brief Handle button/hat press or axis threshold
    *
-   * \param buttonIndex The index of the button as reported by the driver
-   * \param bPressed    true for press motion, false for release motion
+   * \param buttonMap  The button map being manipulated
+   * \param primitive  The source of the action
+   *
+   * \return true if action was mapped to a feature
    */
-  virtual bool OnButton(IJoystickButtonMap* buttonMap, unsigned int buttonIndex) = 0;
-
-  /*!
-   * \brief Handle hat motion
-   *
-   * \param hatIndex     The index of the hat as reported by the driver
-   * \param cardinalDir  The cardinal direction: up, down, right, left (exclusively)
-   */
-  virtual bool OnHat(IJoystickButtonMap* buttonMap, unsigned int hatIndex, HatDirection cardinalDir) = 0;
-
-  /*!
-   * \brief Handle axis motion
-   *
-   * If a joystick feature requires multiple axes (analog sticks, accelerometers),
-   * they can be buffered for later processing.
-   *
-   * \param axisIndex   The index of the axis as reported by the driver
-   * \param position    The position of the axis in the closed interval [-1.0, 1.0]
-   */
-  virtual bool OnAxis(IJoystickButtonMap* buttonMap, unsigned int axisIndex) = 0;
+  virtual bool MapPrimitive(IJoystickButtonMap* buttonMap, const CJoystickDriverPrimitive& primitive) = 0;
 };

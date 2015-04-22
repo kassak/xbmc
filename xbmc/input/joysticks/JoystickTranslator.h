@@ -27,4 +27,6 @@ public:
   static const char* HatDirectionToString(HatDirection dir);
 
   static JoystickFeatureType GetFeatureType(JoystickFeatureID featureId);
+
+  static SemiAxisDirection GetDirection(float position);
 };

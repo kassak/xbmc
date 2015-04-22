@@ -68,3 +68,11 @@ JoystickFeatureType CJoystickTranslator::GetFeatureType(JoystickFeatureID featur
   }
   return JoystickDigitalButton;
 }
+
+SemiAxisDirection CJoystickTranslator::GetDirection(float position)
+{
+  if      (position > 0) return SemiAxisDirectionPositive;
+  else if (position < 0) return SemiAxisDirectionNegative;
+
+  return SemiAxisDirectionUnknown;
+}

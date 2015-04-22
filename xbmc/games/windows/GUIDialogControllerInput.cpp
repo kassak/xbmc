@@ -135,40 +135,21 @@ std::string CGUIDialogControllerInput::ControllerID(void) const
   if (m_controller)
     return m_controller->ID();
 
+
   return "";
 }
 
-bool CGUIDialogControllerInput::OnButton(IJoystickButtonMap* buttonMap, unsigned int buttonIndex)
+bool CGUIDialogControllerInput::MapPrimitive(IJoystickButtonMap* buttonMap, const CJoystickDriverPrimitive& primitive)
 {
   if (IsPrompting())
   {
-    buttonMap->MapButton(m_promptIndex, CJoystickDriverPrimitive(buttonIndex));
+    buttonMap->MapButton(m_promptIndex, primitive);
 
     CancelPrompt();
 
     return true;
   }
 
-  return false;
-}
-
-bool CGUIDialogControllerInput::OnHat(IJoystickButtonMap* buttonMap, unsigned int hatIndex, HatDirection direction)
-{
-  if (IsPrompting())
-  {
-    buttonMap->MapButton(m_promptIndex, CJoystickDriverPrimitive(hatIndex, direction));
-
-    CancelPrompt();
-
-    return true;
-  }
-
-  return false;
-}
-
-bool CGUIDialogControllerInput::OnAxis(IJoystickButtonMap* buttonMap, unsigned int axisIndex)
-{
-  // TODO
   return false;
 }
 

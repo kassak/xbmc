@@ -49,9 +49,7 @@ public:
 
   // Implementation of IJoystickButtonMapper
   virtual std::string ControllerID(void) const;
-  virtual bool OnButton(IJoystickButtonMap* buttonMap, unsigned int buttonIndex);
-  virtual bool OnHat(IJoystickButtonMap* buttonMap, unsigned int hatIndex, HatDirection cardinalDir);
-  virtual bool OnAxis(IJoystickButtonMap* buttonMap, unsigned int axisIndex);
+  virtual bool MapPrimitive(IJoystickButtonMap* buttonMap, const CJoystickDriverPrimitive& primitive);
 
 protected:
   // implementation of CThread
