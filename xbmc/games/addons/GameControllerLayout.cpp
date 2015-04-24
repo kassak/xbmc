@@ -123,7 +123,7 @@ bool CGameControllerLayout::Deserialize(const TiXmlElement* pElement)
 
     m_features.push_back(feature);
 
-    pChild = pChild->NextSiblingElement(LAYOUT_XML_ELM_BUTTON);
+    pChild = pChild->NextSiblingElement();
   }
 
   return true;
