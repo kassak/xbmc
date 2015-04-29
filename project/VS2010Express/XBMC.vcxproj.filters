@@ -364,6 +364,9 @@
     <Filter Include="games\windows">
       <UniqueIdentifier>{b27eff5a-49e1-4e7d-b4c2-f4e46d18629a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="games\windows\wizards">
+      <UniqueIdentifier>{63e2392e-8d91-4bc8-a014-eba86326b29a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\xbmc\win32\pch.cpp">
@@ -3253,6 +3256,9 @@
     </ClCompile>
     <ClCompile Include="..\..\xbmc\filesystem\NFSDirectory.cpp">
       <Filter>filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xbmc\games\windows\wizards\GUIControllerWizard.cpp">
+      <Filter>games\windows\wizards</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -6299,6 +6305,12 @@
     </ClInclude>
     <ClInclude Include="..\..\xbmc\input\joysticks\IJoystickButtonMapper.h">
       <Filter>input\joysticks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xbmc\games\windows\wizards\GUIControllerWizard.h">
+      <Filter>games\windows\wizards</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xbmc\games\windows\wizards\IGUIControllerWizard.h">
+      <Filter>games\windows\wizards</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
