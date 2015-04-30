@@ -22,6 +22,7 @@
 #include "IGUIControllerWizard.h"
 #include "games/GameTypes.h"
 #include "input/joysticks/IJoystickButtonMapper.h"
+#include "input/joysticks/JoystickDriverPrimitive.h"
 #include "threads/CriticalSection.h"
 
 namespace GAME
@@ -75,6 +76,7 @@ private:
   WizardState                          m_state;
   unsigned int                         m_featureIndex;
   bool                                 m_bAutoClose;
+  CJoystickDriverPrimitive             m_lastAnalogStickDir;
   CCriticalSection                     m_mutex;
 };
 
