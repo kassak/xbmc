@@ -48,6 +48,7 @@ public:
 
   // implementation of IJoystickButtonMapper
   virtual std::string ControllerID(void) const;
+  virtual bool IsMapping(void) const;
   virtual bool MapPrimitive(IJoystickButtonMap* buttonMap, const CJoystickDriverPrimitive& primitive);
 
 private:

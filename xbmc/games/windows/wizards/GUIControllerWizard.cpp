@@ -187,23 +187,14 @@ bool CGUIControllerWizard::Abort(void)
 
   bool bAborted = false;
 
-  switch (m_state)
+  if (IsMapping())
   {
-    case STATE_PROMPT_BUTTON:
-    case STATE_PROMPT_ANALOG_STICK_UP:
-    case STATE_PROMPT_ANALOG_STICK_DOWN:
-    case STATE_PROMPT_ANALOG_STICK_RIGHT:
-    case STATE_PROMPT_ANALOG_STICK_LEFT:
-    {
-      CancelPrompt();
+    CancelPrompt();
 
-      m_state = STATE_FINISHED;
-      m_bAutoClose = false;
+    m_state = STATE_FINISHED;
+    m_bAutoClose = false;
 
-      bAborted = true;
-    }
-    default:
-      break;
+    bAborted = true;
   }
 
   return bAborted;
@@ -220,6 +211,26 @@ void CGUIControllerWizard::OnFocus(unsigned int featureIndex)
 std::string CGUIControllerWizard::ControllerID(void) const
 {
   return m_controller->ID();
+}
+
+bool CGUIControllerWizard::IsMapping(void) const
+{
+  CSingleLock lock(m_mutex);
+
+  switch (m_state)
+  {
+    case STATE_PROMPT_BUTTON:
+    case STATE_PROMPT_ANALOG_STICK_UP:
+    case STATE_PROMPT_ANALOG_STICK_DOWN:
+    case STATE_PROMPT_ANALOG_STICK_RIGHT:
+    case STATE_PROMPT_ANALOG_STICK_LEFT:
+      return true;
+
+    default:
+      break;
+  }
+
+  return false;
 }
 
 bool CGUIControllerWizard::MapPrimitive(IJoystickButtonMap* buttonMap, const CJoystickDriverPrimitive& primitive)

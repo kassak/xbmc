@@ -45,6 +45,8 @@ public:
    */
   virtual std::string ControllerID(void) const = 0;
 
+  virtual bool IsMapping(void) const = 0;
+
   /*!
    * \brief Handle button/hat press or axis threshold
    *

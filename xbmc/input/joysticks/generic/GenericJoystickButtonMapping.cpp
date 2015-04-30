@@ -23,6 +23,7 @@
 #include "input/joysticks/JoystickTranslator.h"
 
 #include <assert.h>
+#include <cmath>
 
 #define AXIS_THRESHOLD  0.5f
 
@@ -39,7 +40,6 @@ bool CGenericJoystickButtonMapping::OnButtonMotion(unsigned int buttonIndex, boo
   if (bPressed)
   {
     CJoystickDriverPrimitive buttonPrimitive(buttonIndex);
-
     if (buttonPrimitive.IsValid())
       return m_buttonMapper->MapPrimitive(m_buttonMap, buttonPrimitive);
   }
@@ -49,20 +49,32 @@ bool CGenericJoystickButtonMapping::OnButtonMotion(unsigned int buttonIndex, boo
 
 bool CGenericJoystickButtonMapping::OnHatMotion(unsigned int hatIndex, HatDirection direction)
 {
-  CJoystickDriverPrimitive hatPrimtive(hatIndex, direction);
-  if (hatPrimtive.IsValid())
-    return m_buttonMapper->MapPrimitive(m_buttonMap, hatPrimtive);
+  if (direction != HatDirectionNone)
+  {
+    CJoystickDriverPrimitive hatPrimtive(hatIndex, direction);
+    if (hatPrimtive.IsValid())
+      return m_buttonMapper->MapPrimitive(m_buttonMap, hatPrimtive);
+
+    return m_buttonMapper->IsMapping();
+  }
 
   return false;
 }
 
 bool CGenericJoystickButtonMapping::OnAxisMotion(unsigned int axisIndex, float position)
 {
-  if (position >= AXIS_THRESHOLD)
+  const float magnitude = std::abs(position);
+
+  if (magnitude > 0.0f)
   {
-    CJoystickDriverPrimitive semiAxisPrimitive(axisIndex, CJoystickTranslator::GetDirection(position));
-    if (semiAxisPrimitive.IsValid())
-      return m_buttonMapper->MapPrimitive(m_buttonMap, semiAxisPrimitive);
+    if (magnitude >= AXIS_THRESHOLD)
+    {
+      CJoystickDriverPrimitive semiAxisPrimitive(axisIndex, CJoystickTranslator::GetDirection(position));
+      if (semiAxisPrimitive.IsValid())
+        return m_buttonMapper->MapPrimitive(m_buttonMap, semiAxisPrimitive);
+    }
+
+    return m_buttonMapper->IsMapping();
   }
 
   return false;
