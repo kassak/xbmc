@@ -22,6 +22,7 @@
 #include "input/joysticks/IJoystickButtonMapper.h"
 #include "input/joysticks/JoystickTranslator.h"
 
+#include <algorithm>
 #include <assert.h>
 #include <cmath>
 
@@ -63,19 +64,45 @@ bool CGenericJoystickButtonMapping::OnHatMotion(unsigned int hatIndex, HatDirect
 
 bool CGenericJoystickButtonMapping::OnAxisMotion(unsigned int axisIndex, float position)
 {
-  const float magnitude = std::abs(position);
-
-  if (magnitude > 0.0f)
+  if (position != 0.0f)
   {
-    if (magnitude >= AXIS_THRESHOLD)
+    // Remove axis if it was active in the opposite direction
+    CJoystickDriverPrimitive oppositeAxis(axisIndex, CJoystickTranslator::GetDirection(-position));
+    Delete(oppositeAxis);
+
+    CJoystickDriverPrimitive semiAxisPrimitive(axisIndex, CJoystickTranslator::GetDirection(position));
+    if (semiAxisPrimitive.IsValid())
     {
-      CJoystickDriverPrimitive semiAxisPrimitive(axisIndex, CJoystickTranslator::GetDirection(position));
-      if (semiAxisPrimitive.IsValid())
+      const bool bActive = (std::abs(position) >= AXIS_THRESHOLD);
+
+      if (!bActive)
+      {
+        Delete(semiAxisPrimitive);
+      }
+      else if (!IsActive(semiAxisPrimitive))
+      {
+        Record(semiAxisPrimitive);
         return m_buttonMapper->MapPrimitive(m_buttonMap, semiAxisPrimitive);
+      }
     }
 
     return m_buttonMapper->IsMapping();
   }
 
   return false;
+}
+
+void CGenericJoystickButtonMapping::Record(const CJoystickDriverPrimitive& semiAxis)
+{
+  m_activeAxes.push_back(semiAxis);
+}
+
+void CGenericJoystickButtonMapping::Delete(const CJoystickDriverPrimitive& semiAxis)
+{
+  m_activeAxes.erase(std::remove(m_activeAxes.begin(), m_activeAxes.end(), semiAxis), m_activeAxes.end());
+}
+
+bool CGenericJoystickButtonMapping::IsActive(const CJoystickDriverPrimitive& semiAxis)
+{
+  return std::find(m_activeAxes.begin(), m_activeAxes.end(), semiAxis) != m_activeAxes.end();
 }

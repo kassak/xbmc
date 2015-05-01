@@ -20,6 +20,9 @@
 #pragma once
 
 #include "input/joysticks/IJoystickDriverHandler.h"
+#include "input/joysticks/JoystickDriverPrimitive.h"
+
+#include <vector>
 
 class IJoystickButtonMap;
 class IJoystickButtonMapper;
@@ -42,6 +45,12 @@ public:
   virtual void ProcessAxisMotions(void) { }
 
 private:
+  void Record(const CJoystickDriverPrimitive& semiAxis);
+  void Delete(const CJoystickDriverPrimitive& semiAxis);
+  bool IsActive(const CJoystickDriverPrimitive& semiAxis);
+
   IJoystickButtonMapper* const m_buttonMapper;
   IJoystickButtonMap* const    m_buttonMap;
+
+  std::vector<CJoystickDriverPrimitive> m_activeAxes;
 };
