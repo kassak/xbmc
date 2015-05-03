@@ -47,6 +47,9 @@ public:
 private:
   bool ProcessHatDirection(int index, HatDirection oldDir, HatDirection newDir, HatDirection targetDir);
 
+  void StartRepeating(unsigned int featureIndex);
+  void StopRepeating(unsigned int featureIndex);
+
   float GetAxisState(int axisIndex) const;
 
   IJoystickInputHandler* const m_handler;
@@ -55,4 +58,5 @@ private:
   std::vector<HatDirection>    m_hatStates;
   std::vector<float>           m_axisStates;
   std::vector<unsigned int>    m_featuresWithMotion;
+  std::vector<unsigned int>    m_repeatingFeatures; // Digital buttons emulating analog buttons
 };

@@ -381,11 +381,8 @@ bool CPeripheralAddon::ProcessEvents(void)
   try { LogError(retVal = m_pStruct->GetEvents(&eventCount, &pEvents), "GetEvents()"); }
   catch (std::exception &e) { LogException(e, "GetEvents()"); return false;  }
 
-  if (retVal == PERIPHERAL_NO_ERROR && pEvents != NULL)
+  if (retVal == PERIPHERAL_NO_ERROR)
   {
-    // TODO: Employ RAII to call ProcessAxisMotions()
-    std::set<CPeripheralJoystick*> joysticksWithAxisMotion;
-
     for (unsigned int i = 0; i < eventCount; i++)
     {
       ADDON::PeripheralEvent event(pEvents[i]);
@@ -422,7 +419,6 @@ bool CPeripheralAddon::ProcessEvents(void)
           case PERIPHERAL_EVENT_TYPE_DRIVER_AXIS:
           {
             joystickDevice->OnAxisMotion(event.DriverIndex(), event.AxisState());
-            joysticksWithAxisMotion.insert(joystickDevice);
             break;
           }
           default:
@@ -435,8 +431,11 @@ bool CPeripheralAddon::ProcessEvents(void)
       }
     }
 
-    for (std::set<CPeripheralJoystick*>::iterator it = joysticksWithAxisMotion.begin(); it != joysticksWithAxisMotion.end(); ++it)
-      (*it)->ProcessAxisMotions();
+    for (std::map<unsigned int, CPeripheral*>::const_iterator it = m_peripherals.begin(); it != m_peripherals.end(); ++it)
+    {
+      if (it->second->Type() == PERIPHERAL_JOYSTICK)
+        static_cast<CPeripheralJoystick*>(it->second)->ProcessAxisMotions();
+    }
 
     try { m_pStruct->FreeEvents(eventCount, pEvents); }
     catch (std::exception &e) { LogException(e, "FreeJoysticks()"); }

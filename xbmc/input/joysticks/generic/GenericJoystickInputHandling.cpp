@@ -60,9 +60,17 @@ bool CGenericJoystickInputHandling::OnButtonMotion(unsigned int buttonIndex, boo
     char& wasPressed = m_buttonStates[buttonIndex];
 
     if (!wasPressed && pressed)
-      m_handler->OnButtonPress(feature, true);
+    {
+      if (!m_handler->IsAnalogButton(feature))
+        m_handler->OnButtonPress(feature, true);
+      else
+        StartRepeating(feature);
+    }
     else if (wasPressed && !pressed)
+    {
       m_handler->OnButtonPress(feature, false);
+      StopRepeating(feature);
+    }
 
     wasPressed = pressed;
 
@@ -112,7 +120,18 @@ bool CGenericJoystickInputHandling::ProcessHatDirection(int index,
                 GAME::CGameManager::Get().GetFeatureName(m_handler->ControllerID(), feature).c_str(),
                 bActivated ? "activated" : "deactivated");
 
-      m_handler->OnButtonPress(feature, bActivated);
+      if (bActivated)
+      {
+        if (!m_handler->IsAnalogButton(feature))
+          m_handler->OnButtonPress(feature, true);
+        else
+          StartRepeating(feature);
+      }
+      else
+      {
+        m_handler->OnButtonPress(feature, false);
+        StopRepeating(feature);
+      }
     }
   }
 
@@ -214,6 +233,20 @@ void CGenericJoystickInputHandling::ProcessAxisMotions(void)
       m_handler->OnAccelerometerMotion(feature, xPos, yPos, zPos);
     }
   }
+
+  // Digital buttons emulating analog buttons need to be repeated every frame
+  for (std::vector<unsigned int>::const_iterator it = m_repeatingFeatures.begin(); it != m_repeatingFeatures.end(); ++it)
+    m_handler->OnButtonPress(*it, true);
+}
+
+void CGenericJoystickInputHandling::StartRepeating(unsigned int featureIndex)
+{
+  m_repeatingFeatures.push_back(featureIndex);
+}
+
+void CGenericJoystickInputHandling::StopRepeating(unsigned int featureIndex)
+{
+  m_repeatingFeatures.erase(std::remove(m_repeatingFeatures.begin(), m_repeatingFeatures.end(), featureIndex), m_repeatingFeatures.end());
 }
 
 float CGenericJoystickInputHandling::GetAxisState(int axisIndex) const
