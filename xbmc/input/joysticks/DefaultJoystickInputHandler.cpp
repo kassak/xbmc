@@ -107,7 +107,7 @@ bool CDefaultJoystickInputHandler::OnButtonMotion(unsigned int featureIndex, flo
     if (action.GetID() > 0)
     {
       CAction actionWithAmount(action.GetID(), magnitude, 0.0f, action.GetName());
-      CApplicationMessenger::Get().SendAction(action);
+      CApplicationMessenger::Get().SendAction(actionWithAmount);
     }
   }
 
@@ -142,7 +142,7 @@ bool CDefaultJoystickInputHandler::OnAnalogStickMotion(unsigned int featureIndex
         if (buttonKeyId == buttonKeyIds[i])
         {
           CAction actionWithAmount(action.GetID(), magnitude, 0.0f, action.GetName());
-          CApplicationMessenger::Get().SendAction(action);
+          CApplicationMessenger::Get().SendAction(actionWithAmount);
         }
       }
     }
