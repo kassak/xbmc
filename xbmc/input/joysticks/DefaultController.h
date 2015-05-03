@@ -34,12 +34,12 @@ class CAction;
  *
  * \sa IJoystickInputHandler
  */
-class CDefaultJoystickInputHandler : public IJoystickInputHandler, public ITimerCallback
+class CDefaultController : public IJoystickInputHandler, public ITimerCallback
 {
 public:
-  CDefaultJoystickInputHandler(void);
+  CDefaultController(void);
 
-  virtual ~CDefaultJoystickInputHandler(void) { }
+  virtual ~CDefaultController(void) { }
 
   // implementation of IJoystickInputHandler
   virtual std::string ControllerID(void) const;

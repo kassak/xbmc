@@ -18,7 +18,7 @@
  *
  */
 
-#include "DefaultJoystickInputHandler.h"
+#include "DefaultController.h"
 #include "guilib/GUIWindowManager.h"
 #include "input/ButtonTranslator.h"
 #include "input/joysticks/JoystickTranslator.h"
@@ -43,23 +43,23 @@
 #define ARRAY_SIZE(x)  (sizeof(x) / sizeof((x)[0]))
 #endif
 
-CDefaultJoystickInputHandler::CDefaultJoystickInputHandler(void) :
+CDefaultController::CDefaultController(void) :
   m_holdTimer(this),
   m_lastButtonPress(0)
 {
 }
 
-std::string CDefaultJoystickInputHandler::ControllerID(void) const
+std::string CDefaultController::ControllerID(void) const
 {
   return DEFAULT_GAME_CONTROLLER;
 }
 
-bool CDefaultJoystickInputHandler::IsDigitalButton(unsigned int featureIndex)
+bool CDefaultController::IsDigitalButton(unsigned int featureIndex)
 {
   return !IsAnalogButton(featureIndex);
 }
 
-bool CDefaultJoystickInputHandler::IsAnalogButton(unsigned int featureIndex)
+bool CDefaultController::IsAnalogButton(unsigned int featureIndex)
 {
   const JoystickFeatureID id = GetFeatureID(featureIndex);
 
@@ -74,7 +74,7 @@ bool CDefaultJoystickInputHandler::IsAnalogButton(unsigned int featureIndex)
   return false;
 }
 
-bool CDefaultJoystickInputHandler::OnButtonPress(unsigned int featureIndex, bool bPressed)
+bool CDefaultController::OnButtonPress(unsigned int featureIndex, bool bPressed)
 {
   const JoystickFeatureID id = GetFeatureID(featureIndex);
 
@@ -96,7 +96,7 @@ bool CDefaultJoystickInputHandler::OnButtonPress(unsigned int featureIndex, bool
   return true;
 }
 
-bool CDefaultJoystickInputHandler::OnButtonMotion(unsigned int featureIndex, float magnitude)
+bool CDefaultController::OnButtonMotion(unsigned int featureIndex, float magnitude)
 {
   const JoystickFeatureID id = GetFeatureID(featureIndex);
 
@@ -114,7 +114,7 @@ bool CDefaultJoystickInputHandler::OnButtonMotion(unsigned int featureIndex, flo
   return true;
 }
 
-bool CDefaultJoystickInputHandler::OnAnalogStickMotion(unsigned int featureIndex, float x, float y)
+bool CDefaultController::OnAnalogStickMotion(unsigned int featureIndex, float x, float y)
 {
   const JoystickFeatureID id = GetFeatureID(featureIndex);
 
@@ -165,12 +165,12 @@ bool CDefaultJoystickInputHandler::OnAnalogStickMotion(unsigned int featureIndex
   return true;
 }
 
-bool CDefaultJoystickInputHandler::OnAccelerometerMotion(unsigned int featureIndex, float x, float y, float z)
+bool CDefaultController::OnAccelerometerMotion(unsigned int featureIndex, float x, float y, float z)
 {
   return OnAnalogStickMotion(featureIndex, x, y); // TODO
 }
 
-void CDefaultJoystickInputHandler::OnTimeout(void)
+void CDefaultController::OnTimeout(void)
 {
   CSingleLock lock(m_digitalMutex);
 
@@ -184,7 +184,7 @@ void CDefaultJoystickInputHandler::OnTimeout(void)
   }
 }
 
-void CDefaultJoystickInputHandler::ProcessButtonPress(const CAction& action)
+void CDefaultController::ProcessButtonPress(const CAction& action)
 {
   if (std::find(m_pressedButtons.begin(), m_pressedButtons.end(), action.GetButtonCode()) == m_pressedButtons.end())
   {
@@ -199,7 +199,7 @@ void CDefaultJoystickInputHandler::ProcessButtonPress(const CAction& action)
   }
 }
 
-void CDefaultJoystickInputHandler::ProcessButtonRelease(unsigned int buttonKeyId)
+void CDefaultController::ProcessButtonRelease(unsigned int buttonKeyId)
 {
   std::vector<unsigned int>::iterator it = std::find(m_pressedButtons.begin(), m_pressedButtons.end(), buttonKeyId);
   if (it != m_pressedButtons.end())
@@ -211,19 +211,19 @@ void CDefaultJoystickInputHandler::ProcessButtonRelease(unsigned int buttonKeyId
   }
 }
 
-void CDefaultJoystickInputHandler::StartHoldTimer(unsigned int buttonKeyId)
+void CDefaultController::StartHoldTimer(unsigned int buttonKeyId)
 {
   m_holdTimer.Start(REPEAT_TIMEOUT_MS, true);
   m_lastButtonPress = buttonKeyId;
 }
 
-void CDefaultJoystickInputHandler::ClearHoldTimer(void)
+void CDefaultController::ClearHoldTimer(void)
 {
   m_holdTimer.Stop(true);
   m_lastButtonPress = 0;
 }
 
-JoystickFeatureID CDefaultJoystickInputHandler::GetFeatureID(unsigned int featureIndex)
+JoystickFeatureID CDefaultController::GetFeatureID(unsigned int featureIndex)
 {
   // TODO: Use game peripheral to translate
   switch (featureIndex)
@@ -254,7 +254,7 @@ JoystickFeatureID CDefaultJoystickInputHandler::GetFeatureID(unsigned int featur
   return JoystickIDButtonA;
 }
 
-unsigned int CDefaultJoystickInputHandler::GetButtonKeyID(JoystickFeatureID id,
+unsigned int CDefaultController::GetButtonKeyID(JoystickFeatureID id,
                                                           float x /* = 0.0f */,
                                                           float y /* = 0.0f */,
                                                           float z /* = 0.0f */)
