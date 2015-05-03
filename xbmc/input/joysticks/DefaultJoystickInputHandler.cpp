@@ -54,7 +54,12 @@ std::string CDefaultJoystickInputHandler::ControllerID(void) const
   return DEFAULT_GAME_CONTROLLER;
 }
 
-bool CDefaultJoystickInputHandler::OnButtonPress(unsigned int featureIndex, bool bPressed)
+bool CDefaultJoystickInputHandler::IsDigitalButton(unsigned int featureIndex)
+{
+  return !IsAnalogButton(featureIndex);
+}
+
+bool CDefaultJoystickInputHandler::IsAnalogButton(unsigned int featureIndex)
 {
   const JoystickFeatureID id = GetFeatureID(featureIndex);
 
@@ -62,21 +67,29 @@ bool CDefaultJoystickInputHandler::OnButtonPress(unsigned int featureIndex, bool
   if (buttonKeyId != 0)
   {
     CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(buttonKeyId, 0)));
-    if (action.GetID() > 0)
+    if (action.GetID() > 0 && action.IsAnalog())
+      return true;
+  }
+
+  return false;
+}
+
+bool CDefaultJoystickInputHandler::OnButtonPress(unsigned int featureIndex, bool bPressed)
+{
+  const JoystickFeatureID id = GetFeatureID(featureIndex);
+
+  unsigned int buttonKeyId = GetButtonKeyID(id);
+  if (buttonKeyId != 0)
+  {
+    if (bPressed)
     {
-      if (action.IsAnalog())
-      {
-        const float amount = bPressed ? 1.0f : 0.0f;
-        CAction actionWithAmount(action.GetID(), amount, 0.0f, action.GetName());
-        CApplicationMessenger::Get().SendAction(action);
-      }
-      else
-      {
-        if (bPressed)
-          ProcessButtonPress(action);
-        else
-          ProcessButtonRelease(buttonKeyId);
-      }
+      CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(buttonKeyId, 0)));
+      if (action.GetID() > 0)
+        ProcessButtonPress(action);
+    }
+    else
+    {
+      ProcessButtonRelease(buttonKeyId);
     }
   }
 
@@ -93,18 +106,8 @@ bool CDefaultJoystickInputHandler::OnButtonMotion(unsigned int featureIndex, flo
     CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(buttonKeyId, 0)));
     if (action.GetID() > 0)
     {
-      if (action.IsAnalog())
-      {
-        CAction actionWithAmount(action.GetID(), magnitude, 0.0f, action.GetName());
-        CApplicationMessenger::Get().SendAction(action);
-      }
-      else
-      {
-        if (magnitude >= 0.5f)
-          ProcessButtonPress(action);
-        else if (magnitude < 0.5f)
-          ProcessButtonRelease(buttonKeyId);
-      }
+      CAction actionWithAmount(action.GetID(), magnitude, 0.0f, action.GetName());
+      CApplicationMessenger::Get().SendAction(action);
     }
   }
 

@@ -36,20 +36,27 @@ std::string CDigitalAnalogButtonConverter::ControllerID(void) const
   return m_handler->ControllerID();
 }
 
+bool CDigitalAnalogButtonConverter::IsDigitalButton(unsigned int featureIndex)
+{
+  return m_handler->IsDigitalButton(featureIndex);
+}
+
+bool CDigitalAnalogButtonConverter::IsAnalogButton(unsigned int featureIndex)
+{
+  return m_handler->IsAnalogButton(featureIndex);
+}
+
 bool CDigitalAnalogButtonConverter::OnButtonPress(unsigned int featureIndex, bool bPressed)
 {
-  /* TODO
-  if (m_handler->IsAnalogButton(featureIndex))
+  if (IsAnalogButton(featureIndex))
     return m_handler->OnButtonMotion(featureIndex, bPressed ? 1.0f : 0.0f);
-  */
 
   return m_handler->OnButtonPress(featureIndex, bPressed);
 }
 
 bool CDigitalAnalogButtonConverter::OnButtonMotion(unsigned int featureIndex, float magnitude)
 {
-  /* TODO
-  if (m_handler->IsDigitalButton(featureIndex))
+  if (IsDigitalButton(featureIndex))
   {
     const bool bIsPressed = magnitude >= ANALOG_DIGITAL_THRESHOLD;
     const bool bWasPressed = std::find(m_pressedButtons.begin(), m_pressedButtons.end(), featureIndex) != m_pressedButtons.end();
@@ -69,7 +76,6 @@ bool CDigitalAnalogButtonConverter::OnButtonMotion(unsigned int featureIndex, fl
       return false;
     }
   }
-  */
 
   return m_handler->OnButtonMotion(featureIndex, magnitude);
 }

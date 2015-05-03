@@ -40,6 +40,9 @@ public:
    */
   virtual std::string ControllerID(void) const = 0;
 
+  virtual bool IsDigitalButton(unsigned int featureIndex) = 0;
+  virtual bool IsAnalogButton(unsigned int featureIndex) = 0;
+
   /*!
    * \brief A digital button has been pressed or released
    *

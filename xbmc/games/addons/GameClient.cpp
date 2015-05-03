@@ -68,8 +68,32 @@ CControllerInput::CControllerInput(CGameClient* addon, int port, const GameContr
     m_port(port),
     m_controller(controller)
 {
-  assert(m_addon);
-  assert(controller.get());
+  assert(m_addon != NULL);
+  assert(controller.get() != NULL);
+}
+
+bool CControllerInput::IsDigitalButton(unsigned int featureIndex)
+{
+  const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
+  if (featureIndex < features.size())
+  {
+    return features[featureIndex].Type()       == FEATURE_BUTTON &&
+           features[featureIndex].ButtonType() == BUTTON_DIGITAL;
+  }
+
+  return false;
+}
+
+bool CControllerInput::IsAnalogButton(unsigned int featureIndex)
+{
+  const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
+  if (featureIndex < features.size())
+  {
+    return features[featureIndex].Type()       == FEATURE_BUTTON &&
+           features[featureIndex].ButtonType() == BUTTON_ANALOG;
+  }
+
+  return false;
 }
 
 bool CControllerInput::OnButtonPress(unsigned int featureIndex, bool bPressed)
