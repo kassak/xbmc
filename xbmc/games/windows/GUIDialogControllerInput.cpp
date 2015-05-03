@@ -212,9 +212,13 @@ bool CGUIDialogControllerInput::SetupButtons(const GameControllerPtr& controller
       pGroupList->AddControl(pButton);
   }
 
-  // Update our default control
+  // Configure CGUIControlGroup
   m_defaultControl = GROUP_LIST;
+
+  // Configure CGUIWindow
   m_lastControlID = BUTTON_START;
+
+  // Configure CGUIDialogControllerInput
   m_selectedFeature = 0;
 
   // Success
