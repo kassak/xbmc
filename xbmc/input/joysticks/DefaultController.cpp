@@ -145,19 +145,19 @@ bool CDefaultController::OnAnalogStickMotion(unsigned int featureIndex, float x,
           CApplicationMessenger::Get().SendAction(actionWithAmount);
         }
       }
-    }
-    else
-    {
-      if (buttonKeyId == buttonKeyIds[i])
-      {
-        if (magnitude >= 0.5f)
-          ProcessButtonPress(action);
-        else if (magnitude < 0.5f)
-          ProcessButtonRelease(buttonKeyId);
-      }
       else
       {
-        ProcessButtonRelease(buttonKeyId);
+        if (buttonKeyId == buttonKeyIds[i])
+        {
+          if (magnitude >= 0.5f)
+            ProcessButtonPress(action);
+          else if (magnitude < 0.5f)
+            ProcessButtonRelease(buttonKeyId);
+        }
+        else
+        {
+          ProcessButtonRelease(buttonKeyIds[i]);
+        }
       }
     }
   }
