@@ -24,6 +24,7 @@
 #include "input/joysticks/IJoystickButtonMapper.h"
 #include "input/joysticks/JoystickDriverPrimitive.h"
 #include "threads/CriticalSection.h"
+#include "utils/Observer.h"
 
 namespace GAME
 {
@@ -33,8 +34,8 @@ namespace GAME
  *        from beginning to end
  */
 class CGUIControllerWizard : public IGUIControllerWizard,
-                             public IJoystickButtonMapper/*,
-                             public CThread*/
+                             public IJoystickButtonMapper,
+                             public Observer
 {
 public:
   CGUIControllerWizard(IGUIControllerWizardCallbacks* callbacks,
@@ -51,6 +52,9 @@ public:
   virtual std::string ControllerID(void) const;
   virtual bool IsMapping(void) const;
   virtual bool MapPrimitive(IJoystickButtonMap* buttonMap, const CJoystickDriverPrimitive& primitive);
+
+  // implementation of Observer
+  virtual void Notify(const Observable& obs, const ObservableMessage msg);
 
 private:
   enum WizardState

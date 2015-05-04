@@ -45,10 +45,12 @@ CGUIControllerWizard::CGUIControllerWizard(IGUIControllerWizardCallbacks* callba
   assert(m_controller.get() != NULL);
 
   g_peripherals.RegisterJoystickButtonMapper(this);
+  g_peripherals.RegisterObserver(this);
 }
 
 CGUIControllerWizard::~CGUIControllerWizard(void)
 {
+  g_peripherals.UnregisterObserver(this);
   g_peripherals.UnregisterJoystickButtonMapper(this);
 }
 
@@ -323,6 +325,21 @@ bool CGUIControllerWizard::MapPrimitive(IJoystickButtonMap* buttonMap, const CJo
   }
 
   return bHandled;
+}
+
+void CGUIControllerWizard::Notify(const Observable& obs, const ObservableMessage msg)
+{
+  switch (msg)
+  {
+    case ObservableMessagePeripheralsChanged:
+    {
+      g_peripherals.UnregisterJoystickButtonMapper(this);
+      g_peripherals.RegisterJoystickButtonMapper(this);
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 void CGUIControllerWizard::SetPrompt(const std::string& strPromptMsg)
