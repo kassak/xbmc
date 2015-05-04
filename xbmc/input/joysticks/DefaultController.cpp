@@ -174,7 +174,7 @@ void CDefaultController::OnTimeout(void)
 {
   CSingleLock lock(m_digitalMutex);
 
-  const unsigned int holdTimeMs = (unsigned int)m_holdTimer.GetElapsedMilliseconds();
+  const unsigned int holdTimeMs = (unsigned int)m_holdTimer.GetTotalElapsedMilliseconds();
 
   if (m_lastButtonPress != 0 && holdTimeMs >= HOLD_TIMEOUT_MS)
   {
