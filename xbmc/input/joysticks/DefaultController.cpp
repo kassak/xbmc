@@ -28,8 +28,8 @@
 
 #include <algorithm>
 
-#define HOLD_TIMEOUT_MS    500 // TODO
-#define REPEAT_TIMEOUT_MS  250 // TODO
+#define HOLD_TIMEOUT_MS    500
+#define REPEAT_TIMEOUT_MS  50
 
 #ifndef ABS
 #define ABS(x)  ((x) >= 0 ? (x) : (-x))
