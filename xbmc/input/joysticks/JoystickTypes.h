@@ -19,48 +19,6 @@
  */
 #pragma once
 
-#define DEFAULT_GAME_CONTROLLER   "game.controller.default" // TODO: Move me
-
-/*!
- * \ingroup joysticks
- * \brief Features available on the default controller
- */
-enum JoystickFeatureID
-{
-  JoystickIDButtonA,
-  JoystickIDButtonB,
-  JoystickIDButtonX,
-  JoystickIDButtonY,
-  JoystickIDButtonStart,
-  JoystickIDButtonBack,
-  JoystickIDButtonGuide,
-  JoystickIDButtonLeftBumper,
-  JoystickIDButtonRightBumper,
-  JoystickIDButtonLeftStick,
-  JoystickIDButtonRightStick,
-  JoystickIDButtonUp,
-  JoystickIDButtonRight,
-  JoystickIDButtonDown,
-  JoystickIDButtonLeft,
-  JoystickIDTriggerLeft,
-  JoystickIDTriggerRight,
-  JoystickIDAnalogStickLeft,
-  JoystickIDAnalogStickRight,
-  JoystickIDAccelerometer,
-};
-
-/*!
- * \ingroup joysticks
- * \brief Types of features that emit input events
- */
-enum JoystickFeatureType
-{
-  JoystickDigitalButton,   /*!< @brief Button with two states, pressed and released */
-  JoystickAnalogButton,    /*!< @brief Trigger or pressure-sensitive button */
-  JoystickAnalogStick,     /*!< @brief Control stick capable of motion in two directions */
-  JoystickAccelerometer,   /*!< @brief Accelerometer with x, y and z axes */
-};
-
 /*!
  * \ingroup joysticks
  * \brief States in which a hat (directional pad) can be

@@ -47,8 +47,11 @@ public:
 private:
   bool ProcessHatDirection(int index, HatDirection oldDir, HatDirection newDir, HatDirection targetDir);
 
-  void StartRepeating(unsigned int featureIndex);
-  void StopRepeating(unsigned int featureIndex);
+  void OnPress(const std::string& feature);
+  void OnRelease(const std::string& feature);
+
+  void StartDigitalRepeating(const std::string& feature);
+  void StopDigitalRepeating(const std::string& feature);
 
   float GetAxisState(int axisIndex) const;
 
@@ -57,6 +60,6 @@ private:
   std::vector<char>            m_buttonStates; // std::vector is specialized for <bool>
   std::vector<HatDirection>    m_hatStates;
   std::vector<float>           m_axisStates;
-  std::vector<unsigned int>    m_featuresWithMotion;
-  std::vector<unsigned int>    m_repeatingFeatures; // Digital buttons emulating analog buttons
+  std::vector<std::string>     m_featuresWithMotion;
+  std::vector<std::string>     m_repeatingFeatures;
 };

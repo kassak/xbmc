@@ -20,7 +20,6 @@
 #pragma once
 
 #include "addons/include/kodi_peripheral_types.h"
-#include "games/GameTypes.h"
 #include "input/joysticks/JoystickDriverPrimitive.h"
 #include "peripherals/addons/PeripheralAddon.h"
 
@@ -37,23 +36,20 @@ namespace PERIPHERALS
 
     std::string ControllerID(void) const { return m_strControllerId; }
     bool Load(void);
-    bool MapButton(unsigned int featureIndex, const CJoystickDriverPrimitive& primitive);
-    bool MapAnalogStick(unsigned int featureIndex, int horizIndex, bool horizInverted,
-                                                   int vertIndex,  bool vertInverted);
-    bool MapAccelerometer(unsigned int featureIndex, int xIndex, bool xInverted,
-                                                     int yIndex, bool yInverted,
-                                                     int zIndex, bool zInverted);
+    bool MapButton(const std::string& feature, const CJoystickDriverPrimitive& primitive);
+    bool MapAnalogStick(const std::string& feature, int horizIndex, bool horizInverted,
+                                                    int vertIndex,  bool vertInverted);
+    bool MapAccelerometer(const std::string& feature, int xIndex, bool xInverted,
+                                                      int yIndex, bool yInverted,
+                                                      int zIndex, bool zInverted);
 
   private:
-    const std::string& GetFeatureName(unsigned int featureIndex) const;
-
     // Utility functions
     static JOYSTICK_DRIVER_HAT_DIRECTION      ToHatDirection(HatDirection dir);
     static JOYSTICK_DRIVER_SEMIAXIS_DIRECTION ToSemiAxisDirection(SemiAxisDirection dir);
 
-    CPeripheral* const      m_device;
-    PeripheralAddonPtr      m_addon;
-    const std::string       m_strControllerId;
-    GAME::GameControllerPtr m_controller;
+    CPeripheral* const m_device;
+    PeripheralAddonPtr m_addon;
+    const std::string  m_strControllerId;
   };
 }

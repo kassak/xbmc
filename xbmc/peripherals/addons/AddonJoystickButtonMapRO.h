@@ -34,17 +34,17 @@ namespace PERIPHERALS
 
     std::string ControllerID(void) const { return m_strControllerId; }
     bool Load(void);
-    bool GetFeature(const CJoystickDriverPrimitive& primitive, unsigned int& featureIndex);
-    bool GetButton(unsigned int featureIndex, CJoystickDriverPrimitive& button);
-    bool GetAnalogStick(unsigned int featureIndex, int& horizIndex, bool& horizInverted,
-                                                   int& vertIndex,  bool& vertInverted);
-    bool GetAccelerometer(unsigned int featureIndex, int& xIndex, bool& xInverted,
-                                                     int& yIndex, bool& yInverted,
-                                                     int& zIndex, bool& zInverted);
+    bool GetFeature(const CJoystickDriverPrimitive& primitive, std::string& feature);
+    bool GetButton(const std::string& feature, CJoystickDriverPrimitive& button);
+    bool GetAnalogStick(const std::string& feature, int& horizIndex, bool& horizInverted,
+                                                    int& vertIndex,  bool& vertInverted);
+    bool GetAccelerometer(const std::string& feature, int& xIndex, bool& xInverted,
+                                                      int& yIndex, bool& yInverted,
+                                                      int& zIndex, bool& zInverted);
 
   private:
-    typedef unsigned int FeatureIndex;
-    typedef std::map<CJoystickDriverPrimitive, FeatureIndex> DriverMap;
+    typedef std::string Feature;
+    typedef std::map<CJoystickDriverPrimitive, Feature> DriverMap;
 
     // Utility functions
     static HatDirection       ToHatDirection(JOYSTICK_DRIVER_HAT_DIRECTION driverDirection);

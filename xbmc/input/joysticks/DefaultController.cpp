@@ -28,8 +28,10 @@
 
 #include <algorithm>
 
-#define HOLD_TIMEOUT_MS    500
-#define REPEAT_TIMEOUT_MS  50
+#define DEFAULT_GAME_CONTROLLER   "game.controller.default"
+#define HOLD_TIMEOUT_MS           500
+#define REPEAT_TIMEOUT_MS         50
+#define ANALOG_DIGITAL_THRESHOLD  0.5f
 
 #ifndef ABS
 #define ABS(x)  ((x) >= 0 ? (x) : (-x))
@@ -54,31 +56,22 @@ std::string CDefaultController::ControllerID(void) const
   return DEFAULT_GAME_CONTROLLER;
 }
 
-bool CDefaultController::IsDigitalButton(unsigned int featureIndex)
+InputType CDefaultController::GetInputType(const std::string& feature) const
 {
-  return !IsAnalogButton(featureIndex);
-}
-
-bool CDefaultController::IsAnalogButton(unsigned int featureIndex)
-{
-  const JoystickFeatureID id = GetFeatureID(featureIndex);
-
-  unsigned int buttonKeyId = GetButtonKeyID(id);
+  unsigned int buttonKeyId = GetButtonKeyID(feature);
   if (buttonKeyId != 0)
   {
     CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(buttonKeyId, 0)));
     if (action.GetID() > 0 && action.IsAnalog())
-      return true;
+      return INPUT_TYPE_ANALOG;
   }
 
-  return false;
+  return INPUT_TYPE_DIGITAL;
 }
 
-bool CDefaultController::OnButtonPress(unsigned int featureIndex, bool bPressed)
+bool CDefaultController::OnButtonPress(const std::string& feature, bool bPressed)
 {
-  const JoystickFeatureID id = GetFeatureID(featureIndex);
-
-  unsigned int buttonKeyId = GetButtonKeyID(id);
+  unsigned int buttonKeyId = GetButtonKeyID(feature);
   if (buttonKeyId != 0)
   {
     if (bPressed)
@@ -96,11 +89,9 @@ bool CDefaultController::OnButtonPress(unsigned int featureIndex, bool bPressed)
   return true;
 }
 
-bool CDefaultController::OnButtonMotion(unsigned int featureIndex, float magnitude)
+bool CDefaultController::OnButtonMotion(const std::string& feature, float magnitude)
 {
-  const JoystickFeatureID id = GetFeatureID(featureIndex);
-
-  unsigned int buttonKeyId = GetButtonKeyID(id);
+  unsigned int buttonKeyId = GetButtonKeyID(feature);
   if (buttonKeyId != 0)
   {
     CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(buttonKeyId, 0)));
@@ -114,24 +105,22 @@ bool CDefaultController::OnButtonMotion(unsigned int featureIndex, float magnitu
   return true;
 }
 
-bool CDefaultController::OnAnalogStickMotion(unsigned int featureIndex, float x, float y)
+bool CDefaultController::OnAnalogStickMotion(const std::string& feature, float x, float y)
 {
-  const JoystickFeatureID id = GetFeatureID(featureIndex);
-
-  unsigned int buttonKeyId  = GetButtonKeyID(id, x, y);
+  unsigned int buttonKeyId  = GetButtonKeyID(feature, x, y);
 
   float magnitude = MAX(ABS(x), ABS(y));
 
-  unsigned int buttonRightId = GetButtonKeyID(id,  1.0f,  0.0f);
-  unsigned int buttonUpId    = GetButtonKeyID(id,  0.0f,  1.0f);
-  unsigned int buttonLeftId  = GetButtonKeyID(id, -1.0f,  0.0f);
-  unsigned int buttonDownId  = GetButtonKeyID(id,  0.0f, -1.0f);
+  unsigned int buttonRightId = GetButtonKeyID(feature,  1.0f,  0.0f);
+  unsigned int buttonUpId    = GetButtonKeyID(feature,  0.0f,  1.0f);
+  unsigned int buttonLeftId  = GetButtonKeyID(feature, -1.0f,  0.0f);
+  unsigned int buttonDownId  = GetButtonKeyID(feature,  0.0f, -1.0f);
 
   unsigned int buttonKeyIds[] = {buttonRightId, buttonUpId, buttonLeftId, buttonDownId};
 
   for (unsigned int i = 0; i < ARRAY_SIZE(buttonKeyIds); i++)
   {
-    if (!buttonKeyIds[i])
+    if (buttonKeyIds[i] == 0)
       continue;
 
     CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(buttonKeyId, 0)));
@@ -149,9 +138,9 @@ bool CDefaultController::OnAnalogStickMotion(unsigned int featureIndex, float x,
       {
         if (buttonKeyId == buttonKeyIds[i])
         {
-          if (magnitude >= 0.5f)
+          if (magnitude >= ANALOG_DIGITAL_THRESHOLD)
             ProcessButtonPress(action);
-          else if (magnitude < 0.5f)
+          else if (magnitude < ANALOG_DIGITAL_THRESHOLD)
             ProcessButtonRelease(buttonKeyId);
         }
         else
@@ -165,9 +154,9 @@ bool CDefaultController::OnAnalogStickMotion(unsigned int featureIndex, float x,
   return true;
 }
 
-bool CDefaultController::OnAccelerometerMotion(unsigned int featureIndex, float x, float y, float z)
+bool CDefaultController::OnAccelerometerMotion(const std::string& feature, float x, float y, float z)
 {
-  return OnAnalogStickMotion(featureIndex, x, y); // TODO
+  return false; // TODO
 }
 
 void CDefaultController::OnTimeout(void)
@@ -223,77 +212,43 @@ void CDefaultController::ClearHoldTimer(void)
   m_lastButtonPress = 0;
 }
 
-JoystickFeatureID CDefaultController::GetFeatureID(unsigned int featureIndex)
+unsigned int CDefaultController::GetButtonKeyID(const std::string& feature,
+                                                float x /* = 0.0f */,
+                                                float y /* = 0.0f */,
+                                                float z /* = 0.0f */)
 {
-  // TODO: Use game peripheral to translate
-  switch (featureIndex)
+  if      (feature == "a")             return KEY_BUTTON_A;
+  else if (feature == "b")             return KEY_BUTTON_B;
+  else if (feature == "x")             return KEY_BUTTON_X;
+  else if (feature == "y")             return KEY_BUTTON_Y;
+  else if (feature == "start")         return KEY_BUTTON_START;
+  else if (feature == "back")          return KEY_BUTTON_BACK;
+  else if (feature == "guide")         return KEY_BUTTON_GUIDE;
+  else if (feature == "leftbumper")    return KEY_BUTTON_LEFT_SHOULDER;
+  else if (feature == "rightbumper")   return KEY_BUTTON_RIGHT_SHOULDER;
+  else if (feature == "leftthumb")     return KEY_BUTTON_LEFT_THUMB_BUTTON;
+  else if (feature == "rightthumb")    return KEY_BUTTON_RIGHT_THUMB_BUTTON;
+  else if (feature == "up")            return KEY_BUTTON_DPAD_UP;
+  else if (feature == "down")          return KEY_BUTTON_DPAD_DOWN;
+  else if (feature == "right")         return KEY_BUTTON_DPAD_RIGHT;
+  else if (feature == "left")          return KEY_BUTTON_DPAD_LEFT;
+  else if (feature == "lefttrigger")   return KEY_BUTTON_LEFT_TRIGGER;
+  else if (feature == "righttrigger")  return KEY_BUTTON_RIGHT_TRIGGER;
+  else if (feature == "leftstick")
   {
-    case  0: return JoystickIDButtonA;
-    case  1: return JoystickIDButtonB;
-    case  2: return JoystickIDButtonX;
-    case  3: return JoystickIDButtonY;
-    case  4: return JoystickIDButtonStart;
-    case  5: return JoystickIDButtonBack;
-    case  6: return JoystickIDButtonGuide;
-    case  7: return JoystickIDButtonLeftBumper;
-    case  8: return JoystickIDButtonRightBumper;
-    case  9: return JoystickIDButtonLeftStick;
-    case 10: return JoystickIDButtonRightStick;
-    case 11: return JoystickIDButtonUp;
-    case 12: return JoystickIDButtonDown;
-    case 13: return JoystickIDButtonRight;
-    case 14: return JoystickIDButtonLeft;
-    case 15: return JoystickIDTriggerLeft;
-    case 16: return JoystickIDTriggerRight;
-    case 17: return JoystickIDAnalogStickLeft;
-    case 18: return JoystickIDAnalogStickRight;
-    case 19: return JoystickIDAccelerometer;
-    default:
-      break;
+    if      (y >= x && y >  -x)          return KEY_BUTTON_LEFT_THUMB_STICK_UP;
+    else if (y <  x && y >= -x)          return KEY_BUTTON_LEFT_THUMB_STICK_RIGHT;
+    else if (y <= x && y <  -x)          return KEY_BUTTON_LEFT_THUMB_STICK_DOWN;
+    else if (y >  x && y <= -x)          return KEY_BUTTON_LEFT_THUMB_STICK_LEFT;
   }
-  return JoystickIDButtonA;
-}
+  else if (feature == "rightstick")
+  {
+    if      (y >= x && y >  -x)          return KEY_BUTTON_RIGHT_THUMB_STICK_UP;
+    else if (y <  x && y >= -x)          return KEY_BUTTON_RIGHT_THUMB_STICK_RIGHT;
+    else if (y <= x && y <  -x)          return KEY_BUTTON_RIGHT_THUMB_STICK_DOWN;
+    else if (y >  x && y <= -x)          return KEY_BUTTON_RIGHT_THUMB_STICK_LEFT;
+  }
+  else if (feature == "accelerometer") return 0; // TODO
 
-unsigned int CDefaultController::GetButtonKeyID(JoystickFeatureID id,
-                                                          float x /* = 0.0f */,
-                                                          float y /* = 0.0f */,
-                                                          float z /* = 0.0f */)
-{
-  switch (id)
-  {
-    case JoystickIDButtonA:           return KEY_BUTTON_A;
-    case JoystickIDButtonB:           return KEY_BUTTON_B;
-    case JoystickIDButtonX:           return KEY_BUTTON_X;
-    case JoystickIDButtonY:           return KEY_BUTTON_Y;
-    case JoystickIDButtonStart:       return KEY_BUTTON_START;
-    case JoystickIDButtonBack:        return KEY_BUTTON_BACK;
-    case JoystickIDButtonGuide:       return KEY_BUTTON_GUIDE;
-    case JoystickIDButtonLeftBumper:  return KEY_BUTTON_LEFT_SHOULDER;
-    case JoystickIDButtonRightBumper: return KEY_BUTTON_RIGHT_SHOULDER;
-    case JoystickIDButtonLeftStick:   return KEY_BUTTON_LEFT_THUMB_BUTTON;
-    case JoystickIDButtonRightStick:  return KEY_BUTTON_RIGHT_THUMB_BUTTON;
-    case JoystickIDButtonUp:          return KEY_BUTTON_DPAD_UP;
-    case JoystickIDButtonRight:       return KEY_BUTTON_DPAD_RIGHT;
-    case JoystickIDButtonDown:        return KEY_BUTTON_DPAD_DOWN;
-    case JoystickIDButtonLeft:        return KEY_BUTTON_DPAD_LEFT;
-    case JoystickIDTriggerLeft:       return KEY_BUTTON_LEFT_TRIGGER;
-    case JoystickIDTriggerRight:      return KEY_BUTTON_RIGHT_TRIGGER;
-    case JoystickIDAnalogStickLeft:
-      if      (y >= x && y >  -x)       return KEY_BUTTON_LEFT_THUMB_STICK_UP;
-      else if (y <  x && y >= -x)       return KEY_BUTTON_LEFT_THUMB_STICK_RIGHT;
-      else if (y <= x && y <  -x)       return KEY_BUTTON_LEFT_THUMB_STICK_DOWN;
-      else if (y >  x && y <= -x)       return KEY_BUTTON_LEFT_THUMB_STICK_LEFT;
-      break;
-    case JoystickIDAnalogStickRight:
-      if      (y >= x && y >  -x)       return KEY_BUTTON_RIGHT_THUMB_STICK_UP;
-      else if (y <  x && y >= -x)       return KEY_BUTTON_RIGHT_THUMB_STICK_RIGHT;
-      else if (y <= x && y <  -x)       return KEY_BUTTON_RIGHT_THUMB_STICK_DOWN;
-      else if (y >  x && y <= -x)       return KEY_BUTTON_RIGHT_THUMB_STICK_LEFT;
-      break;
-    case JoystickIDAccelerometer:
-      return 0; // TODO
-    default:
-      break;
-  }
   return 0;
 }

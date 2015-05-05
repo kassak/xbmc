@@ -43,53 +43,53 @@ bool CAddonJoystickButtonMap::Load(void)
   return m_buttonMapRO.Load() && m_buttonMapWO.Load();
 }
 
-bool CAddonJoystickButtonMap::GetFeature(const CJoystickDriverPrimitive& primitive, unsigned int& featureIndex)
+bool CAddonJoystickButtonMap::GetFeature(const CJoystickDriverPrimitive& primitive, std::string& feature)
 {
-  return m_buttonMapRO.GetFeature(primitive, featureIndex);
+  return m_buttonMapRO.GetFeature(primitive, feature);
 }
 
-bool CAddonJoystickButtonMap::GetButton(unsigned int featureIndex, CJoystickDriverPrimitive& button)
+bool CAddonJoystickButtonMap::GetButton(const std::string& feature, CJoystickDriverPrimitive& button)
 {
-  return m_buttonMapRO.GetButton(featureIndex, button);
+  return m_buttonMapRO.GetButton(feature, button);
 }
 
-bool CAddonJoystickButtonMap::MapButton(unsigned int featureIndex, const CJoystickDriverPrimitive& primitive)
+bool CAddonJoystickButtonMap::MapButton(const std::string& feature, const CJoystickDriverPrimitive& primitive)
 {
-  return m_buttonMapWO.MapButton(featureIndex, primitive);
+  return m_buttonMapWO.MapButton(feature, primitive);
 }
 
-bool CAddonJoystickButtonMap::GetAnalogStick(unsigned int featureIndex,
+bool CAddonJoystickButtonMap::GetAnalogStick(const std::string& feature,
                                              int& horizIndex, bool& horizInverted,
                                              int& vertIndex,  bool& vertInverted)
 {
-  return m_buttonMapRO.GetAnalogStick(featureIndex, horizIndex, horizInverted,
-                                                    vertIndex, vertInverted);
+  return m_buttonMapRO.GetAnalogStick(feature, horizIndex, horizInverted,
+                                               vertIndex, vertInverted);
 }
 
-bool CAddonJoystickButtonMap::MapAnalogStick(unsigned int featureIndex,
+bool CAddonJoystickButtonMap::MapAnalogStick(const std::string& feature,
                                              int horizIndex, bool horizInverted,
                                              int vertIndex,  bool vertInverted)
 {
-  return m_buttonMapWO.MapAnalogStick(featureIndex, horizIndex, horizInverted,
-                                                    vertIndex, vertInverted);
+  return m_buttonMapWO.MapAnalogStick(feature, horizIndex, horizInverted,
+                                               vertIndex, vertInverted);
 }
 
-bool CAddonJoystickButtonMap::GetAccelerometer(unsigned int featureIndex,
+bool CAddonJoystickButtonMap::GetAccelerometer(const std::string& feature,
                                                int& xIndex, bool& xInverted,
                                                int& yIndex, bool& yInverted,
                                                int& zIndex, bool& zInverted)
 {
-  return m_buttonMapRO.GetAccelerometer(featureIndex, xIndex, xInverted,
-                                                      yIndex, yInverted,
-                                                      zIndex, zInverted);
+  return m_buttonMapRO.GetAccelerometer(feature, xIndex, xInverted,
+                                                 yIndex, yInverted,
+                                                 zIndex, zInverted);
 }
 
-bool CAddonJoystickButtonMap::MapAccelerometer(unsigned int featureIndex,
+bool CAddonJoystickButtonMap::MapAccelerometer(const std::string& feature,
                                                int xIndex, bool xInverted,
                                                int yIndex, bool yInverted,
                                                int zIndex, bool zInverted)
 {
-  return m_buttonMapWO.MapAccelerometer(featureIndex, xIndex, xInverted,
-                                                      yIndex, yInverted,
-                                                      zIndex, zInverted);
+  return m_buttonMapWO.MapAccelerometer(feature, xIndex, xInverted,
+                                                 yIndex, yInverted,
+                                                 zIndex, zInverted);
 }

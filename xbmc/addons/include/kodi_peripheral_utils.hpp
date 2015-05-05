@@ -329,19 +329,16 @@ namespace ADDON
   {
   public:
     JoystickFeature(void)
-    : m_id(0)
     {
     }
 
-    JoystickFeature(unsigned int id, const std::string& name)
-    : m_id(id),
-      m_name(name)
+    JoystickFeature(const std::string& name)
+    : m_name(name)
     {
     }
 
     JoystickFeature(const JOYSTICK_FEATURE& feature)
-    : m_id(feature.id),
-      m_name(feature.feature_name ? feature.feature_name : "")
+    : m_name(feature.feature_name ? feature.feature_name : "")
     {
     }
 
@@ -350,15 +347,12 @@ namespace ADDON
     virtual JoystickFeature* Clone(void) const { return new JoystickFeature(*this); }
 
     virtual JOYSTICK_DRIVER_TYPE Type(void) const { return JOYSTICK_DRIVER_TYPE_UNKNOWN; }
-    unsigned int                 ID(void) const   { return m_id; }
     const std::string&           Name(void) const { return m_name; }
 
-    void SetID(unsigned int id)           { m_id   = id; }
     void SetName(const std::string& name) { m_name = name; }
 
     virtual void ToStruct(JOYSTICK_FEATURE& feature) const
     {
-      feature.id           = m_id;
       feature.feature_name = new char[m_name.length() + 1];
       feature.driver_type  = Type();
 
@@ -371,7 +365,6 @@ namespace ADDON
     }
 
   private:
-    unsigned int m_id;
     std::string  m_name;
   };
 
@@ -390,8 +383,8 @@ namespace ADDON
     {
     }
 
-    DriverButton(unsigned int id, const std::string& name, int index) :
-      JoystickFeature(id, name),
+    DriverButton(const std::string& name, int index) :
+      JoystickFeature(name),
       m_index(index)
     {
     }
@@ -435,8 +428,8 @@ namespace ADDON
     {
     }
 
-    DriverHat(unsigned int id, const std::string& name, int index, JOYSTICK_DRIVER_HAT_DIRECTION direction) :
-      JoystickFeature(id, name),
+    DriverHat(const std::string& name, int index, JOYSTICK_DRIVER_HAT_DIRECTION direction) :
+      JoystickFeature(name),
       m_index(index),
       m_direction(direction)
     {
@@ -486,8 +479,8 @@ namespace ADDON
     {
     }
 
-    DriverSemiAxis(unsigned int id, const std::string& name, int index, JOYSTICK_DRIVER_SEMIAXIS_DIRECTION direction) :
-      JoystickFeature(id, name),
+    DriverSemiAxis(const std::string& name, int index, JOYSTICK_DRIVER_SEMIAXIS_DIRECTION direction) :
+      JoystickFeature(name),
       m_index(index),
       m_direction(direction)
     {
@@ -539,8 +532,8 @@ namespace ADDON
     {
     }
 
-    DriverAnalogStick(unsigned int id, const std::string& name, int xIndex, bool xInverted, int yIndex, bool yInverted) :
-      JoystickFeature(id, name),
+    DriverAnalogStick(const std::string& name, int xIndex, bool xInverted, int yIndex, bool yInverted) :
+      JoystickFeature(name),
       m_xIndex(xIndex),
       m_xInverted(xInverted),
       m_yIndex(yIndex),
@@ -607,8 +600,8 @@ namespace ADDON
     {
     }
 
-    DriverAccelerometer(unsigned int id, const std::string& name, int xIndex, bool xInverted, int yIndex, bool yInverted, int zIndex, bool zInverted) :
-      JoystickFeature(id, name),
+    DriverAccelerometer(const std::string& name, int xIndex, bool xInverted, int yIndex, bool yInverted, int zIndex, bool zInverted) :
+      JoystickFeature(name),
       m_xIndex(xIndex),
       m_xInverted(xInverted),
       m_yIndex(yIndex),

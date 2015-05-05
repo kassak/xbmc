@@ -36,19 +36,19 @@ namespace PERIPHERALS
     // Implementation of IJoystickButtonMap
     virtual std::string ControllerID(void) const { return m_buttonMapRO.ControllerID(); }
     virtual bool Load(void);
-    virtual bool GetFeature(const CJoystickDriverPrimitive& primitive, unsigned int& featureIndex);
-    virtual bool GetButton(unsigned int featureIndex, CJoystickDriverPrimitive& button);
-    virtual bool MapButton(unsigned int featureIndex, const CJoystickDriverPrimitive& primitive);
-    virtual bool GetAnalogStick(unsigned int featureIndex, int& horizIndex, bool& horizInverted,
-                                                           int& vertIndex,  bool& vertInverted);
-    virtual bool MapAnalogStick(unsigned int featureIndex, int horizIndex, bool horizInverted,
-                                                           int vertIndex,  bool vertInverted);
-    virtual bool GetAccelerometer(unsigned int featureIndex, int& xIndex, bool& xInverted,
-                                                             int& yIndex, bool& yInverted,
-                                                             int& zIndex, bool& zInverted);
-    virtual bool MapAccelerometer(unsigned int featureIndex, int xIndex, bool xInverted,
-                                                             int yIndex, bool yInverted,
-                                                             int zIndex, bool zInverted);
+    virtual bool GetFeature(const CJoystickDriverPrimitive& primitive, std::string& feature);
+    virtual bool GetButton(const std::string& feature, CJoystickDriverPrimitive& button);
+    virtual bool MapButton(const std::string& feature, const CJoystickDriverPrimitive& primitive);
+    virtual bool GetAnalogStick(const std::string& feature, int& horizIndex, bool& horizInverted,
+                                                            int& vertIndex,  bool& vertInverted);
+    virtual bool MapAnalogStick(const std::string& feature, int horizIndex, bool horizInverted,
+                                                            int vertIndex,  bool vertInverted);
+    virtual bool GetAccelerometer(const std::string& feature, int& xIndex, bool& xInverted,
+                                                              int& yIndex, bool& yInverted,
+                                                              int& zIndex, bool& zInverted);
+    virtual bool MapAccelerometer(const std::string& feature, int xIndex, bool xInverted,
+                                                              int yIndex, bool yInverted,
+                                                              int zIndex, bool zInverted);
 
   private:
     PeripheralAddonPtr        m_addon;

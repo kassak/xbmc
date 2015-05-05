@@ -105,23 +105,23 @@ CAddonJoystickButtonMapRO::DriverMap CAddonJoystickButtonMapRO::ToDriverMap(cons
   return driverMap;
 }
 
-bool CAddonJoystickButtonMapRO::GetFeature(const CJoystickDriverPrimitive& primitive, unsigned int& featureIndex)
+bool CAddonJoystickButtonMapRO::GetFeature(const CJoystickDriverPrimitive& primitive, std::string& feature)
 {
   DriverMap::const_iterator it = m_driverMap.find(primitive);
   if (it != m_driverMap.end())
   {
-    featureIndex = it->second;
+    feature = it->second;
     return true;
   }
 
   return false;
 }
 
-bool CAddonJoystickButtonMapRO::GetButton(unsigned int featureIndex, CJoystickDriverPrimitive& button)
+bool CAddonJoystickButtonMapRO::GetButton(const std::string& feature, CJoystickDriverPrimitive& button)
 {
   bool retVal(false);
 
-  JoystickFeatureMap::const_iterator it = m_features.find(featureIndex);
+  JoystickFeatureMap::const_iterator it = m_features.find(feature);
   if (it != m_features.end())
   {
     const ADDON::JoystickFeature* feature = it->second.get();
@@ -162,13 +162,13 @@ bool CAddonJoystickButtonMapRO::GetButton(unsigned int featureIndex, CJoystickDr
   return retVal;
 }
 
-bool CAddonJoystickButtonMapRO::GetAnalogStick(unsigned int featureIndex,
-                                             int& horizIndex, bool& horizInverted,
-                                             int& vertIndex,  bool& vertInverted)
+bool CAddonJoystickButtonMapRO::GetAnalogStick(const std::string& feature,
+                                               int& horizIndex, bool& horizInverted,
+                                               int& vertIndex,  bool& vertInverted)
 {
   bool retVal(false);
 
-  JoystickFeatureMap::const_iterator it = m_features.find(featureIndex);
+  JoystickFeatureMap::const_iterator it = m_features.find(feature);
   if (it != m_features.end())
   {
     const ADDON::JoystickFeature* feature = it->second.get();
@@ -187,14 +187,14 @@ bool CAddonJoystickButtonMapRO::GetAnalogStick(unsigned int featureIndex,
   return retVal;
 }
 
-bool CAddonJoystickButtonMapRO::GetAccelerometer(unsigned int featureIndex,
-                                               int& xIndex, bool& xInverted,
-                                               int& yIndex, bool& yInverted,
-                                               int& zIndex, bool& zInverted)
+bool CAddonJoystickButtonMapRO::GetAccelerometer(const std::string& feature,
+                                                 int& xIndex, bool& xInverted,
+                                                 int& yIndex, bool& yInverted,
+                                                 int& zIndex, bool& zInverted)
 {
   bool retVal(false);
 
-  JoystickFeatureMap::const_iterator it = m_features.find(featureIndex);
+  JoystickFeatureMap::const_iterator it = m_features.find(feature);
   if (it != m_features.end())
   {
     const ADDON::JoystickFeature* feature = it->second.get();

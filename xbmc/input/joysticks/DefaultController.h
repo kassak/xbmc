@@ -43,12 +43,11 @@ public:
 
   // implementation of IJoystickInputHandler
   virtual std::string ControllerID(void) const;
-  virtual bool IsDigitalButton(unsigned int featureIndex);
-  virtual bool IsAnalogButton(unsigned int featureIndex);
-  virtual bool OnButtonPress(unsigned int featureIndex, bool bPressed);
-  virtual bool OnButtonMotion(unsigned int featureIndex, float magnitude);
-  virtual bool OnAnalogStickMotion(unsigned int featureIndex, float x, float y);
-  virtual bool OnAccelerometerMotion(unsigned int featureIndex, float x, float y, float z);
+  virtual InputType GetInputType(const std::string& feature) const;
+  virtual bool OnButtonPress(const std::string& feature, bool bPressed);
+  virtual bool OnButtonMotion(const std::string& feature, float magnitude);
+  virtual bool OnAnalogStickMotion(const std::string& feature, float x, float y);
+  virtual bool OnAccelerometerMotion(const std::string& feature, float x, float y, float z);
 
   // implementation of ITimerCallback
   virtual void OnTimeout(void);
@@ -59,8 +58,6 @@ private:
 
   void StartHoldTimer(unsigned int buttonKeyId);
   void ClearHoldTimer(void);
-
-  static JoystickFeatureID GetFeatureID(unsigned int featureIndex);
 
   /*!
    * \brief Get the button key, as defined in guilib/Key.h, for the specified
@@ -79,9 +76,10 @@ private:
    *
    * \return True if the event was handled otherwise false
    */
-  static unsigned int GetButtonKeyID(JoystickFeatureID id, float x = 0.0f,
-                                                           float y = 0.0f,
-                                                           float z = 0.0f);
+  static unsigned int GetButtonKeyID(const std::string& feature,
+                                     float x = 0.0f,
+                                     float y = 0.0f,
+                                     float z = 0.0f);
 
   CTimer                    m_holdTimer; // TODO: This creates a new thread every button press!
   unsigned int              m_lastButtonPress;

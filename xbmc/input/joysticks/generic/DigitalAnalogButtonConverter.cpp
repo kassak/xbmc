@@ -36,56 +36,65 @@ std::string CDigitalAnalogButtonConverter::ControllerID(void) const
   return m_handler->ControllerID();
 }
 
-bool CDigitalAnalogButtonConverter::IsDigitalButton(unsigned int featureIndex)
+InputType CDigitalAnalogButtonConverter::GetInputType(const std::string& feature) const
 {
-  return m_handler->IsDigitalButton(featureIndex);
+  return m_handler->GetInputType(feature);
 }
 
-bool CDigitalAnalogButtonConverter::IsAnalogButton(unsigned int featureIndex)
+bool CDigitalAnalogButtonConverter::OnButtonPress(const std::string& feature, bool bPressed)
 {
-  return m_handler->IsAnalogButton(featureIndex);
+  if (GetInputType(feature) == INPUT_TYPE_ANALOG)
+    return m_handler->OnButtonMotion(feature, bPressed ? 1.0f : 0.0f);
+
+  return m_handler->OnButtonPress(feature, bPressed);
 }
 
-bool CDigitalAnalogButtonConverter::OnButtonPress(unsigned int featureIndex, bool bPressed)
+bool CDigitalAnalogButtonConverter::OnButtonMotion(const std::string& feature, float magnitude)
 {
-  if (IsAnalogButton(featureIndex))
-    return m_handler->OnButtonMotion(featureIndex, bPressed ? 1.0f : 0.0f);
-
-  return m_handler->OnButtonPress(featureIndex, bPressed);
-}
-
-bool CDigitalAnalogButtonConverter::OnButtonMotion(unsigned int featureIndex, float magnitude)
-{
-  if (IsDigitalButton(featureIndex))
+  if (GetInputType(feature) == INPUT_TYPE_DIGITAL)
   {
     const bool bIsPressed = magnitude >= ANALOG_DIGITAL_THRESHOLD;
-    const bool bWasPressed = std::find(m_pressedButtons.begin(), m_pressedButtons.end(), featureIndex) != m_pressedButtons.end();
 
-    if (!bWasPressed && bIsPressed)
+    if (bIsPressed && !IsActivated(feature))
     {
-      m_pressedButtons.push_back(featureIndex);
-      return m_handler->OnButtonPress(featureIndex, true);
+      Activate(feature);
+      return m_handler->OnButtonPress(feature, true);
     }
-    else if (bWasPressed && !bIsPressed)
+    else if (!bIsPressed && IsActivated(feature))
     {
-      m_pressedButtons.erase(std::remove(m_pressedButtons.begin(), m_pressedButtons.end(), featureIndex));
-      return m_handler->OnButtonPress(featureIndex, false);
+      Deactivate(feature);
+      return m_handler->OnButtonPress(feature, false);
     }
     else
     {
-      return false;
+      return true;
     }
   }
 
-  return m_handler->OnButtonMotion(featureIndex, magnitude);
+  return m_handler->OnButtonMotion(feature, magnitude);
 }
 
-bool CDigitalAnalogButtonConverter::OnAnalogStickMotion(unsigned int featureIndex, float x, float y)
+bool CDigitalAnalogButtonConverter::OnAnalogStickMotion(const std::string& feature, float x, float y)
 {
-  return m_handler->OnAnalogStickMotion(featureIndex, x, y);
+  return m_handler->OnAnalogStickMotion(feature, x, y);
 }
 
-bool CDigitalAnalogButtonConverter::OnAccelerometerMotion(unsigned int featureIndex, float x, float y, float z)
+bool CDigitalAnalogButtonConverter::OnAccelerometerMotion(const std::string& feature, float x, float y, float z)
 {
-  return m_handler->OnAccelerometerMotion(featureIndex, x, y, z);
+  return m_handler->OnAccelerometerMotion(feature, x, y, z);
+}
+
+bool CDigitalAnalogButtonConverter::IsActivated(const std::string& feature) const
+{
+  return std::find(m_activatedFeatures.begin(), m_activatedFeatures.end(), feature) != m_activatedFeatures.end();
+}
+
+void CDigitalAnalogButtonConverter::Activate(const std::string& feature)
+{
+  m_activatedFeatures.push_back(feature);
+}
+
+void CDigitalAnalogButtonConverter::Deactivate(const std::string& feature)
+{
+  m_activatedFeatures.erase(std::remove(m_activatedFeatures.begin(), m_activatedFeatures.end(), feature), m_activatedFeatures.end());
 }

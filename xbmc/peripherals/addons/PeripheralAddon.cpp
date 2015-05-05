@@ -23,7 +23,6 @@
 #include "addons/AddonManager.h"
 #include "filesystem/Directory.h"
 #include "filesystem/SpecialProtocol.h"
-#include "games/addons/GameController.h"
 #include "input/joysticks/IJoystickButtonMap.h"
 #include "input/joysticks/IJoystickDriverHandler.h"
 #include "input/joysticks/JoystickDriverPrimitive.h"
@@ -38,7 +37,6 @@
 #include <string.h>
 #include <utility>
 
-using namespace GAME;
 using namespace PERIPHERALS;
 using namespace XFILE;
 
@@ -499,12 +497,7 @@ bool CPeripheralAddon::GetButtonMap(const CPeripheral* device, const std::string
     {
       JoystickFeaturePtr feature(ADDON::JoystickFeatureFactory::Create(pFeatures[i]));
       if (feature)
-      {
-        // Correct feature indices
-        feature->SetID(GetFeatureIndex(strControllerId, feature->Name()));
-
-        features[feature->ID()] = feature;
-      }
+        features[feature->Name()] = feature;
     }
 
     try { m_pStruct->FreeButtonMap(featureCount, pFeatures); }
@@ -602,44 +595,6 @@ void CPeripheralAddon::SetJoystickInfo(CPeripheralJoystick& joystick, const ADDO
   joystick.SetButtonCount(joystickInfo.ButtonCount());
   joystick.SetHatCount(joystickInfo.HatCount());
   joystick.SetAxisCount(joystickInfo.AxisCount());
-}
-
-const GameControllerPtr& CPeripheralAddon::GetGameController(const std::string& strControllerId)
-{
-  std::map<ControllerID, GameControllerPtr>::const_iterator it = m_gameControllers.find(strControllerId);
-  if (it != m_gameControllers.end())
-    return it->second;
-
-  ADDON::AddonPtr addon;
-  if (ADDON::CAddonMgr::Get().GetAddon(strControllerId, addon, ADDON::ADDON_GAME_CONTROLLER))
-  {
-    GameControllerPtr controller = std::dynamic_pointer_cast<CGameController>(addon);
-    if (controller)
-    {
-      GameControllerPtr& controllerRef = m_gameControllers[strControllerId];
-      controllerRef = controller;
-      return controllerRef;
-    }
-  }
-
-  return CGameController::EmptyPtr;
-}
-
-int CPeripheralAddon::GetFeatureIndex(const std::string& strControllerId, const std::string& featureName)
-{
-  const GameControllerPtr& controller = GetGameController(strControllerId);
-
-  if (controller)
-  {
-    const std::vector<CGameControllerFeature>& features = controller->Layout().Features();
-    for (unsigned int i = 0; i < features.size(); i++)
-    {
-      if (featureName == features[i].Name())
-        return i;
-    }
-  }
-
-  return -1;
 }
 
 const char* CPeripheralAddon::ToString(const PERIPHERAL_ERROR error)

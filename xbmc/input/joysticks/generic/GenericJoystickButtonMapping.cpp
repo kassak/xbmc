@@ -66,22 +66,22 @@ bool CGenericJoystickButtonMapping::OnAxisMotion(unsigned int axisIndex, float p
 {
   if (position != 0.0f)
   {
-    // Remove axis if it was active in the opposite direction
-    CJoystickDriverPrimitive oppositeAxis(axisIndex, CJoystickTranslator::GetDirection(-position));
-    Delete(oppositeAxis);
+    // Deactivate axis in the opposite direction
+    CJoystickDriverPrimitive oppositeAxis(axisIndex, CJoystickTranslator::PositionToDirection(-position));
+    Deactivate(oppositeAxis);
 
-    CJoystickDriverPrimitive semiAxisPrimitive(axisIndex, CJoystickTranslator::GetDirection(position));
+    CJoystickDriverPrimitive semiAxisPrimitive(axisIndex, CJoystickTranslator::PositionToDirection(position));
     if (semiAxisPrimitive.IsValid())
     {
       const bool bActive = (std::abs(position) >= AXIS_THRESHOLD);
 
       if (!bActive)
       {
-        Delete(semiAxisPrimitive);
+        Deactivate(semiAxisPrimitive);
       }
       else if (!IsActive(semiAxisPrimitive))
       {
-        Record(semiAxisPrimitive);
+        Activate(semiAxisPrimitive);
         return m_buttonMapper->MapPrimitive(m_buttonMap, semiAxisPrimitive);
       }
     }
@@ -92,17 +92,17 @@ bool CGenericJoystickButtonMapping::OnAxisMotion(unsigned int axisIndex, float p
   return false;
 }
 
-void CGenericJoystickButtonMapping::Record(const CJoystickDriverPrimitive& semiAxis)
+void CGenericJoystickButtonMapping::Activate(const CJoystickDriverPrimitive& semiAxis)
 {
-  m_activeAxes.push_back(semiAxis);
+  m_activatedAxes.push_back(semiAxis);
 }
 
-void CGenericJoystickButtonMapping::Delete(const CJoystickDriverPrimitive& semiAxis)
+void CGenericJoystickButtonMapping::Deactivate(const CJoystickDriverPrimitive& semiAxis)
 {
-  m_activeAxes.erase(std::remove(m_activeAxes.begin(), m_activeAxes.end(), semiAxis), m_activeAxes.end());
+  m_activatedAxes.erase(std::remove(m_activatedAxes.begin(), m_activatedAxes.end(), semiAxis), m_activatedAxes.end());
 }
 
 bool CGenericJoystickButtonMapping::IsActive(const CJoystickDriverPrimitive& semiAxis)
 {
-  return std::find(m_activeAxes.begin(), m_activeAxes.end(), semiAxis) != m_activeAxes.end();
+  return std::find(m_activatedAxes.begin(), m_activatedAxes.end(), semiAxis) != m_activatedAxes.end();
 }
