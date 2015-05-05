@@ -21,10 +21,10 @@
 #define KODI_GAME_TYPES_H_
 
 /* current game API version */
-#define GAME_API_VERSION                "1.0.5"
+#define GAME_API_VERSION                "1.0.6"
 
 /* min. game API version */
-#define GAME_MIN_API_VERSION            "1.0.5"
+#define GAME_MIN_API_VERSION            "1.0.6"
 
 /* magic number for empty tray */
 #define GAME_NO_DISK                   ((unsigned)-1)
@@ -300,7 +300,6 @@ typedef struct game_input_event
   GAME_INPUT_EVENT_SOURCE type;
   int                     port;
   const char*             controller_id;
-  unsigned int            feature_index;
   const char*             feature_name;
   union
   {

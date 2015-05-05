@@ -89,13 +89,12 @@ public:
   CControllerInput(CGameClient* addon, int port, const GameControllerPtr& controller);
 
   // Implementation of IJoystickInputHandler
-  virtual std::string ControllerID(void) const { return m_controller->ID(); }
-  virtual bool IsDigitalButton(unsigned int featureIndex);
-  virtual bool IsAnalogButton(unsigned int featureIndex);
-  virtual bool OnButtonPress(unsigned int featureIndex, bool bPressed);
-  virtual bool OnButtonMotion(unsigned int featureIndex, float magnitude);
-  virtual bool OnAnalogStickMotion(unsigned int featureIndex, float x, float y);
-  virtual bool OnAccelerometerMotion(unsigned int featureIndex, float x, float y, float z);
+  virtual std::string ControllerID(void) const;
+  virtual InputType GetInputType(const std::string& feature) const;
+  virtual bool OnButtonPress(const std::string& feature, bool bPressed);
+  virtual bool OnButtonMotion(const std::string& feature, float magnitude);
+  virtual bool OnAnalogStickMotion(const std::string& feature, float x, float y);
+  virtual bool OnAccelerometerMotion(const std::string& feature, float x, float y, float z);
 
   const GameControllerPtr& Controller(void) const { return m_controller; }
 
@@ -162,10 +161,10 @@ public:
   void ClosePort(unsigned int port);
   void UpdatePort(unsigned int port, const GameControllerPtr& controller);
 
-  bool OnButtonPress(int port, unsigned int featureIndex, bool bPressed);
-  bool OnButtonMotion(int port, unsigned int featureIndex, float magnitude);
-  bool OnAnalogStickMotion(int port, unsigned int featureIndex, float x, float y);
-  bool OnAccelerometerMotion(int port, unsigned int featureIndex, float x, float y, float z);
+  bool OnButtonPress(int port, const std::string& feature, bool bPressed);
+  bool OnButtonMotion(int port, const std::string& feature, float magnitude);
+  bool OnAnalogStickMotion(int port, const std::string& feature, float x, float y);
+  bool OnAccelerometerMotion(int port, const std::string& feature, float x, float y, float z);
 
 private:
   // Called by the constructors

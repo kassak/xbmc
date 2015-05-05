@@ -254,11 +254,13 @@ bool CGUIControllerWizard::MapPrimitive(IJoystickButtonMap* buttonMap, const CJo
   }
   else
   {
+    const std::vector<CGameControllerFeature>& features = m_controller->Layout().Features();
+
     switch (m_state)
     {
       case STATE_PROMPT_BUTTON:
       {
-        bHandled = buttonMap->MapButton(m_featureIndex, primitive);
+        bHandled = buttonMap->MapButton(features[m_featureIndex].Name(), primitive);
         break;
       }
       case STATE_PROMPT_ANALOG_STICK_UP:
@@ -270,12 +272,16 @@ bool CGUIControllerWizard::MapPrimitive(IJoystickButtonMap* buttonMap, const CJo
           int  vertIndex = -1;
           bool vertInverted = false;
 
-          buttonMap->GetAnalogStick(m_featureIndex, horizIndex, horizInverted, vertIndex, vertInverted);
+          buttonMap->GetAnalogStick(features[m_featureIndex].Name(),
+                                    horizIndex, horizInverted,
+                                    vertIndex,  vertInverted);
 
           vertIndex = primitive.Index();
           vertInverted = (primitive.SemiAxisDir() == SemiAxisDirectionNegative);
 
-          bHandled = buttonMap->MapAnalogStick(m_featureIndex, horizIndex, horizInverted, vertIndex, vertInverted);
+          bHandled = buttonMap->MapAnalogStick(features[m_featureIndex].Name(),
+                                               horizIndex, horizInverted,
+                                               vertIndex,  vertInverted);
 
           m_lastAnalogStickDir = primitive;
         }
@@ -296,12 +302,16 @@ bool CGUIControllerWizard::MapPrimitive(IJoystickButtonMap* buttonMap, const CJo
           int  vertIndex = -1;
           bool vertInverted = false;
 
-          buttonMap->GetAnalogStick(m_featureIndex, horizIndex, horizInverted, vertIndex, vertInverted);
+          buttonMap->GetAnalogStick(features[m_featureIndex].Name(),
+                                    horizIndex, horizInverted,
+                                    vertIndex,  vertInverted);
 
           horizIndex = primitive.Index();
           horizInverted = (primitive.SemiAxisDir() == SemiAxisDirectionNegative);
 
-          bHandled = buttonMap->MapAnalogStick(m_featureIndex, horizIndex, horizInverted, vertIndex, vertInverted);
+          bHandled = buttonMap->MapAnalogStick(features[m_featureIndex].Name(),
+                                               horizIndex, horizInverted,
+                                               vertIndex,  vertInverted);
 
           m_lastAnalogStickDir = primitive;
         }
