@@ -3230,9 +3230,6 @@
     <ClCompile Include="..\..\xbmc\peripherals\addons\AddonJoystickInputHandling.cpp">
       <Filter>peripherals\addons</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xbmc\input\joysticks\DefaultJoystickInputHandler.cpp">
-      <Filter>input\joysticks</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\xbmc\games\addons\GameController.cpp">
       <Filter>games\addons</Filter>
     </ClCompile>
@@ -3259,6 +3256,9 @@
     </ClCompile>
     <ClCompile Include="..\..\xbmc\games\windows\wizards\GUIControllerWizard.cpp">
       <Filter>games\windows\wizards</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xbmc\input\joysticks\DefaultController.cpp">
+      <Filter>input\joysticks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -6279,9 +6279,6 @@
     <ClInclude Include="..\..\xbmc\peripherals\addons\AddonJoystickInputHandling.h">
       <Filter>peripherals\addons</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xbmc\input\joysticks\DefaultJoystickInputHandler.h">
-      <Filter>input\joysticks</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\xbmc\games\addons\GameControllerLayout.h">
       <Filter>games\addons</Filter>
     </ClInclude>
@@ -6311,6 +6308,9 @@
     </ClInclude>
     <ClInclude Include="..\..\xbmc\games\windows\wizards\IGUIControllerWizard.h">
       <Filter>games\windows\wizards</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xbmc\input\joysticks\DefaultController.h">
+      <Filter>input\joysticks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
