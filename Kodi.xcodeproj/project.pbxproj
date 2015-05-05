@@ -364,6 +364,9 @@
 		689443A91ACC87CB007242E7 /* GameClientProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 689443A41ACC87CB007242E7 /* GameClientProperties.cpp */; };
 		689443AA1ACC87CB007242E7 /* GameClientProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 689443A41ACC87CB007242E7 /* GameClientProperties.cpp */; };
 		689443AB1ACC87CB007242E7 /* GameClientProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 689443A41ACC87CB007242E7 /* GameClientProperties.cpp */; };
+		6897247C1AF95815007CC86F /* ButtonKeyHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 689724791AF95815007CC86F /* ButtonKeyHandler.cpp */; };
+		6897247D1AF95815007CC86F /* ButtonKeyHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 689724791AF95815007CC86F /* ButtonKeyHandler.cpp */; };
+		6897247E1AF95815007CC86F /* ButtonKeyHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 689724791AF95815007CC86F /* ButtonKeyHandler.cpp */; };
 		68A70C6B1AE9BE7000C11CE6 /* GUIControllerWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68A70C671AE9BE7000C11CE6 /* GUIControllerWizard.cpp */; };
 		68A70C6C1AE9BE7000C11CE6 /* GUIControllerWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68A70C671AE9BE7000C11CE6 /* GUIControllerWizard.cpp */; };
 		68A70C6D1AE9BE7000C11CE6 /* GUIControllerWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68A70C671AE9BE7000C11CE6 /* GUIControllerWizard.cpp */; };
@@ -3836,6 +3839,9 @@
 		689443A31ACC87CB007242E7 /* GameClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameClient.h; path = games/addons/GameClient.h; sourceTree = "<group>"; };
 		689443A41ACC87CB007242E7 /* GameClientProperties.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameClientProperties.cpp; path = games/addons/GameClientProperties.cpp; sourceTree = "<group>"; };
 		689443A51ACC87CB007242E7 /* GameClientProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameClientProperties.h; path = games/addons/GameClientProperties.h; sourceTree = "<group>"; };
+		689724791AF95815007CC86F /* ButtonKeyHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ButtonKeyHandler.cpp; path = joysticks/ButtonKeyHandler.cpp; sourceTree = "<group>"; };
+		6897247A1AF95815007CC86F /* ButtonKeyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonKeyHandler.h; path = joysticks/ButtonKeyHandler.h; sourceTree = "<group>"; };
+		6897247B1AF95815007CC86F /* IButtonKeyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IButtonKeyHandler.h; path = joysticks/IButtonKeyHandler.h; sourceTree = "<group>"; };
 		68A70C671AE9BE7000C11CE6 /* GUIControllerWizard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GUIControllerWizard.cpp; path = games/windows/wizards/GUIControllerWizard.cpp; sourceTree = "<group>"; };
 		68A70C681AE9BE7000C11CE6 /* GUIControllerWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GUIControllerWizard.h; path = games/windows/wizards/GUIControllerWizard.h; sourceTree = "<group>"; };
 		68AFC99C1ACC5E2000DD5173 /* IJoystickButtonMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IJoystickButtonMap.h; path = joysticks/IJoystickButtonMap.h; sourceTree = "<group>"; };
@@ -7231,8 +7237,11 @@
 			isa = PBXGroup;
 			children = (
 				68AFC99B1ACC5E1000DD5173 /* generic */,
+				689724791AF95815007CC86F /* ButtonKeyHandler.cpp */,
+				6897247A1AF95815007CC86F /* ButtonKeyHandler.h */,
 				686263721AE088A900CE83FE /* DefaultController.cpp */,
 				686263731AE088A900CE83FE /* DefaultController.h */,
+				6897247B1AF95815007CC86F /* IButtonKeyHandler.h */,
 				68AFC99C1ACC5E2000DD5173 /* IJoystickButtonMap.h */,
 				68833D711AE09E7A00FD6E06 /* IJoystickButtonMapper.h */,
 				68AFC99D1ACC5E2000DD5173 /* IJoystickDriverHandler.h */,
@@ -11319,6 +11328,7 @@
 				C8482919156CFFE7005A996F /* AddonCallbacks.cpp in Sources */,
 				68D279B11ACC6DE300B25E88 /* PeripheralBusAddon.cpp in Sources */,
 				C848291A156CFFE7005A996F /* AddonCallbacksAddon.cpp in Sources */,
+				6897247C1AF95815007CC86F /* ButtonKeyHandler.cpp in Sources */,
 				C848291B156CFFE7005A996F /* AddonCallbacksGUI.cpp in Sources */,
 				C848291C156CFFE7005A996F /* AddonCallbacksPVR.cpp in Sources */,
 				C848291F156D003E005A996F /* TextSearch.cpp in Sources */,
@@ -12279,6 +12289,7 @@
 				DFF0F37C17528350002DA3A4 /* GUIDialogPVRGroupManager.cpp in Sources */,
 				DFF0F37D17528350002DA3A4 /* GUIDialogPVRGuideInfo.cpp in Sources */,
 				6894439D1ACC87A7007242E7 /* GameSettings.cpp in Sources */,
+				6897247E1AF95815007CC86F /* ButtonKeyHandler.cpp in Sources */,
 				DFF0F37E17528350002DA3A4 /* GUIDialogPVRGuideOSD.cpp in Sources */,
 				DFF0F37F17528350002DA3A4 /* GUIDialogPVRGuideSearch.cpp in Sources */,
 				DFF0F38017528350002DA3A4 /* GUIDialogPVRRecordingInfo.cpp in Sources */,
@@ -13080,6 +13091,7 @@
 				E49912DA174E5DAD00741B6D /* AnimatedGif.cpp in Sources */,
 				E49912DB174E5DAD00741B6D /* cximage.cpp in Sources */,
 				E49912DC174E5DAD00741B6D /* D3DResource.cpp in Sources */,
+				6897247D1AF95815007CC86F /* ButtonKeyHandler.cpp in Sources */,
 				E49912DD174E5DAD00741B6D /* DDSImage.cpp in Sources */,
 				E49912DE174E5DAD00741B6D /* DirectXGraphics.cpp in Sources */,
 				E49912DF174E5DAD00741B6D /* DirtyRegionSolvers.cpp in Sources */,
