@@ -67,10 +67,10 @@ bool CGenericJoystickButtonMapping::OnAxisMotion(unsigned int axisIndex, float p
   if (position != 0.0f)
   {
     // Deactivate axis in the opposite direction
-    CJoystickDriverPrimitive oppositeAxis(axisIndex, CJoystickTranslator::PositionToDirection(-position));
+    CJoystickDriverPrimitive oppositeAxis(axisIndex, CJoystickTranslator::PositionToSemiAxisDirection(-position));
     Deactivate(oppositeAxis);
 
-    CJoystickDriverPrimitive semiAxisPrimitive(axisIndex, CJoystickTranslator::PositionToDirection(position));
+    CJoystickDriverPrimitive semiAxisPrimitive(axisIndex, CJoystickTranslator::PositionToSemiAxisDirection(position));
     if (semiAxisPrimitive.IsValid())
     {
       const bool bActive = (std::abs(position) >= AXIS_THRESHOLD);

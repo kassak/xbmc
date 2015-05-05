@@ -53,7 +53,7 @@ bool CDigitalAnalogButtonConverter::OnButtonMotion(const std::string& feature, f
 {
   if (GetInputType(feature) == INPUT_TYPE_DIGITAL)
   {
-    const bool bIsPressed = magnitude >= ANALOG_DIGITAL_THRESHOLD;
+    const bool bIsPressed = (magnitude >= ANALOG_DIGITAL_THRESHOLD);
 
     if (bIsPressed && !IsActivated(feature))
     {

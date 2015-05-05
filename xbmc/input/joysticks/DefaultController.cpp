@@ -19,19 +19,13 @@
  */
 
 #include "DefaultController.h"
-#include "guilib/GUIWindowManager.h"
-#include "input/ButtonTranslator.h"
-#include "input/joysticks/JoystickTranslator.h"
+#include "ButtonKeyHandler.h"
+#include "JoystickTranslator.h"
 #include "input/Key.h"
-#include "threads/SingleLock.h"
-#include "ApplicationMessenger.h"
 
-#include <algorithm>
+#define DEFAULT_GAME_CONTROLLER    "game.controller.default"
 
-#define DEFAULT_GAME_CONTROLLER   "game.controller.default"
-#define HOLD_TIMEOUT_MS           500
-#define REPEAT_TIMEOUT_MS         50
-#define ANALOG_DIGITAL_THRESHOLD  0.5f
+#define ANALOG_DIGITAL_THRESHOLD   0.5f
 
 #ifndef ABS
 #define ABS(x)  ((x) >= 0 ? (x) : (-x))
@@ -41,14 +35,14 @@
 #define MAX(x, y)  ((x) >= (y) ? (x) : (y))
 #endif
 
-#ifndef ARRAY_SIZE
-#define ARRAY_SIZE(x)  (sizeof(x) / sizeof((x)[0]))
-#endif
-
-CDefaultController::CDefaultController(void) :
-  m_holdTimer(this),
-  m_lastButtonPress(0)
+CDefaultController::CDefaultController(void)
+  : m_handler(new CButtonKeyHandler)
 {
+}
+
+CDefaultController::~CDefaultController(void)
+{
+  delete m_handler;
 }
 
 std::string CDefaultController::ControllerID(void) const
@@ -58,100 +52,78 @@ std::string CDefaultController::ControllerID(void) const
 
 InputType CDefaultController::GetInputType(const std::string& feature) const
 {
-  unsigned int buttonKeyId = GetButtonKeyID(feature);
-  if (buttonKeyId != 0)
-  {
-    CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(buttonKeyId, 0)));
-    if (action.GetID() > 0 && action.IsAnalog())
-      return INPUT_TYPE_ANALOG;
-  }
-
-  return INPUT_TYPE_DIGITAL;
+  return m_handler->GetInputType(GetButtonKeyID(feature));
 }
 
 bool CDefaultController::OnButtonPress(const std::string& feature, bool bPressed)
 {
-  unsigned int buttonKeyId = GetButtonKeyID(feature);
-  if (buttonKeyId != 0)
+  const unsigned int buttonKeyId = GetButtonKeyID(feature);
+
+  if (m_handler->GetInputType(buttonKeyId) == INPUT_TYPE_DIGITAL)
   {
-    if (bPressed)
-    {
-      CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(buttonKeyId, 0)));
-      if (action.GetID() > 0)
-        ProcessButtonPress(action);
-    }
-    else
-    {
-      ProcessButtonRelease(buttonKeyId);
-    }
+    m_handler->OnDigitalButtonKey(buttonKeyId, bPressed);
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 bool CDefaultController::OnButtonMotion(const std::string& feature, float magnitude)
 {
-  unsigned int buttonKeyId = GetButtonKeyID(feature);
-  if (buttonKeyId != 0)
+  const unsigned int buttonKeyId = GetButtonKeyID(feature);
+
+  if (m_handler->GetInputType(buttonKeyId) == INPUT_TYPE_ANALOG)
   {
-    CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(buttonKeyId, 0)));
-    if (action.GetID() > 0)
-    {
-      CAction actionWithAmount(action.GetID(), magnitude, 0.0f, action.GetName());
-      CApplicationMessenger::Get().SendAction(actionWithAmount);
-    }
+    m_handler->OnAnalogButtonKey(GetButtonKeyID(feature), magnitude);
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 bool CDefaultController::OnAnalogStickMotion(const std::string& feature, float x, float y)
 {
-  unsigned int buttonKeyId  = GetButtonKeyID(feature, x, y);
+  // Calculate the direction of the stick's position
+  const CardinalDirection analogStickDir = CJoystickTranslator::PositionToCardinalDirection(x, y);
 
-  float magnitude = MAX(ABS(x), ABS(y));
-
-  unsigned int buttonRightId = GetButtonKeyID(feature,  1.0f,  0.0f);
-  unsigned int buttonUpId    = GetButtonKeyID(feature,  0.0f,  1.0f);
-  unsigned int buttonLeftId  = GetButtonKeyID(feature, -1.0f,  0.0f);
-  unsigned int buttonDownId  = GetButtonKeyID(feature,  0.0f, -1.0f);
-
-  unsigned int buttonKeyIds[] = {buttonRightId, buttonUpId, buttonLeftId, buttonDownId};
-
-  for (unsigned int i = 0; i < ARRAY_SIZE(buttonKeyIds); i++)
+  // Process directions in which the stick is not pointing first
+  for (std::vector<CardinalDirection>::const_iterator it = GetDirections().begin(); it != GetDirections().end(); ++it)
   {
-    if (buttonKeyIds[i] == 0)
+    if (*it == analogStickDir)
       continue;
 
-    CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(buttonKeyId, 0)));
-    if (action.GetID() > 0)
-    {
-      if (action.IsAnalog())
-      {
-        if (buttonKeyId == buttonKeyIds[i])
-        {
-          CAction actionWithAmount(action.GetID(), magnitude, 0.0f, action.GetName());
-          CApplicationMessenger::Get().SendAction(actionWithAmount);
-        }
-      }
-      else
-      {
-        if (buttonKeyId == buttonKeyIds[i])
-        {
-          if (magnitude >= ANALOG_DIGITAL_THRESHOLD)
-            ProcessButtonPress(action);
-          else if (magnitude < ANALOG_DIGITAL_THRESHOLD)
-            ProcessButtonRelease(buttonKeyId);
-        }
-        else
-        {
-          ProcessButtonRelease(buttonKeyIds[i]);
-        }
-      }
-    }
+    // Calculate the button key ID and input type for this direction
+    const unsigned int buttonKeyId = GetButtonKeyID(feature, *it);
+    const InputType inputType = m_handler->GetInputType(buttonKeyId);
+
+    if (inputType == INPUT_TYPE_DIGITAL)
+      m_handler->OnDigitalButtonKey(buttonKeyId, false);
+    else if (inputType == INPUT_TYPE_ANALOG)
+      m_handler->OnAnalogButtonKey(buttonKeyId, 0.0f);
   }
 
-  return true;
+  // Process analog stick direction last to avoid prematurely clearing the hold timer
+
+  // Calculate the button key ID and input type for the analog stick's direction
+  const unsigned int buttonKeyId = GetButtonKeyID(feature, analogStickDir);
+  const InputType inputType = m_handler->GetInputType(buttonKeyId);
+
+  // Calculate the magnitude in the cardinal direction
+  const float magnitude = MAX(ABS(x), ABS(y));
+
+  if (inputType == INPUT_TYPE_DIGITAL)
+  {
+    const bool bIsPressed = (magnitude >= ANALOG_DIGITAL_THRESHOLD);
+    m_handler->OnDigitalButtonKey(buttonKeyId, bIsPressed);
+    return true;
+  }
+  else if (inputType == INPUT_TYPE_ANALOG)
+  {
+    m_handler->OnAnalogButtonKey(buttonKeyId, magnitude);
+    return true;
+  }
+
+  return false;
 }
 
 bool CDefaultController::OnAccelerometerMotion(const std::string& feature, float x, float y, float z)
@@ -159,63 +131,7 @@ bool CDefaultController::OnAccelerometerMotion(const std::string& feature, float
   return false; // TODO
 }
 
-void CDefaultController::OnTimeout(void)
-{
-  CSingleLock lock(m_digitalMutex);
-
-  const unsigned int holdTimeMs = (unsigned int)m_holdTimer.GetTotalElapsedMilliseconds();
-
-  if (m_lastButtonPress != 0 && holdTimeMs >= HOLD_TIMEOUT_MS)
-  {
-    CAction action(CButtonTranslator::GetInstance().GetAction(g_windowManager.GetActiveWindowID(), CKey(m_lastButtonPress, holdTimeMs)));
-    if (action.GetID() > 0)
-      CApplicationMessenger::Get().SendAction(action);
-  }
-}
-
-void CDefaultController::ProcessButtonPress(const CAction& action)
-{
-  if (std::find(m_pressedButtons.begin(), m_pressedButtons.end(), action.GetButtonCode()) == m_pressedButtons.end())
-  {
-    ClearHoldTimer();
-
-    CApplicationMessenger::Get().SendAction(action);
-
-    CSingleLock lock(m_digitalMutex);
-
-    m_pressedButtons.push_back(action.GetButtonCode());
-    StartHoldTimer(action.GetButtonCode());
-  }
-}
-
-void CDefaultController::ProcessButtonRelease(unsigned int buttonKeyId)
-{
-  std::vector<unsigned int>::iterator it = std::find(m_pressedButtons.begin(), m_pressedButtons.end(), buttonKeyId);
-  if (it != m_pressedButtons.end())
-  {
-    m_pressedButtons.erase(it);
-
-    if (buttonKeyId == m_lastButtonPress || m_pressedButtons.empty())
-      ClearHoldTimer();
-  }
-}
-
-void CDefaultController::StartHoldTimer(unsigned int buttonKeyId)
-{
-  m_holdTimer.Start(REPEAT_TIMEOUT_MS, true);
-  m_lastButtonPress = buttonKeyId;
-}
-
-void CDefaultController::ClearHoldTimer(void)
-{
-  m_holdTimer.Stop(true);
-  m_lastButtonPress = 0;
-}
-
-unsigned int CDefaultController::GetButtonKeyID(const std::string& feature,
-                                                float x /* = 0.0f */,
-                                                float y /* = 0.0f */,
-                                                float z /* = 0.0f */)
+unsigned int CDefaultController::GetButtonKeyID(const std::string& feature, CardinalDirection dir /* = DirectionUnknown */)
 {
   if      (feature == "a")             return KEY_BUTTON_A;
   else if (feature == "b")             return KEY_BUTTON_B;
@@ -236,19 +152,42 @@ unsigned int CDefaultController::GetButtonKeyID(const std::string& feature,
   else if (feature == "righttrigger")  return KEY_BUTTON_RIGHT_TRIGGER;
   else if (feature == "leftstick")
   {
-    if      (y >= x && y >  -x)          return KEY_BUTTON_LEFT_THUMB_STICK_UP;
-    else if (y <  x && y >= -x)          return KEY_BUTTON_LEFT_THUMB_STICK_RIGHT;
-    else if (y <= x && y <  -x)          return KEY_BUTTON_LEFT_THUMB_STICK_DOWN;
-    else if (y >  x && y <= -x)          return KEY_BUTTON_LEFT_THUMB_STICK_LEFT;
+    switch (dir)
+    {
+    case DirectionUp:     return KEY_BUTTON_LEFT_THUMB_STICK_UP;
+    case DirectionDown:   return KEY_BUTTON_LEFT_THUMB_STICK_DOWN;
+    case DirectionRight:  return KEY_BUTTON_LEFT_THUMB_STICK_RIGHT;
+    case DirectionLeft:   return KEY_BUTTON_LEFT_THUMB_STICK_LEFT;
+    default:
+      break;
+    }
   }
   else if (feature == "rightstick")
   {
-    if      (y >= x && y >  -x)          return KEY_BUTTON_RIGHT_THUMB_STICK_UP;
-    else if (y <  x && y >= -x)          return KEY_BUTTON_RIGHT_THUMB_STICK_RIGHT;
-    else if (y <= x && y <  -x)          return KEY_BUTTON_RIGHT_THUMB_STICK_DOWN;
-    else if (y >  x && y <= -x)          return KEY_BUTTON_RIGHT_THUMB_STICK_LEFT;
+    switch (dir)
+    {
+    case DirectionUp:     return KEY_BUTTON_RIGHT_THUMB_STICK_UP;
+    case DirectionDown:   return KEY_BUTTON_RIGHT_THUMB_STICK_DOWN;
+    case DirectionRight:  return KEY_BUTTON_RIGHT_THUMB_STICK_RIGHT;
+    case DirectionLeft:   return KEY_BUTTON_RIGHT_THUMB_STICK_LEFT;
+    default:
+      break;
+    }
   }
   else if (feature == "accelerometer") return 0; // TODO
 
   return 0;
+}
+
+const std::vector<CardinalDirection>& CDefaultController::GetDirections(void)
+{
+  static std::vector<CardinalDirection> directions;
+  if (directions.empty())
+  {
+    directions.push_back(DirectionUp);
+    directions.push_back(DirectionDown);
+    directions.push_back(DirectionRight);
+    directions.push_back(DirectionLeft);
+  }
+  return directions;
 }

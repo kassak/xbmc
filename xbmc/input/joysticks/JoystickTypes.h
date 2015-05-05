@@ -21,15 +21,28 @@
 
 /*!
  * \ingroup joysticks
+ * \brief Cardinal directions
+ */
+enum CardinalDirection
+{
+  DirectionUnknown,
+  DirectionUp,
+  DirectionDown,
+  DirectionRight,
+  DirectionLeft,
+};
+
+/*!
+ * \ingroup joysticks
  * \brief States in which a hat (directional pad) can be
  */
 enum HatDirection
 {
   HatDirectionNone      = 0x0,    /*!< @brief no directions are pressed */
-  HatDirectionLeft      = 0x1,    /*!< @brief only left is pressed */
-  HatDirectionRight     = 0x2,    /*!< @brief only right is pressed */
-  HatDirectionUp        = 0x4,    /*!< @brief only up is pressed */
-  HatDirectionDown      = 0x8,    /*!< @brief only down is pressed */
+  HatDirectionUp        = 0x1,    /*!< @brief only up is pressed */
+  HatDirectionDown      = 0x2,    /*!< @brief only down is pressed */
+  HatDirectionRight     = 0x4,    /*!< @brief only right is pressed */
+  HatDirectionLeft      = 0x8,    /*!< @brief only left is pressed */
   HatDirectionLeftUp    = HatDirectionLeft  | HatDirectionUp,
   HatDirectionLeftDown  = HatDirectionLeft  | HatDirectionDown,
   HatDirectionRightUp   = HatDirectionRight | HatDirectionUp,

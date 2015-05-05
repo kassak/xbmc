@@ -1,4 +1,5 @@
-SRCS=DefaultController.cpp \
+SRCS=ButtonKeyHandler.cpp \
+     DefaultController.cpp \
      JoystickDriverPrimitive.cpp \
      JoystickTranslator.cpp \
 

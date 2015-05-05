@@ -21,12 +21,10 @@
 
 #include "input/joysticks/IJoystickInputHandler.h"
 #include "input/joysticks/JoystickTypes.h"
-#include "threads/CriticalSection.h"
-#include "threads/Timer.h"
 
 #include <vector>
 
-class CAction;
+class IButtonKeyHandler;
 
 /*!
  * \ingroup joysticks_generic
@@ -34,12 +32,12 @@ class CAction;
  *
  * \sa IJoystickInputHandler
  */
-class CDefaultController : public IJoystickInputHandler, public ITimerCallback
+class CDefaultController : public IJoystickInputHandler
 {
 public:
   CDefaultController(void);
 
-  virtual ~CDefaultController(void) { }
+  virtual ~CDefaultController(void);
 
   // implementation of IJoystickInputHandler
   virtual std::string ControllerID(void) const;
@@ -49,40 +47,16 @@ public:
   virtual bool OnAnalogStickMotion(const std::string& feature, float x, float y);
   virtual bool OnAccelerometerMotion(const std::string& feature, float x, float y, float z);
 
-  // implementation of ITimerCallback
-  virtual void OnTimeout(void);
-
 private:
-  void ProcessButtonPress(const CAction& action);
-  void ProcessButtonRelease(unsigned int buttonKeyId);
-
-  void StartHoldTimer(unsigned int buttonKeyId);
-  void ClearHoldTimer(void);
-
   /*!
    * \brief Get the button key, as defined in guilib/Key.h, for the specified
    *        joystick feature/direction
    *
-   * A direction vector of the feature's position can be used to obtain keys
-   * for analog stick directions (e.g. "rightthumbstickup").
-   *
-   * Ties are resolved in the clockwise direction. A right thumb stick at (0.5, 0.5)
-   * will resolve to "rightthumbstickright".
-   *
-   * \param id        The joystick feature ID
-   * \param x         The x component of the direction vector being queried
-   * \param y         The y component of the direction vector being queried
-   * \param z         The z component of the direction vector being queried
-   *
    * \return True if the event was handled otherwise false
    */
-  static unsigned int GetButtonKeyID(const std::string& feature,
-                                     float x = 0.0f,
-                                     float y = 0.0f,
-                                     float z = 0.0f);
+  static unsigned int GetButtonKeyID(const std::string& feature, CardinalDirection dir = DirectionUnknown);
 
-  CTimer                    m_holdTimer; // TODO: This creates a new thread every button press!
-  unsigned int              m_lastButtonPress;
-  std::vector<unsigned int> m_pressedButtons;
-  CCriticalSection          m_digitalMutex;
+  static const std::vector<CardinalDirection>& GetDirections(void);
+
+  IButtonKeyHandler* const m_handler;
 };

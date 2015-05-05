@@ -39,10 +39,20 @@ const char* CJoystickTranslator::HatDirectionToString(HatDirection dir)
   return "RELEASED";
 }
 
-SemiAxisDirection CJoystickTranslator::PositionToDirection(float position)
+SemiAxisDirection CJoystickTranslator::PositionToSemiAxisDirection(float position)
 {
   if      (position > 0) return SemiAxisDirectionPositive;
   else if (position < 0) return SemiAxisDirectionNegative;
 
   return SemiAxisDirectionUnknown;
+}
+
+CardinalDirection CJoystickTranslator::PositionToCardinalDirection(float x, float y)
+{
+  if      (y >= x && y >  -x) return DirectionUp;
+  else if (y <  x && y >= -x) return DirectionRight;
+  else if (y <= x && y <  -x) return DirectionDown;
+  else if (y >  x && y <= -x) return DirectionLeft;
+
+  return DirectionUnknown;
 }

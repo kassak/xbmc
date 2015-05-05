@@ -26,5 +26,19 @@ class CJoystickTranslator
 public:
   static const char* HatDirectionToString(HatDirection dir);
 
-  static SemiAxisDirection PositionToDirection(float position);
+  static SemiAxisDirection PositionToSemiAxisDirection(float position);
+
+  /*!
+   * A direction vector of the feature's position can be used to obtain keys
+   * for analog stick directions (e.g. "rightthumbstickup").
+   *
+   * Ties are resolved in the clockwise direction. A right thumb stick at (0.5, 0.5)
+   * will resolve to "rightthumbstickright".
+   *
+   * \param id        The joystick feature ID
+   * \param x         The x component of the direction vector being queried
+   * \param y         The y component of the direction vector being queried
+   * \param z         The z component of the direction vector being queried
+   */
+  static CardinalDirection PositionToCardinalDirection(float x, float y);
 };
