@@ -28,6 +28,8 @@ class IJoystickInputHandler;
 class IJoystickButtonMap;
 
 /*!
+ * \ingroup joysticks_generic
+ *
  * \brief Generic implementation of IJoystickDriverHandler to translate raw
  *        actions into physical joystick features using the provided button map
  */

@@ -24,6 +24,8 @@
 class IJoystickDriverHandler;
 
 /*!
+ * \ingroup joysticks_generic
+ *
  * \brief Generic implementation of IKeyboardHandler to handle a keyboard as a
  *        joystick with many buttons.
  */

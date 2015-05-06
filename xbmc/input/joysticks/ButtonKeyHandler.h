@@ -24,12 +24,6 @@
 
 #include <vector>
 
-/*!
- * \ingroup joysticks
- * \brief
- *
- * \sa IButtonKeyHandler
- */
 class CButtonKeyHandler : public IButtonKeyHandler, public ITimerCallback
 {
 public:

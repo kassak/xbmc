@@ -24,15 +24,15 @@
 #include <vector>
 
 /*!
+ * \ingroup joysticks_generic
+ *
  * \brief Convert between digital and analog button events
  *
- * A game peripheral may contain a digital button mapped to a driver axis, or
- * an analog button mapped to a driver's digital button.
+ * If the input type is digital, driver axes are converted to digital buttons by
+ * thresholding around 0.5.
  *
- * This class converts these button presses to the format expected by the input
- * handler:
- *    - Digital button events are converted to analog events with magnitude 0.0 or 1.0
- *    - Analog button events are thresholded around 0.5 and reported as pressed/unpressed
+ * If the input type is analog, driver buttons/hats are converted to analog
+ * events with magnitude 0.0 or 1.0.
  */
 class CDigitalAnalogButtonConverter : public IJoystickInputHandler
 {

@@ -32,6 +32,8 @@ enum DriverPrimitiveType
 };
 
 /*!
+ * \ingroup joysticks
+ *
  * \brief Basic driver element associated with input events
  *
  * A driver primitive can be a button, one of the four direction arrows on a

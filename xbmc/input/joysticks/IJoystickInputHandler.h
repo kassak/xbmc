@@ -19,8 +19,6 @@
  */
 #pragma once
 
-#include "JoystickTypes.h"
-
 #include <string>
 
 enum InputType
@@ -32,6 +30,7 @@ enum InputType
 
 /*!
  * \ingroup joysticks
+ *
  * \brief Interface for handling input events for game controllers
  */
 class IJoystickInputHandler
@@ -46,6 +45,12 @@ public:
    */
   virtual std::string ControllerID(void) const = 0;
 
+  /*!
+   * \brief Get the type of input handled by the specified feature
+   *
+   * \return INPUT_TYPE_DIGITAL for digital buttons, INPUT_TYPE_ANALOG for analog
+   *         buttons, or INPUT_TYPE_UNKNOWN otherwise
+   */
   virtual InputType GetInputType(const std::string& feature) const = 0;
 
   /*!

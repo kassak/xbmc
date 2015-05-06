@@ -30,7 +30,7 @@ namespace PERIPHERALS
   {
   public:
     CPeripheralBusAddon(CPeripherals *manager);
-    virtual ~CPeripheralBusAddon(void);
+    virtual ~CPeripheralBusAddon(void) { }
 
     bool GetAddon(const std::string &strId, ADDON::AddonPtr &addon) const;
     bool GetAddonWithButtonMap(const CPeripheral* device, PeripheralAddonPtr &addon) const;

@@ -84,7 +84,7 @@ bool CDefaultController::OnButtonMotion(const std::string& feature, float magnit
 bool CDefaultController::OnAnalogStickMotion(const std::string& feature, float x, float y)
 {
   // Calculate the direction of the stick's position
-  const CardinalDirection analogStickDir = CJoystickTranslator::PositionToCardinalDirection(x, y);
+  const CardinalDirection analogStickDir = CJoystickTranslator::VectorToCardinalDirection(x, y);
 
   // Process directions in which the stick is not pointing first
   for (std::vector<CardinalDirection>::const_iterator it = GetDirections().begin(); it != GetDirections().end(); ++it)

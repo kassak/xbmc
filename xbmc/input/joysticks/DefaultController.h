@@ -27,7 +27,8 @@
 class IButtonKeyHandler;
 
 /*!
- * \ingroup joysticks_generic
+ * \ingroup joysticks
+ *
  * \brief Implementation of IJoystickInputHandler for the default controller
  *
  * \sa IJoystickInputHandler
@@ -52,10 +53,13 @@ private:
    * \brief Get the button key, as defined in guilib/Key.h, for the specified
    *        joystick feature/direction
    *
-   * \return True if the event was handled otherwise false
+   * \return The button key ID
    */
   static unsigned int GetButtonKeyID(const std::string& feature, CardinalDirection dir = DirectionUnknown);
 
+  /*!
+   * \brief Return a vector of the four cardinal directions
+   */
   static const std::vector<CardinalDirection>& GetDirections(void);
 
   IButtonKeyHandler* const m_handler;

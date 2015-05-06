@@ -19,10 +19,9 @@
  */
 #pragma once
 
-#include "input/joysticks/JoystickDriverPrimitive.h"
-
 #include <string>
 
+class CJoystickDriverPrimitive;
 class IJoystickButtonMap;
 
 /*!
@@ -45,6 +44,11 @@ public:
    */
   virtual std::string ControllerID(void) const = 0;
 
+  /*!
+   * \brief Check if the button mapper is waiting for button input
+   *
+   * \return True if the button mapper is expecting input, false otherwise
+   */
   virtual bool IsMapping(void) const = 0;
 
   /*!
@@ -53,7 +57,7 @@ public:
    * \param buttonMap  The button map being manipulated
    * \param primitive  The source of the action
    *
-   * \return true if action was mapped to a feature
+   * \return True if action was mapped to a feature
    */
   virtual bool MapPrimitive(IJoystickButtonMap* buttonMap, const CJoystickDriverPrimitive& primitive) = 0;
 };

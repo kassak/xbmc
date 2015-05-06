@@ -25,7 +25,6 @@
 #include "addons/include/kodi_peripheral_utils.hpp"
 #include "input/joysticks/JoystickTypes.h"
 #include "peripherals/PeripheralTypes.h"
-#include "threads/Thread.h"
 
 #include <map>
 #include <memory>

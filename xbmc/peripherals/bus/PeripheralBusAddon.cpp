@@ -35,10 +35,6 @@ CPeripheralBusAddon::CPeripheralBusAddon(CPeripherals *manager) :
 {
 }
 
-CPeripheralBusAddon::~CPeripheralBusAddon(void)
-{
-}
-
 bool CPeripheralBusAddon::GetAddon(const std::string &strId, AddonPtr &addon) const
 {
   CSingleLock lock(m_critSection);

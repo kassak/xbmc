@@ -32,8 +32,8 @@ CGenericJoystickButtonMapping::CGenericJoystickButtonMapping(IJoystickButtonMapp
   : m_buttonMapper(buttonMapper),
     m_buttonMap(buttonMap)
 {
-  assert(m_buttonMapper);
-  assert(m_buttonMap);
+  assert(m_buttonMapper != NULL);
+  assert(m_buttonMap != NULL);
 }
 
 bool CGenericJoystickButtonMapping::OnButtonMotion(unsigned int buttonIndex, bool bPressed)
