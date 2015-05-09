@@ -3260,6 +3260,9 @@
     <ClCompile Include="..\..\xbmc\input\joysticks\DefaultController.cpp">
       <Filter>input\joysticks</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\xbmc\input\joysticks\ButtonKeyHandler.cpp">
+      <Filter>input\joysticks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\xbmc\win32\pch.h">
@@ -6310,6 +6313,12 @@
       <Filter>games\windows\wizards</Filter>
     </ClInclude>
     <ClInclude Include="..\..\xbmc\input\joysticks\DefaultController.h">
+      <Filter>input\joysticks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xbmc\input\joysticks\ButtonKeyHandler.h">
+      <Filter>input\joysticks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xbmc\input\joysticks\IButtonKeyHandler.h">
       <Filter>input\joysticks</Filter>
     </ClInclude>
   </ItemGroup>
