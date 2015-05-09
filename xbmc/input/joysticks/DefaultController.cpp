@@ -74,7 +74,7 @@ bool CDefaultController::OnButtonMotion(const std::string& feature, float magnit
 
   if (m_handler->GetInputType(buttonKeyId) == INPUT_TYPE_ANALOG)
   {
-    m_handler->OnAnalogButtonKey(GetButtonKeyID(feature), magnitude);
+    m_handler->OnAnalogButtonKey(buttonKeyId, magnitude);
     return true;
   }
 
