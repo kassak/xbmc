@@ -57,14 +57,11 @@ bool CGenericJoystickInputHandling::OnButtonMotion(unsigned int buttonIndex, boo
     char& wasPressed = m_buttonStates[buttonIndex];
 
     if (!wasPressed && pressed)
-      OnPress(feature);
+      bHandled = OnPress(feature);
     else if (wasPressed && !pressed)
       OnRelease(feature);
 
     wasPressed = pressed;
-
-    if (pressed)
-      bHandled = true;
   }
   else if (bPressed)
   {
@@ -223,14 +220,18 @@ void CGenericJoystickInputHandling::ProcessAxisMotions(void)
     m_handler->OnButtonPress(*it, true);
 }
 
-void CGenericJoystickInputHandling::OnPress(const std::string& feature)
+bool CGenericJoystickInputHandling::OnPress(const std::string& feature)
 {
   const InputType inputType = m_handler->GetInputType(feature);
 
+  bool bHandled = false;
+
   if (inputType == INPUT_TYPE_DIGITAL)
-    m_handler->OnButtonPress(feature, true);
+    bHandled = m_handler->OnButtonPress(feature, true);
   else if (inputType == INPUT_TYPE_ANALOG)
-    StartDigitalRepeating(feature); // Analog actions repeat every frame
+    bHandled = StartDigitalRepeating(feature); // Analog actions repeat every frame
+
+  return bHandled;
 }
 
 void CGenericJoystickInputHandling::OnRelease(const std::string& feature)
@@ -239,9 +240,11 @@ void CGenericJoystickInputHandling::OnRelease(const std::string& feature)
   StopDigitalRepeating(feature);
 }
 
-void CGenericJoystickInputHandling::StartDigitalRepeating(const std::string& feature)
+bool CGenericJoystickInputHandling::StartDigitalRepeating(const std::string& feature)
 {
+  // TODO: Need to check if feature is used by game client
   m_repeatingFeatures.push_back(feature);
+  return true;
 }
 
 void CGenericJoystickInputHandling::StopDigitalRepeating(const std::string& feature)
