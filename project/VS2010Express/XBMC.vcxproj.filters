@@ -376,6 +376,9 @@
     <Filter Include="games\windows">
       <UniqueIdentifier>{b27eff5a-49e1-4e7d-b4c2-f4e46d18629a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cores\Transcoder">
+      <UniqueIdentifier>{654f1b50-e012-4141-ae01-81bdd7a9529f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\xbmc\win32\pch.cpp">
@@ -3274,7 +3277,9 @@
     <ClCompile Include="..\..\xbmc\interfaces\json-rpc\TranscoderOperations.cpp">
       <Filter>interfaces\json-rpc</Filter>
     </ClCompile>
-  </ItemGroup>
+    <ClCompile Include="..\..\xbmc\cores\Transcoder\Transcoder.cpp">
+      <Filter>cores\Transcoder</Filter>
+    </ClCompile>  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\xbmc\win32\pch.h">
       <Filter>win32</Filter>
@@ -6337,6 +6342,9 @@
     </ClInclude>
     <ClInclude Include="..\..\xbmc\interfaces\json-rpc\TranscoderOperations.h">
       <Filter>interfaces\json-rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xbmc\cores\Transcoder\Transcoder.h">
+      <Filter>cores\Transcoder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

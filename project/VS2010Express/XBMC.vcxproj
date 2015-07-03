@@ -253,6 +253,7 @@
     <ClCompile Include="..\..\xbmc\cores\RetroPlayer\RetroPlayerAudio.cpp" />
     <ClCompile Include="..\..\xbmc\cores\RetroPlayer\RetroPlayerDialogs.cpp" />
     <ClCompile Include="..\..\xbmc\cores\RetroPlayer\RetroPlayerVideo.cpp" />
+    <ClCompile Include="..\..\xbmc\cores\Transcoder\Transcoder.cpp" />
     <ClCompile Include="..\..\xbmc\cores\VideoRenderers\OverlayRendererGUI.cpp" />
     <ClCompile Include="..\..\xbmc\cores\VideoRenderers\RenderCapture.cpp" />
     <ClCompile Include="..\..\xbmc\cores\VideoRenderers\VideoShaders\WinVideoFilter.cpp" />
@@ -928,6 +929,7 @@
     <ClInclude Include="..\..\xbmc\cores\RetroPlayer\RetroPlayerAudio.h" />
     <ClInclude Include="..\..\xbmc\cores\RetroPlayer\RetroPlayerDialogs.h" />
     <ClInclude Include="..\..\xbmc\cores\RetroPlayer\RetroPlayerVideo.h" />
+    <ClInclude Include="..\..\xbmc\cores\Transcoder\Transcoder.h" />
     <ClInclude Include="..\..\xbmc\cores\VideoRenderers\OverlayRendererGUI.h" />
     <ClInclude Include="..\..\xbmc\dialogs\GUIDialogKeyboardGeneric.h" />
     <ClInclude Include="..\..\xbmc\DbUrl.h" />
