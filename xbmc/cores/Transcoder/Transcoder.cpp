@@ -124,43 +124,45 @@ int CTranscoder::OpenOutputFile(const char *filename)
 			if (dec_ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
 				if (dict) { av_free(dict); dict = NULL; }
 				av_dict_set(&dict, "preset", "slow", 0);
-				av_dict_set(&dict, "vprofile", "baseline", 0);
-				av_opt_set(enc_ctx->priv_data, "profile", "baseline", AV_OPT_SEARCH_CHILDREN);
-				enc_ctx->profile = FF_PROFILE_H264_BASELINE;
-				enc_ctx->height = dec_ctx->height;
-				enc_ctx->width = dec_ctx->width;
-				enc_ctx->sample_aspect_ratio = dec_ctx->sample_aspect_ratio;
+				av_dict_set(&dict, "vprofile", "high", 0);
+				av_opt_set(enc_ctx->priv_data, "profile", "high", AV_OPT_SEARCH_CHILDREN);
+				enc_ctx->profile = -99;
+				enc_ctx->height = 480;
+        enc_ctx->width = 1150;
+        AVRational r1;
+        r1.num = 2048; r1.den = 2047;
+				enc_ctx->sample_aspect_ratio = r1;
 				av_log(NULL, AV_LOG_DEBUG, "Video framerate: %u/%u", dec_ctx->framerate.num, dec_ctx->framerate.den);
 				/* take first format from list of supported formats */
-				enc_ctx->pix_fmt = encoder->pix_fmts[0];
+        enc_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
 				/* video time_base can be set to whatever is handy and supported by encoder */
 				//AVRational enc_time_base = dec_ctx->time_base;
 				//enc_time_base.den /= 2;
-				enc_ctx->time_base = dec_ctx->time_base;
+				//enc_ctx->time_base = dec_ctx->time_base;
 				/* Dirty hack*/
-				//AVRational r = { 1, 24 };
-				//enc_ctx->time_base = r;
-				enc_ctx->gop_size = 12; /* emit one intra frame every ten frames */
-				enc_ctx->max_b_frames = 1;
+				AVRational r;
+        r.num = 1001; r.den = 24000 * 2;
+				enc_ctx->time_base = r;
+				enc_ctx->gop_size = -1; /* emit one intra frame every ten frames */
+				enc_ctx->max_b_frames = 0;
 				enc_ctx->bit_rate = 500 * 1000;
-				enc_ctx->bit_rate_tolerance = 0;
-				enc_ctx->rc_max_rate = 0;
-				enc_ctx->rc_buffer_size = 0;
-				enc_ctx->gop_size = 12;
-				enc_ctx->max_b_frames = 3;
-				enc_ctx->b_frame_strategy = 1;
-				enc_ctx->coder_type = 1;
-				enc_ctx->me_method = ME_HEX;
-				enc_ctx->me_subpel_quality = 5;
-				enc_ctx->me_cmp = 1;
-				enc_ctx->me_range = 16;
-				enc_ctx->qmin = 10;
-				enc_ctx->qmax = 51;
-				enc_ctx->scenechange_threshold = 40;
-				enc_ctx->flags |= CODEC_FLAG_LOOP_FILTER;
-				enc_ctx->i_quant_factor = 0.71;
-				enc_ctx->qcompress = 0.6;
-				enc_ctx->max_qdiff = 4;
+				enc_ctx->bit_rate_tolerance = 4 * 1000 * 1000;
+				enc_ctx->rc_max_rate = 500 * 1000;
+        enc_ctx->rc_min_rate = 0;
+				enc_ctx->rc_buffer_size = 1 * 1000 * 1000;
+				enc_ctx->b_frame_strategy = -1;
+				enc_ctx->coder_type = -1;
+				enc_ctx->me_method = -1;
+				enc_ctx->me_subpel_quality = -1;
+				enc_ctx->me_cmp = -1;
+				enc_ctx->me_range = -1;
+				enc_ctx->qmin = -1;
+				enc_ctx->qmax = -1;
+				enc_ctx->scenechange_threshold = -1;
+        enc_ctx->flags = 2143289344;
+				enc_ctx->i_quant_factor = -1;
+				enc_ctx->qcompress = -1;
+				enc_ctx->max_qdiff = -1;
 				//c->directpred = 1;
 				//c->flags2 |= CODEC_FLAG2_FASTPSKIP;
 			}
