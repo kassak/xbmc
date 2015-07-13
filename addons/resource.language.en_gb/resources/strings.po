@@ -13257,7 +13257,21 @@ msgctxt "#27024"
 msgid "Game providers"
 msgstr ""
 
-#empty strings from id 27025 to 29799
+#: system/settings/settings.xml
+msgctxt "#27025"
+msgid "Enable network play"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#27026"
+msgid "Allow other applications to connect to a playing game."
+msgstr ""
+
+msgctxt "#27027"
+msgid "Network play"
+msgstr ""
+
+#empty strings from id 27028 to 29799
 
 #strings 29800 thru 29998 reserved strings used only in the default Project Mayhem III skin and not c++ code
 

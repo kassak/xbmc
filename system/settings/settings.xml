@@ -2025,6 +2025,13 @@
           </control>
         </setting>
       </group>
+      <group id="2">
+        <setting id="gamesgeneral.enablenetplay" type="boolean" label="27025" help="27026">
+          <level>0</level>
+          <default>true</default>
+          <control type="toggle" />
+        </setting>
+      </group>
     </category>
     <category id="gamesinput" label="27019" help="27020">
       <group id="1">
