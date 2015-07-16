@@ -1,5 +1,7 @@
 #include <string>
 
+#include <threads/Thread.h>
+
 extern "C" {
 #include <libavcodec\avcodec.h>
 #include <libavformat\avformat.h>
@@ -12,16 +14,21 @@ extern "C" {
 #include <libavutil/pixdesc.h>
 }
 
-class CTranscoder
+class CTranscoder : CThread, public IRunnable
 {
 
 public:
 
-  CTranscoder() {};
-  virtual ~CTranscoder() {};
+  CTranscoder();
+  virtual ~CTranscoder();
 
   int Transcode(std::string path);
   std::string TranscodePath(const std::string &path) const;
+
+protected:
+
+  virtual void OnStartup();
+  virtual void OnExit();
 
 private:
 
@@ -41,6 +48,10 @@ private:
   int FlushEncoder(unsigned int stream_index);
 
   static void LogError(int errnum);
+
+  virtual void Run();
+
+  std::string path;
 
   AVFormatContext *ifmt_ctx;
   AVFormatContext *ofmt_ctx;

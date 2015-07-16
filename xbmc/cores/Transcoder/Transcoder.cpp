@@ -22,6 +22,17 @@
 
 #include <stdio.h>
 
+CTranscoder::CTranscoder()
+  : CThread(this, "Transcoder")
+{
+  av_log(NULL, AV_LOG_DEBUG, "CTranscoder::CTranscoder() was called.\n");
+}
+
+CTranscoder::~CTranscoder()
+{
+  av_log(NULL, AV_LOG_DEBUG, "CTranscoder::~CTranscoder() was called.\n");
+}
+
 void CTranscoder::LogError(int errnum)
 {
 	char* buf = (char*) malloc(AV_ERROR_MAX_STRING_SIZE * sizeof(char));
@@ -509,134 +520,155 @@ int CTranscoder::FlushEncoder(unsigned int stream_index)
 
 int CTranscoder::Transcode(std::string path)
 {
-	int ret;
-	AVPacket packet;
-	packet.data = NULL;
-	packet.size = 0;
-	AVFrame *frame = NULL;
-	enum AVMediaType type;
-	unsigned int stream_index;
-	unsigned int i;
-	int got_frame;
-	int(*dec_func)(AVCodecContext *, AVFrame *, int *, const AVPacket *);
-
-	if (path.empty()) {
-		av_log(NULL, AV_LOG_ERROR, "Path to input file must not be empty.\n");
-		return 1;
-	}
-
-
-  std::string pathOut = TranscodePath(path);
-	printf("Using input file %s and output file %s", path.c_str(), pathOut.c_str());
-
-	av_register_all();
-	avcodec_register_all();
-	avfilter_register_all();
-
-  if ((ret = OpenInputFile(path.c_str())) < 0)
-		goto end;
-  if ((ret = OpenOutputFile(pathOut.c_str())) < 0)
-		goto end;
-	if ((ret = InitFilters()) < 0)
-		goto end;
-
-	/* read all packets */
-	while (1) {
-		if ((ret = av_read_frame(ifmt_ctx, &packet)) < 0)
-			break;
-		stream_index = packet.stream_index;
-		type = ifmt_ctx->streams[packet.stream_index]->codec->codec_type;
-		av_log(NULL, AV_LOG_DEBUG, "Demuxer gave frame of stream_index %u\n",
-			stream_index);
-
-		if (filter_ctx[stream_index].filter_graph) {
-			av_log(NULL, AV_LOG_DEBUG, "Going to reencode&filter the frame\n");
-			frame = av_frame_alloc();
-			if (!frame) {
-				ret = AVERROR(ENOMEM);
-				break;
-			}
-			av_packet_rescale_ts(&packet,
-				ifmt_ctx->streams[stream_index]->time_base,
-				ifmt_ctx->streams[stream_index]->codec->time_base);
-			dec_func = (type == AVMEDIA_TYPE_VIDEO) ? avcodec_decode_video2 :
-				avcodec_decode_audio4;
-			ret = dec_func(ifmt_ctx->streams[stream_index]->codec, frame,
-				&got_frame, &packet);
-			if (ret < 0) {
-				av_frame_free(&frame);
-				av_log(NULL, AV_LOG_ERROR, "Decoding failed\n");
-				break;
-			}
-
-			if (got_frame) {
-				frame->pts = av_frame_get_best_effort_timestamp(frame);
-				ret = FilterEncodeWriteFrame(frame, stream_index);
-				av_frame_free(&frame);
-				if (ret < 0)
-					goto end;
-			}
-			else {
-				av_frame_free(&frame);
-			}
-		}
-		else {
-			/* remux this frame without reencoding */
-			av_packet_rescale_ts(&packet,
-				ifmt_ctx->streams[stream_index]->time_base,
-				ofmt_ctx->streams[stream_index]->time_base);
-
-			ret = av_interleaved_write_frame(ofmt_ctx, &packet);
-			if (ret < 0)
-				goto end;
-		}
-		av_free_packet(&packet);
-	}
-
-	/* flush filters and encoders */
-	for (i = 0; i < ifmt_ctx->nb_streams; i++) {
-		/* flush filter */
-		if (!filter_ctx[i].filter_graph)
-			continue;
-    ret = FilterEncodeWriteFrame(NULL, i);
-		if (ret < 0) {
-			av_log(NULL, AV_LOG_ERROR, "Flushing filter failed\n");
-			goto end;
-		}
-
-		/* flush encoder */
-		ret = FlushEncoder(i);
-		if (ret < 0) {
-			av_log(NULL, AV_LOG_ERROR, "Flushing encoder failed\n");
-			goto end;
-		}
-	}
-
-	av_write_trailer(ofmt_ctx);
-end:
-	av_free_packet(&packet);
-	av_frame_free(&frame);
-	for (i = 0; i < ifmt_ctx->nb_streams; i++) {
-		avcodec_close(ifmt_ctx->streams[i]->codec);
-		if (ofmt_ctx && ofmt_ctx->nb_streams > i && ofmt_ctx->streams[i] && ofmt_ctx->streams[i]->codec)
-			avcodec_close(ofmt_ctx->streams[i]->codec);
-		if (filter_ctx && filter_ctx[i].filter_graph)
-			avfilter_graph_free(&filter_ctx[i].filter_graph);
-	}
-	av_free(filter_ctx);
-	avformat_close_input(&ifmt_ctx);
-	if (ofmt_ctx && !(ofmt_ctx->oformat->flags & AVFMT_NOFILE))
-		avio_closep(&ofmt_ctx->pb);
-	avformat_free_context(ofmt_ctx);
-
-	if (ret < 0) {
-    LogError(ret);
-	}
-
-	return ret ? 1 : 0;
+  this->path = path;
+  bool autoDelete = true;
+  this->Create(autoDelete);
+  return 1;
 }
 
 std::string CTranscoder::TranscodePath(const std::string &path) const
 {
   return path.substr(0, path.find_last_of('.')) + std::string("-transcoded.mp4");
+}
+
+void CTranscoder::Run()
+{
+  av_log(NULL, AV_LOG_DEBUG, "CTranscoder::Run() was called.");
+  int ret;
+  AVPacket packet;
+  packet.data = NULL;
+  packet.size = 0;
+  AVFrame *frame = NULL;
+  enum AVMediaType type;
+  unsigned int stream_index;
+  unsigned int i;
+  int got_frame;
+  int(*dec_func)(AVCodecContext *, AVFrame *, int *, const AVPacket *);
+
+  if (path.empty()) {
+    av_log(NULL, AV_LOG_ERROR, "Path to input file must not be empty.\n");
+    return;
+  }
+
+
+  std::string pathOut = TranscodePath(path);
+  printf("Using input file %s and output file %s", path.c_str(), pathOut.c_str());
+
+  av_register_all();
+  avcodec_register_all();
+  avfilter_register_all();
+
+  if ((ret = OpenInputFile(path.c_str())) < 0)
+    goto end;
+  if ((ret = OpenOutputFile(pathOut.c_str())) < 0)
+    goto end;
+  if ((ret = InitFilters()) < 0)
+    goto end;
+
+  /* read all packets */
+  while (1) {
+    if (m_bStop)
+    {
+      av_log(NULL, AV_LOG_DEBUG, "Transcoder asked to stop!\n");
+    }
+    if ((ret = av_read_frame(ifmt_ctx, &packet)) < 0)
+      break;
+    stream_index = packet.stream_index;
+    type = ifmt_ctx->streams[packet.stream_index]->codec->codec_type;
+    av_log(NULL, AV_LOG_DEBUG, "Demuxer gave frame of stream_index %u\n",
+      stream_index);
+
+    if (filter_ctx[stream_index].filter_graph) {
+      av_log(NULL, AV_LOG_DEBUG, "Going to reencode&filter the frame\n");
+      frame = av_frame_alloc();
+      if (!frame) {
+        ret = AVERROR(ENOMEM);
+        break;
+      }
+      av_packet_rescale_ts(&packet,
+        ifmt_ctx->streams[stream_index]->time_base,
+        ifmt_ctx->streams[stream_index]->codec->time_base);
+      dec_func = (type == AVMEDIA_TYPE_VIDEO) ? avcodec_decode_video2 :
+        avcodec_decode_audio4;
+      ret = dec_func(ifmt_ctx->streams[stream_index]->codec, frame,
+        &got_frame, &packet);
+      if (ret < 0) {
+        av_frame_free(&frame);
+        av_log(NULL, AV_LOG_ERROR, "Decoding failed\n");
+        break;
+      }
+
+      if (got_frame) {
+        frame->pts = av_frame_get_best_effort_timestamp(frame);
+        ret = FilterEncodeWriteFrame(frame, stream_index);
+        av_frame_free(&frame);
+        if (ret < 0)
+          goto end;
+      }
+      else {
+        av_frame_free(&frame);
+      }
+    }
+    else {
+      /* remux this frame without reencoding */
+      av_packet_rescale_ts(&packet,
+        ifmt_ctx->streams[stream_index]->time_base,
+        ofmt_ctx->streams[stream_index]->time_base);
+
+      ret = av_interleaved_write_frame(ofmt_ctx, &packet);
+      if (ret < 0)
+        goto end;
+    }
+    av_free_packet(&packet);
+  }
+
+  /* flush filters and encoders */
+  for (i = 0; i < ifmt_ctx->nb_streams; i++) {
+    /* flush filter */
+    if (!filter_ctx[i].filter_graph)
+      continue;
+    ret = FilterEncodeWriteFrame(NULL, i);
+    if (ret < 0) {
+      av_log(NULL, AV_LOG_ERROR, "Flushing filter failed\n");
+      goto end;
+    }
+
+    /* flush encoder */
+    ret = FlushEncoder(i);
+    if (ret < 0) {
+      av_log(NULL, AV_LOG_ERROR, "Flushing encoder failed\n");
+      goto end;
+    }
+  }
+
+  av_write_trailer(ofmt_ctx);
+end:
+  av_free_packet(&packet);
+  av_frame_free(&frame);
+  for (i = 0; i < ifmt_ctx->nb_streams; i++) {
+    avcodec_close(ifmt_ctx->streams[i]->codec);
+    if (ofmt_ctx && ofmt_ctx->nb_streams > i && ofmt_ctx->streams[i] && ofmt_ctx->streams[i]->codec)
+      avcodec_close(ofmt_ctx->streams[i]->codec);
+    if (filter_ctx && filter_ctx[i].filter_graph)
+      avfilter_graph_free(&filter_ctx[i].filter_graph);
+  }
+  av_free(filter_ctx);
+  avformat_close_input(&ifmt_ctx);
+  if (ofmt_ctx && !(ofmt_ctx->oformat->flags & AVFMT_NOFILE))
+    avio_closep(&ofmt_ctx->pb);
+  avformat_free_context(ofmt_ctx);
+
+  if (ret < 0) {
+    LogError(ret);
+  }
+}
+
+void CTranscoder::OnStartup()
+{
+  av_log(NULL, AV_LOG_DEBUG, "CTranscoder::onStartup() was called.\n");
+}
+
+void CTranscoder::OnExit()
+{
+  av_log(NULL, AV_LOG_DEBUG, "CTranscoder::onExit() was called.\n");
 }

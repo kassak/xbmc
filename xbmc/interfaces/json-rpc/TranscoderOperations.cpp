@@ -47,8 +47,8 @@ JSONRPC_STATUS CTranscoderOperations::Transcode(const std::string &method, ITran
     CLog::Log(LOGDEBUG, "JSONRPC: Found requested movie '%s' with id '%d' in library. Path: %s"
       , moviename.c_str(), (int) movieid.asInteger(), moviepath.c_str());
 
-    CTranscoder transcoder;
-    std::string transpath = transcoder.TranscodePath(moviepath);
+    CTranscoder* transcoder = new CTranscoder();
+    std::string transpath = transcoder->TranscodePath(moviepath);
 
     if (XFILE::CFile::Exists(transpath))
     {
@@ -57,7 +57,7 @@ JSONRPC_STATUS CTranscoderOperations::Transcode(const std::string &method, ITran
     else
     {
       CLog::Log(LOGDEBUG, "Transcoding movie to: %s", transpath);
-      transcoder.Transcode(moviepath);
+      transcoder->Transcode(moviepath);
     }
 
     result["protocol"] = "http";
