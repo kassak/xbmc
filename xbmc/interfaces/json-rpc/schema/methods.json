@@ -2343,7 +2343,12 @@
     "transport": "Response",
     "permission": "WriteFile",
     "params": [
-      { "name": "movieid", "$ref": "Library.Id", "required": true }
+      { "name": "movieid", "$ref": "Library.Id", "required": true },
+      { "name": "options", "type": "object", "required": true,
+        "properties": {
+          "container": { "type": "string", "required": true, "description": "Container format to use for the transcoded data" }
+        }
+      }
     ],
     "returns": "string"
   }

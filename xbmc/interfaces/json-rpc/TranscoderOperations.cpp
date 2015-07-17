@@ -19,6 +19,7 @@
  */
 
 #include "TranscoderOperations.h"
+#include "cores/Transcoder/JSONTranscodingOptions.h"
 #include "VideoLibrary.h"
 #include "utils/log.h"
 #include "cores/Transcoder/Transcoder.h"
@@ -48,11 +49,14 @@ JSONRPC_STATUS CTranscoderOperations::Transcode(const std::string &method, ITran
       , moviename.c_str(), (int) movieid.asInteger(), moviepath.c_str());
 
     CTranscoder* transcoder = new CTranscoder();
+    JSONTranscodingOptions transOpts(parameterObject["options"]);
+    transcoder->SetTranscodingOptions(transOpts);
     std::string transpath = transcoder->TranscodePath(moviepath);
 
     if (XFILE::CFile::Exists(transpath))
     {
       CLog::Log(LOGDEBUG, "Transcoded movie already exists.");
+      delete transcoder;
     }
     else
     {

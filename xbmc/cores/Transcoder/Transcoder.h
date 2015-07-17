@@ -1,5 +1,8 @@
+#pragma once
+
 #include <string>
 
+#include "TranscodingOptions.h"
 #include <threads/Thread.h>
 
 extern "C" {
@@ -25,12 +28,16 @@ public:
   int Transcode(std::string path);
   std::string TranscodePath(const std::string &path) const;
 
+  void SetTranscodingOptions(TranscodingOptions transOpts);
+
 protected:
 
   virtual void OnStartup();
   virtual void OnExit();
 
 private:
+
+  TranscodingOptions m_TransOpts;
 
   typedef struct FilteringContext {
     AVFilterContext *buffersink_ctx;
@@ -48,14 +55,23 @@ private:
   int FlushEncoder(unsigned int stream_index);
 
   static void LogError(int errnum);
+  static void ResetAVDictionary(AVDictionary **dict);
 
   virtual void Run();
 
   std::string path;
 
+  AVPacket packet;
+
+  AVFrame *frame;
+
+  enum AVMediaType type;
+
   AVFormatContext *ifmt_ctx;
   AVFormatContext *ofmt_ctx;
 
   FilteringContext *filter_ctx;
+
+
 
 };
