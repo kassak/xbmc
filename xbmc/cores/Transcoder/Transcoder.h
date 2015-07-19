@@ -6,9 +6,9 @@
 #include <threads/Thread.h>
 
 extern "C" {
-#include <libavcodec\avcodec.h>
-#include <libavformat\avformat.h>
-#include <libswscale\swscale.h>
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
 #include <libavfilter/avfiltergraph.h>
 #include <libavfilter/avcodec.h>
 #include <libavfilter/buffersink.h>
@@ -54,6 +54,9 @@ private:
   int FilterEncodeWriteFrame(AVFrame *frame, unsigned int stream_index);
   int FlushEncoder(unsigned int stream_index);
 
+  int InitSwsContext();
+  int SwsScaleVideo(const AVFrame *src_frame, AVFrame **scaled_frame);
+
   static void LogError(int errnum);
   static void ResetAVDictionary(AVDictionary **dict);
 
@@ -72,6 +75,11 @@ private:
 
   FilteringContext *filter_ctx;
 
-
+  bool m_bFoundVideoStream;
+  bool m_bFoundAudioStream;
+  int m_iVideoWidth;
+  int m_iVideoHeight;
+  AVPixelFormat m_eVideoPixelFormat;
+  SwsContext *sws_video_ctx;
 
 };

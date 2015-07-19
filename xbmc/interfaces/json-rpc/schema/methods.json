@@ -2346,7 +2346,9 @@
       { "name": "movieid", "$ref": "Library.Id", "required": true },
       { "name": "options", "type": "object", "required": true,
         "properties": {
-          "container": { "type": "string", "required": true, "description": "Container format to use for the transcoded data" }
+          "container": { "type": "string", "required": true, "description": "Container format to use for the transcoded data" },
+          "width": { "type": "integer", "required": true, "description": "Width of the transcoded video" },
+          "height": { "type": "integer", "required": true, "description": "Height of the transcoded video" }
         }
       }
     ],

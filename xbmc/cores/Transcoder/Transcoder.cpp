@@ -34,6 +34,12 @@ CTranscoder::CTranscoder()
   ifmt_ctx = NULL;
   ofmt_ctx = NULL;
   filter_ctx = NULL;
+  sws_video_ctx = NULL;
+  m_bFoundVideoStream = false;
+  m_bFoundAudioStream = false;
+  int m_iVideoWidth = 0;
+  int m_iVideoHeight = 0;
+  AVPixelFormat m_eVideoPixelFormat = AV_PIX_FMT_NONE;
 }
 
 CTranscoder::~CTranscoder()
@@ -76,6 +82,77 @@ CTranscoder::~CTranscoder()
   {
     av_free(filter_ctx);
   }
+  if (sws_video_ctx)
+  {
+    sws_freeContext(sws_video_ctx);
+  }
+}
+
+
+int CTranscoder::InitSwsContext()
+{
+  sws_video_ctx = sws_getContext(m_iVideoWidth,
+    m_iVideoHeight,
+    m_eVideoPixelFormat,
+    m_TransOpts.GetWidth(),
+    m_TransOpts.GetHeight(),
+    m_TransOpts.GetPixelFormat(),
+    m_TransOpts.GetSwsInterpolationMethod(),
+    NULL, NULL, NULL);
+
+  int ret = 0;
+  if (sws_video_ctx == NULL)
+  {
+    ret = AVERROR(ENOMEM);
+  }
+  return ret;
+}
+
+int CTranscoder::SwsScaleVideo(const AVFrame *src_frame, AVFrame **scaled_frame)
+{
+  int ret;
+
+  // Allocate a new frame
+  *scaled_frame = av_frame_alloc();
+  if (*scaled_frame == 0)
+  {
+    CLog::Log(LOGERROR, "CTranscoder::SwsScaleVideo(): Could not allocate frame.");
+    ret = AVERROR(ENOMEM);
+    return ret;
+  }
+
+  // Allocate space for raw data
+  uint8_t *raw_data = NULL;
+  int numBytes = avpicture_get_size(m_TransOpts.GetPixelFormat(), m_TransOpts.GetWidth(), m_TransOpts.GetHeight());
+  raw_data = (uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
+  if (raw_data == 0)
+  {
+    CLog::Log(LOGERROR, "CTranscoder::SwsScaleVideo(): Could not allocate raw data.");
+    ret = AVERROR(ENOMEM);
+    return ret;
+  }
+  if ((ret = avpicture_fill((AVPicture *)*scaled_frame, raw_data, m_TransOpts.GetPixelFormat(),
+    m_TransOpts.GetWidth(), m_TransOpts.GetHeight())) < 0)
+  {
+    CLog::Log(LOGERROR, "CTranscoder::SwsScaleVideo(): Could not set up the picture fields.");
+    return ret;
+  }
+  sws_scale(sws_video_ctx, (uint8_t const * const *)src_frame->data, src_frame->linesize,
+    0, m_iVideoHeight, (*scaled_frame)->data, (*scaled_frame)->linesize);
+  // TODO: Find out which of the following properties need to be set at all
+  (*scaled_frame)->width = m_TransOpts.GetWidth();
+  (*scaled_frame)->height = m_TransOpts.GetHeight();
+  (*scaled_frame)->format = m_TransOpts.GetPixelFormat();
+  (*scaled_frame)->sample_aspect_ratio = src_frame->sample_aspect_ratio;
+  (*scaled_frame)->pts = src_frame->pts;
+  (*scaled_frame)->pkt_pts = src_frame->pkt_pts;
+  (*scaled_frame)->pkt_dts = src_frame->pkt_dts;
+  (*scaled_frame)->nb_samples = src_frame->nb_samples;
+  (*scaled_frame)->key_frame = src_frame->key_frame;
+  (*scaled_frame)->pict_type = src_frame->pict_type;
+  (*scaled_frame)->coded_picture_number = src_frame->coded_picture_number;
+
+  return 0;
 }
 
 void CTranscoder::LogError(int errnum)
@@ -127,6 +204,17 @@ int CTranscoder::OpenInputFile(const char *filename)
         CLog::Log(LOGERROR, "Failed to open decoder for stream #%u\n", i);
 				return ret;
 			}
+      if (!m_bFoundVideoStream && codec_type == AVMEDIA_TYPE_VIDEO)
+      {
+        m_bFoundVideoStream = true;
+        m_iVideoWidth = codec_ctx->width;
+        m_iVideoHeight = codec_ctx->height;
+        m_eVideoPixelFormat = codec_ctx->pix_fmt;
+      }
+      if (!m_bFoundAudioStream && codec_type == AVMEDIA_TYPE_AUDIO)
+      {
+        m_bFoundAudioStream = true;
+      }
 		}
 	}
 
@@ -183,25 +271,22 @@ int CTranscoder::OpenOutputFile(const char *filename)
 
       av_opt_set(enc_ctx->priv_data, "profile", "high", AV_OPT_SEARCH_CHILDREN);
 
-      enc_ctx->profile = -99;
-      enc_ctx->height = 480;
-      enc_ctx->width = 1150;
-      AVRational r1;
-      r1.num = 2048; r1.den = 2047;
-      enc_ctx->sample_aspect_ratio = r1;
+      enc_ctx->profile = FF_PROFILE_H264_HIGH;
+      enc_ctx->height = m_TransOpts.GetHeight();
+      enc_ctx->width = m_TransOpts.GetWidth();
+      enc_ctx->pix_fmt = m_TransOpts.GetPixelFormat();
+      AVRational sar; sar.num = 1; sar.den = 1;
+      enc_ctx->sample_aspect_ratio = sar;
       CLog::Log(LOGDEBUG, "CTranscoder::OpenOutputFile: Video framerate: %u/%u", dec_ctx->framerate.num, dec_ctx->framerate.den);
-      enc_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
-      AVRational enc_time_base = dec_ctx->time_base;
-      //enc_time_base.den /= 2;
-      enc_ctx->time_base = enc_time_base;
-      //AVRational r; r.num = 1001; r.den = 24000 * 2;
-      //enc_ctx->time_base = r;
+      enc_ctx->time_base = dec_ctx->time_base;
       enc_ctx->max_b_frames = 0;
       enc_ctx->bit_rate = 500 * 1000;
       enc_ctx->bit_rate_tolerance = 4 * 1000 * 1000;
       enc_ctx->rc_max_rate = 500 * 1000;
       enc_ctx->rc_min_rate = 0;
       enc_ctx->rc_buffer_size = 1 * 1000 * 1000;
+      // TODO: Some of the following settings are needed for a correctly working encoder.
+      // Find out which one or which combination of them!
       enc_ctx->flags = 2143289344;
       enc_ctx->gop_size = -1;
       enc_ctx->b_frame_strategy = -1;
@@ -217,7 +302,6 @@ int CTranscoder::OpenOutputFile(const char *filename)
       enc_ctx->qmax = -1;
       enc_ctx->max_qdiff = -1;
 
-      /* Third parameter can be used to pass settings to encoder */
       if ((ret = avcodec_open2(enc_ctx, encoder, &dict)) < 0)
       {
         CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Cannot open video encoder for stream #%u\n", i);
@@ -255,7 +339,7 @@ int CTranscoder::OpenOutputFile(const char *filename)
 		}
 		else
     {
-			/* if this stream must be remuxed */
+			/* Simply remux other streams */
 			ret = avcodec_copy_context(ofmt_ctx->streams[i]->codec,
 				ifmt_ctx->streams[i]->codec);
 			if (ret < 0) {
@@ -305,15 +389,18 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 	AVFilterInOut *inputs = avfilter_inout_alloc();
 	AVFilterGraph *filter_graph = avfilter_graph_alloc();
 
-	if (!outputs || !inputs || !filter_graph) {
+	if (!outputs || !inputs || !filter_graph)
+  {
 		ret = AVERROR(ENOMEM);
 		goto end;
 	}
 
-	if (dec_ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
+	if (dec_ctx->codec_type == AVMEDIA_TYPE_VIDEO)
+  {
 		buffersrc = avfilter_get_by_name("buffer");
 		buffersink = avfilter_get_by_name("buffersink");
-		if (!buffersrc || !buffersink) {
+		if (!buffersrc || !buffersink) 
+    {
       CLog::Log(LOGERROR, "filtering source or sink element not found\n");
 			ret = AVERROR_UNKNOWN;
 			goto end;
@@ -321,7 +408,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 
 		_snprintf(args, sizeof(args),
 			"video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
-			dec_ctx->width, dec_ctx->height, dec_ctx->pix_fmt,
+      m_TransOpts.GetWidth(), m_TransOpts.GetHeight(), m_TransOpts.GetPixelFormat(),
 			dec_ctx->time_base.num, dec_ctx->time_base.den,
 			dec_ctx->sample_aspect_ratio.num,
 			dec_ctx->sample_aspect_ratio.den);
@@ -605,18 +692,29 @@ void CTranscoder::Run()
 
   int ret;
   if ((ret = OpenInputFile(path.c_str())) < 0)
+  {
     goto end;
+  }
   if ((ret = OpenOutputFile(pathOut.c_str())) < 0)
+  {
     goto end;
+  }
   if ((ret = InitFilters()) < 0)
+  {
     goto end;
+  }
+  if ((ret = InitSwsContext()) < 0)
+  {
+    goto end;
+  }
 
   unsigned int stream_index;
   unsigned int i;
   int got_frame;
   int(*dec_func)(AVCodecContext *, AVFrame *, int *, const AVPacket *);
 
-  while (1) {
+  while (1)
+  {
     if (m_bStop)
     {
       CLog::Log(LOGDEBUG, "CTranscoder::Run(): Transcoder asked to stop!\n");
@@ -624,23 +722,33 @@ void CTranscoder::Run()
     if ((ret = av_read_frame(ifmt_ctx, &packet)) < 0)
       break;
     stream_index = packet.stream_index;
-    type = ifmt_ctx->streams[packet.stream_index]->codec->codec_type;
+    AVStream *stream = ifmt_ctx->streams[stream_index];
+    AVCodecContext *codec_ctx = stream->codec;
+    type = codec_ctx->codec_type;
     //CLog::Log(LOGDEBUG, "CTranscoder::Run(): Demuxer gave frame of stream_index %u\n", stream_index);
 
-    if (filter_ctx[stream_index].filter_graph) {
-      //CLog::Log(LOGDEBUG, "CTranscoder::Run(): Going to reencode and filter the frame\n");
-      frame = av_frame_alloc();
-      if (!frame) {
+    if (filter_ctx[stream_index].filter_graph)
+    {
+      //CLog::Log(LOGDEBUG, "CTranscoder::Run(): Going to reencode and filter the frame\n"); 
+      if ((frame = av_frame_alloc()) == NULL)
+      {
         ret = AVERROR(ENOMEM);
         break;
       }
-      av_packet_rescale_ts(&packet,
-        ifmt_ctx->streams[stream_index]->time_base,
-        ifmt_ctx->streams[stream_index]->codec->time_base);
-      dec_func = (type == AVMEDIA_TYPE_VIDEO) ? avcodec_decode_video2 :
-        avcodec_decode_audio4;
-      ret = dec_func(ifmt_ctx->streams[stream_index]->codec, frame,
-        &got_frame, &packet);
+      av_packet_rescale_ts(&packet, stream->time_base, codec_ctx->time_base);
+      if (type == AVMEDIA_TYPE_VIDEO)
+      {
+        ret = avcodec_decode_video2(codec_ctx, frame, &got_frame, &packet);
+      }
+      else if (type == AVMEDIA_TYPE_AUDIO)
+      {
+        ret = avcodec_decode_audio4(codec_ctx, frame, &got_frame, &packet);
+      }
+      else
+      {
+        CLog::Log(LOGERROR, "CTranscoder::Run(): Got packet of unexpected media type.");
+        ret = -1;
+      }
       if (ret < 0) {
         av_frame_free(&frame);
         CLog::Log(LOGERROR, "CTranscoder::Run(): Decoding failed\n");
@@ -650,8 +758,31 @@ void CTranscoder::Run()
       if (got_frame)
       {
         frame->pts = av_frame_get_best_effort_timestamp(frame);
-        ret = FilterEncodeWriteFrame(frame, stream_index);
-        av_frame_free(&frame);
+        if (type == AVMEDIA_TYPE_VIDEO)
+        {
+          // Rescale the video frame
+          AVFrame *scaledFrame;
+          if ((ret = SwsScaleVideo(frame, &scaledFrame)) == 0)
+          {
+            ret = FilterEncodeWriteFrame(scaledFrame, stream_index);
+            av_frame_free(&scaledFrame);
+            av_frame_free(&frame);
+          }
+          else
+          {
+            CLog::Log(LOGERROR, "CTranscoder::Run(): Scaling of video frame failed.");
+            if (scaledFrame)
+            {
+              av_frame_free(&scaledFrame);
+            }
+            av_frame_free(&frame);
+          }
+        }
+        else
+        {
+          ret = FilterEncodeWriteFrame(frame, stream_index);
+          av_frame_free(&frame);
+        }
         if (ret < 0)
           goto end;
       }
