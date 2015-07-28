@@ -121,22 +121,14 @@ int CTranscoder::SwsScaleVideo(const AVFrame *src_frame, AVFrame **scaled_frame)
     return ret;
   }
 
-  // Allocate space for raw data
-  uint8_t *raw_data = NULL;
-  int numBytes = avpicture_get_size(m_TransOpts.GetPixelFormat(), m_TransOpts.GetWidth(), m_TransOpts.GetHeight());
-  raw_data = (uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
-  if (raw_data == 0)
-  {
-    CLog::Log(LOGERROR, "CTranscoder::SwsScaleVideo(): Could not allocate raw data.");
-    ret = AVERROR(ENOMEM);
-    return ret;
-  }
-  if ((ret = avpicture_fill((AVPicture *)*scaled_frame, raw_data, m_TransOpts.GetPixelFormat(),
+  // Allocate space for the picture data
+  if ((ret = avpicture_alloc((AVPicture *)*scaled_frame, m_TransOpts.GetPixelFormat(),
     m_TransOpts.GetWidth(), m_TransOpts.GetHeight())) < 0)
   {
-    CLog::Log(LOGERROR, "CTranscoder::SwsScaleVideo(): Could not set up the picture fields.");
+    CLog::Log(LOGERROR, "CTranscoder::SwsScaleVideo(): Could not allocate picture.");
     return ret;
   }
+
   sws_scale(sws_video_ctx, (uint8_t const * const *)src_frame->data, src_frame->linesize,
     0, m_iVideoHeight, (*scaled_frame)->data, (*scaled_frame)->linesize);
   // TODO: Find out which of the following properties need to be set at all
@@ -363,6 +355,8 @@ int CTranscoder::OpenOutputFile(const char *filename)
 			return ret;
 		}
 	}
+
+  // TODO: Set metadata of the ofmt_ctx, i.e. output file
 
 	/* init muxer, write output file header */
   ResetAVDictionary(&dict);
@@ -711,7 +705,6 @@ void CTranscoder::Run()
   unsigned int stream_index;
   unsigned int i;
   int got_frame;
-  int(*dec_func)(AVCodecContext *, AVFrame *, int *, const AVPacket *);
 
   while (1)
   {
@@ -765,6 +758,7 @@ void CTranscoder::Run()
           if ((ret = SwsScaleVideo(frame, &scaledFrame)) == 0)
           {
             ret = FilterEncodeWriteFrame(scaledFrame, stream_index);
+            avpicture_free((AVPicture *)scaledFrame);
             av_frame_free(&scaledFrame);
             av_frame_free(&frame);
           }
@@ -773,6 +767,7 @@ void CTranscoder::Run()
             CLog::Log(LOGERROR, "CTranscoder::Run(): Scaling of video frame failed.");
             if (scaledFrame)
             {
+              avpicture_free((AVPicture *)scaledFrame);
               av_frame_free(&scaledFrame);
             }
             av_frame_free(&frame);
