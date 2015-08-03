@@ -2348,7 +2348,9 @@
         "properties": {
           "container": { "type": "string", "required": true, "description": "Container format to use for the transcoded data" },
           "width": { "type": "integer", "required": true, "description": "Width of the transcoded video" },
-          "height": { "type": "integer", "required": true, "description": "Height of the transcoded video" }
+          "height": { "type": "integer", "required": true, "description": "Height of the transcoded video" },
+          "streaming": { "type": "string", "required": false, "description": "Streaming method"},
+          "segmentduration": { "type": "integer", "required": false, "description": "Duration of an HTTP Live Streaming media segment file" }
         }
       }
     ],

@@ -37,57 +37,20 @@ CTranscoder::CTranscoder()
   sws_video_ctx = NULL;
   m_bFoundVideoStream = false;
   m_bFoundAudioStream = false;
-  int m_iVideoWidth = 0;
-  int m_iVideoHeight = 0;
+  m_iVideoWidth = 0;
+  m_iVideoHeight = 0;
   AVPixelFormat m_eVideoPixelFormat = AV_PIX_FMT_NONE;
+  m_iHLS_Segment = 1;
+  m_iDuration = 0;
 }
 
 CTranscoder::~CTranscoder()
 {
   CLog::Log(LOGDEBUG, "CTranscoder::~CTranscoder() was called.\n");
-  if (packet.data)
-  {
-    av_free_packet(&packet);
-  }
-  if (frame)
-  {
-    av_frame_free(&frame);
-  }
-  if (ifmt_ctx)
-  {
-    unsigned int i;
-    for (i = 0; i < ifmt_ctx->nb_streams; i++)
-    {
-      avcodec_close(ifmt_ctx->streams[i]->codec);
-      if (ofmt_ctx && ofmt_ctx->nb_streams > i && ofmt_ctx->streams[i] && ofmt_ctx->streams[i]->codec)
-      {
-        avcodec_close(ofmt_ctx->streams[i]->codec);
-      }
-      if (filter_ctx && filter_ctx[i].filter_graph)
-      {
-        avfilter_graph_free(&filter_ctx[i].filter_graph);
-      }
-    }
-    avformat_close_input(&ifmt_ctx);
-  }
-  if (ofmt_ctx)
-  {
-    if (!(ofmt_ctx->oformat->flags & AVFMT_NOFILE))
-    {
-      avio_closep(&ofmt_ctx->pb);
-    }
-  avformat_free_context(ofmt_ctx);
-  }
-  if (filter_ctx)
-  {
-    av_free(filter_ctx);
-  }
-  if (sws_video_ctx)
-  {
-    sws_freeContext(sws_video_ctx);
-  }
+  CloseSwsContext();
+  CloseOutputFile();
+  CloseInputFile();
 }
-
 
 int CTranscoder::InitSwsContext()
 {
@@ -104,6 +67,16 @@ int CTranscoder::InitSwsContext()
   if (sws_video_ctx == NULL)
   {
     ret = AVERROR(ENOMEM);
+  }
+  return ret;
+}
+
+int CTranscoder::CloseSwsContext()
+{
+  int ret = 0;
+  if (sws_video_ctx)
+  {
+    sws_freeContext(sws_video_ctx);
   }
   return ret;
 }
@@ -147,6 +120,24 @@ int CTranscoder::SwsScaleVideo(const AVFrame *src_frame, AVFrame **scaled_frame)
   return 0;
 }
 
+int CTranscoder::HLS_CreatePlaylist(const char* filename)
+{
+  int ret = 0;
+
+  return ret;
+}
+
+int CTranscoder::ShouldStartNewSegment(int64_t time_stamp, const AVRational& time_base)
+{
+  int ret = 0;
+  if (time_stamp * time_base.num / time_base.den > m_iHLS_Segment * m_TransOpts.GetSegmentDuration())
+  {
+    m_iHLS_Segment++;
+    ret = 1;
+  }
+  return ret;
+}
+
 void CTranscoder::LogError(int errnum)
 {
 	char* buf = (char*) malloc(AV_ERROR_MAX_STRING_SIZE * sizeof(char));
@@ -170,30 +161,44 @@ int CTranscoder::OpenInputFile(const char *filename)
 
 	if ((ret = avformat_open_input(&ifmt_ctx, filename, NULL, NULL)) < 0)
   {
-    CLog::Log(LOGERROR, "CTranscoder::OpenInputFile: Cannot open input file '%s'\n", filename);
+    CLog::Log(LOGERROR, "CTranscoder::OpenInputFile(): Cannot open input file '%s'\n", filename);
 		return ret;
 	}
 
 	if ((ret = avformat_find_stream_info(ifmt_ctx, NULL)) < 0)
   {
-    CLog::Log(LOGERROR, "CTranscoder::OpenInputFile: Cannot find stream information\n");
+    CLog::Log(LOGERROR, "CTranscoder::OpenInputFile(): Cannot find stream information\n");
 		return ret;
 	}
 
-	unsigned int i;
+  int duration_time_base = AV_TIME_BASE;
+  m_iDuration = ifmt_ctx->duration;
+  CLog::Log(LOGDEBUG, "CTranscoder::OpenInputFile(): Duration of the media file: %d/%d",
+    m_iDuration, duration_time_base);
+
+  AVDurationEstimationMethod dem = ifmt_ctx->duration_estimation_method;
+  if (dem == AVFMT_DURATION_FROM_PTS)
+    CLog::Log(LOGDEBUG, "CTranscoder::OpenInputFile(): Duration estimation method: AVFMT_DURATION_FROM_PTS");
+  else if (dem == AVFMT_DURATION_FROM_STREAM)
+    CLog::Log(LOGDEBUG, "CTranscoder::OpenInputFile(): Duration estimation method: AVFMT_DURATION_FROM_STREAM");
+  else if (dem == AVFMT_DURATION_FROM_BITRATE)
+    CLog::Log(LOGDEBUG, "CTranscoder::OpenInputFile(): Duration estimation method: AVFMT_DURATION_FROM_BITRATE");
+  else
+    CLog::Log(LOGERROR, "CTranscoder::OpenInputFile(): Duration estimation method: UNKNOWN");
+	
+		/* Open video and audio decoders */
+  unsigned int i;
 	for (i = 0; i < ifmt_ctx->nb_streams; i++)
   {
     AVStream *stream = ifmt_ctx->streams[i];
     AVCodecContext *codec_ctx = stream->codec;
     AVMediaType codec_type = codec_ctx->codec_type;
-		/* Reencode video & audio and remux subtitles etc. */
 		if (codec_type == AVMEDIA_TYPE_VIDEO	|| codec_type == AVMEDIA_TYPE_AUDIO)
     {
-			/* Open decoder */
       AVCodecID codec_id = codec_ctx->codec_id;
       if ((ret = avcodec_open2(codec_ctx, avcodec_find_decoder(codec_id), NULL)) < 0)
       {
-        CLog::Log(LOGERROR, "Failed to open decoder for stream #%u\n", i);
+        CLog::Log(LOGERROR, "CTranscoder::OpenInputFile(): Failed to open decoder for stream #%u\n", i);
 				return ret;
 			}
       if (!m_bFoundVideoStream && codec_type == AVMEDIA_TYPE_VIDEO)
@@ -211,7 +216,23 @@ int CTranscoder::OpenInputFile(const char *filename)
 	}
 
 	av_dump_format(ifmt_ctx, 0, filename, 0);
-	return 0;
+	return ret;
+}
+
+int CTranscoder::CloseInputFile()
+{
+  int ret = 0;
+  if (ifmt_ctx)
+  {
+    unsigned int i;
+    for (i = 0; i < ifmt_ctx->nb_streams; i++)
+    {
+      avcodec_close(ifmt_ctx->streams[i]->codec);
+    }
+    avformat_close_input(&ifmt_ctx);
+    ifmt_ctx = NULL;
+  }
+  return ret;
 }
 
 int CTranscoder::OpenOutputFile(const char *filename)
@@ -370,6 +391,51 @@ int CTranscoder::OpenOutputFile(const char *filename)
 	return 0;
 }
 
+int CTranscoder::CloseOutputFile()
+{
+  int ret = 0;
+  FlushFiltersAndEncoders();
+  av_write_trailer(ofmt_ctx);
+  if (packet.data)
+  {
+    av_free_packet(&packet);
+  }
+  if (frame)
+  {
+    av_frame_free(&frame);
+  }
+  if (ifmt_ctx)
+  {
+    unsigned int i;
+    for (i = 0; i < ifmt_ctx->nb_streams; i++)
+    {
+      if (ofmt_ctx && ofmt_ctx->nb_streams > i && ofmt_ctx->streams[i] && ofmt_ctx->streams[i]->codec)
+      {
+        avcodec_close(ofmt_ctx->streams[i]->codec);
+      }
+      if (filter_ctx && filter_ctx[i].filter_graph)
+      {
+        avfilter_graph_free(&filter_ctx[i].filter_graph);
+      }
+    }
+  }
+  if (ofmt_ctx)
+  {
+    if (!(ofmt_ctx->oformat->flags & AVFMT_NOFILE))
+    {
+      avio_closep(&ofmt_ctx->pb);
+    }
+    avformat_free_context(ofmt_ctx);
+    ofmt_ctx = NULL;
+  }
+  if (filter_ctx)
+  {
+    av_free(filter_ctx);
+    filter_ctx = NULL;
+  }
+  return ret;
+}
+
 int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 	AVCodecContext *enc_ctx, const char *filter_spec)
 {
@@ -395,7 +461,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 		buffersink = avfilter_get_by_name("buffersink");
 		if (!buffersrc || !buffersink) 
     {
-      CLog::Log(LOGERROR, "filtering source or sink element not found\n");
+      CLog::Log(LOGERROR, "CTranscoder::InitFilter(): Filtering source or sink element not found.");
 			ret = AVERROR_UNKNOWN;
 			goto end;
 		}
@@ -410,14 +476,14 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 		ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in",
 			args, NULL, filter_graph);
 		if (ret < 0) {
-      CLog::Log(LOGERROR, "Cannot create buffer source\n");
+      CLog::Log(LOGERROR, "CTranscoder::InitFilter(): Cannot create buffer source.");
 			goto end;
 		}
 
 		ret = avfilter_graph_create_filter(&buffersink_ctx, buffersink, "out",
 			NULL, NULL, filter_graph);
 		if (ret < 0) {
-      CLog::Log(LOGERROR, "Cannot create buffer sink\n");
+      CLog::Log(LOGERROR, "CTranscoder::InitFilter(): Cannot create buffer sink.");
 			goto end;
 		}
 
@@ -425,7 +491,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 			(uint8_t*)&enc_ctx->pix_fmt, sizeof(enc_ctx->pix_fmt),
 			AV_OPT_SEARCH_CHILDREN);
 		if (ret < 0) {
-      CLog::Log(LOGERROR, "Cannot set output pixel format\n");
+      CLog::Log(LOGERROR, "CTranscoder::InitFilter(): Cannot set output pixel format.");
 			goto end;
 		}
 	}
@@ -433,7 +499,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 		buffersrc = avfilter_get_by_name("abuffer");
 		buffersink = avfilter_get_by_name("abuffersink");
 		if (!buffersrc || !buffersink) {
-      CLog::Log(LOGERROR, "filtering source or sink element not found\n");
+      CLog::Log(LOGERROR, "CTranscoder::InitFilter(): Filtering source or sink element not found.");
 			ret = AVERROR_UNKNOWN;
 			goto end;
 		}
@@ -449,14 +515,14 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 		ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in",
 			args, NULL, filter_graph);
 		if (ret < 0) {
-      CLog::Log(LOGERROR, "Cannot create audio buffer source\n");
+      CLog::Log(LOGERROR, "CTranscoder::InitFilter(): Cannot create audio buffer source.");
 			goto end;
 		}
 
 		ret = avfilter_graph_create_filter(&buffersink_ctx, buffersink, "out",
 			NULL, NULL, filter_graph);
 		if (ret < 0) {
-      CLog::Log(LOGERROR, "Cannot create audio buffer sink\n");
+      CLog::Log(LOGERROR, "CTranscoder::InitFilter(): Cannot create audio buffer sink.");
 			goto end;
 		}
 
@@ -464,7 +530,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 			(uint8_t*)&enc_ctx->sample_fmt, sizeof(enc_ctx->sample_fmt),
 			AV_OPT_SEARCH_CHILDREN);
 		if (ret < 0) {
-      CLog::Log(LOGERROR, "Cannot set output sample format\n");
+      CLog::Log(LOGERROR, "CTranscoder::InitFilter(): Cannot set output sample format.");
 			goto end;
 		}
 
@@ -472,7 +538,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 			(uint8_t*)&enc_ctx->channel_layout,
 			sizeof(enc_ctx->channel_layout), AV_OPT_SEARCH_CHILDREN);
 		if (ret < 0) {
-      CLog::Log(LOGERROR, "Cannot set output channel layout\n");
+      CLog::Log(LOGERROR, "CTranscoder::InitFilter(): Cannot set output channel layout.");
 			goto end;
 		}
 
@@ -480,7 +546,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 			(uint8_t*)&enc_ctx->sample_rate, sizeof(enc_ctx->sample_rate),
 			AV_OPT_SEARCH_CHILDREN);
 		if (ret < 0) {
-      CLog::Log(LOGERROR, "Cannot set output sample rate\n");
+      CLog::Log(LOGERROR, "CTranscoder::InitFilter(): Cannot set output sample rate.");
 			goto end;
 		}
 	}
@@ -489,7 +555,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 		goto end;
 	}
 
-	/* Endpoints for the filter graph. */
+	// Endpoints for the filter graph
 	outputs->name = av_strdup("in");
 	outputs->filter_ctx = buffersrc_ctx;
 	outputs->pad_idx = 0;
@@ -512,7 +578,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 	if ((ret = avfilter_graph_config(filter_graph, NULL)) < 0)
 		goto end;
 
-	/* Fill FilteringContext */
+	// Fill filtering context
 	fctx->buffersrc_ctx = buffersrc_ctx;
 	fctx->buffersink_ctx = buffersink_ctx;
 	fctx->filter_graph = filter_graph;
@@ -524,34 +590,35 @@ end:
 	return ret;
 }
 
-int CTranscoder::InitFilters(void)
+int CTranscoder::InitFilters()
 {
-	const char *filter_spec;
-	unsigned int i;
-	int ret;
+	int ret = 0;
 	filter_ctx = (FilteringContext*) av_malloc_array(ifmt_ctx->nb_streams, sizeof(*filter_ctx));
-	if (!filter_ctx)
+  if (!filter_ctx)
+  {
 		return AVERROR(ENOMEM);
+  }
 
+	unsigned int i;
 	for (i = 0; i < ifmt_ctx->nb_streams; i++) {
 		filter_ctx[i].buffersrc_ctx = NULL;
 		filter_ctx[i].buffersink_ctx = NULL;
 		filter_ctx[i].filter_graph = NULL;
-		if (!(ifmt_ctx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO
-			|| ifmt_ctx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO))
-			continue;
-
-
-		if (ifmt_ctx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
+    AVMediaType type = ifmt_ctx->streams[i]->codec->codec_type;
+	  const char *filter_spec;
+		if (type == AVMEDIA_TYPE_VIDEO)
 			filter_spec = "null"; /* passthrough (dummy) filter for video */
-		else
-			filter_spec = "anull"; /* passthrough (dummy) filter for audio */
-		ret = InitFilter(&filter_ctx[i], ifmt_ctx->streams[i]->codec,
-			ofmt_ctx->streams[i]->codec, filter_spec);
-		if (ret)
-			return ret;
+    else if (type == AVMEDIA_TYPE_AUDIO)
+      filter_spec = "anull"; /* passthrough (dummy) filter for audio */
+    else
+      continue;
+    if ((ret = InitFilter(&filter_ctx[i], ifmt_ctx->streams[i]->codec,
+			ofmt_ctx->streams[i]->codec, filter_spec)) != 0)
+    {
+      break;
+    }
 	}
-	return 0;
+	return ret;
 }
 
 int CTranscoder::EncodeWriteFrame(AVFrame *filt_frame, unsigned int stream_index, int *got_frame) {
@@ -654,6 +721,35 @@ int CTranscoder::FlushEncoder(unsigned int stream_index)
 	return ret;
 }
 
+int CTranscoder::FlushFiltersAndEncoders()
+{
+  int ret = 0;
+  unsigned int i;
+  for (i = 0; i < ifmt_ctx->nb_streams; i++)
+  {
+    // Flush filter
+    if (!filter_ctx[i].filter_graph)
+    {
+      continue;
+    }
+    if ((ret = FilterEncodeWriteFrame(NULL, i)) < 0)
+    {
+      CLog::Log(LOGERROR, "CTranscoder::FlushFiltersAndEncoders(): Flushing filter failed.");
+      LogError(ret);
+      break;
+    }
+
+    // Flush encoder
+    if ((ret = FlushEncoder(i)) < 0)
+    {
+      CLog::Log(LOGERROR, "CTranscoder::FlushFiltersAndEncoders(): Flushing encoder failed.");
+      LogError(ret);
+      break;
+    }
+  }
+  return ret;
+}
+
 int CTranscoder::Transcode(std::string path)
 {
   this->path = path;
@@ -668,8 +764,23 @@ std::string CTranscoder::TranscodePath(const std::string &path) const
     + std::string("-transcoded.") + m_TransOpts.GetFileExtension();
 }
 
+std::string CTranscoder::TranscodePlaylistPath(const std::string &path) const
+{
+  return path.substr(0, path.find_last_of('.'))
+    + std::string("-transcoded.") + std::string("m3u8");
+}
+
+std::string CTranscoder::TranscodeSegmentPath(const std::string &path) const
+{
+  char segment[10];
+  itoa(m_iHLS_Segment, segment, 10);
+  return path.substr(0, path.find_last_of('.'))
+    + std::string("-transcoded") + std::string(segment) + std::string(".") + m_TransOpts.GetFileExtension();
+}
+
 void CTranscoder::Run()
 {
+  int ret;
   CLog::Log(LOGDEBUG, "CTranscoder::Run() was called.");
   
   if (path.empty()) {
@@ -677,15 +788,169 @@ void CTranscoder::Run()
     return;
   }
 
-  std::string pathOut = TranscodePath(path);
-  CLog::Log(LOGDEBUG, "CTranscoder::Run(): Using input file %s and output file %s", path.c_str(), pathOut.c_str());
+  CLog::Log(LOGDEBUG, "CTranscoder::Run(): Input file: %s", path.c_str());
 
   avfilter_register_all();
   avcodec_register_all();
   av_register_all();
 
-  int ret;
+  std::string pathOut = TranscodePath(path);
+
+  // HTTP Live Streaming
+  if (m_TransOpts.GetStreamingMethod() == "hls")
+  {
+    std::string pathPlaylist = TranscodePlaylistPath(path);
+    CLog::Log(LOGDEBUG, "CTranscoder::Run(): Output file: %s", pathPlaylist.c_str());
+
+    // Input file and sws context are only created once
+    if ((ret = OpenInputFile(path.c_str())) < 0)
+    {
+      goto end;
+    }
+    if ((ret = InitSwsContext()) < 0)
+    {
+      goto end;
+    }
+
+    // Output file and filters need to be created for every media segment file
+    std::string pathSegment = TranscodeSegmentPath(path);
+    if ((ret = OpenOutputFile(pathSegment.c_str())) < 0)
+    {
+      goto end;
+    }
+    if ((ret = InitFilters()) < 0)
+    {
+      goto end;
+    }
+
+    unsigned int stream_index;
+    unsigned int i;
+    int got_frame;
+
+    while (1)
+    {
+      if (m_bStop)
+      {
+        CLog::Log(LOGDEBUG, "CTranscoder::Run(): Transcoder asked to stop!\n");
+      }
+      if ((ret = av_read_frame(ifmt_ctx, &packet)) < 0)
+        break;
+      stream_index = packet.stream_index;
+      AVStream *stream = ifmt_ctx->streams[stream_index];
+      AVCodecContext *codec_ctx = stream->codec;
+      type = codec_ctx->codec_type;
+      //CLog::Log(LOGDEBUG, "CTranscoder::Run(): Demuxer gave frame of stream_index %u\n", stream_index);
+
+      if (filter_ctx[stream_index].filter_graph)
+      {
+        //CLog::Log(LOGDEBUG, "CTranscoder::Run(): Going to reencode and filter the frame\n"); 
+        if ((frame = av_frame_alloc()) == NULL)
+        {
+          ret = AVERROR(ENOMEM);
+          break;
+        }
+        av_packet_rescale_ts(&packet, stream->time_base, codec_ctx->time_base);
+        if (type == AVMEDIA_TYPE_VIDEO)
+        {
+          ret = avcodec_decode_video2(codec_ctx, frame, &got_frame, &packet);
+        }
+        else if (type == AVMEDIA_TYPE_AUDIO)
+        {
+          ret = avcodec_decode_audio4(codec_ctx, frame, &got_frame, &packet);
+        }
+        else
+        {
+          CLog::Log(LOGERROR, "CTranscoder::Run(): Got packet of unexpected media type.");
+          ret = -1;
+        }
+        if (ret < 0) {
+          av_frame_free(&frame);
+          CLog::Log(LOGERROR, "CTranscoder::Run(): Decoding failed\n");
+          break;
+        }
+
+        if (got_frame)
+        {
+          frame->pts = av_frame_get_best_effort_timestamp(frame);
+          int64_t last_pts = frame->pts;
+          if (type == AVMEDIA_TYPE_VIDEO)
+          {
+            // Rescale the video frame
+            AVFrame *scaledFrame;
+            if ((ret = SwsScaleVideo(frame, &scaledFrame)) == 0)
+            {
+              ret = FilterEncodeWriteFrame(scaledFrame, stream_index);
+              avpicture_free((AVPicture *)scaledFrame);
+              av_frame_free(&scaledFrame);
+              av_frame_free(&frame);
+            }
+            else
+            {
+              CLog::Log(LOGERROR, "CTranscoder::Run(): Scaling of video frame failed.");
+              if (scaledFrame)
+              {
+                avpicture_free((AVPicture *)scaledFrame);
+                av_frame_free(&scaledFrame);
+              }
+              av_frame_free(&frame);
+            }
+
+            // See if it's time to start a new segment
+            if (ShouldStartNewSegment(last_pts, codec_ctx->time_base))
+            {
+              CLog::Log(LOGDEBUG, "CTranscoder::Run(): Time to start segment %d.", m_iHLS_Segment);
+              CloseOutputFile();
+
+              pathSegment = TranscodeSegmentPath(path);
+              if ((ret = OpenOutputFile(pathSegment.c_str())) < 0)
+              {
+                goto end;
+              }
+              if ((ret = InitFilters()) < 0)
+              {
+                goto end;
+              }
+            }
+          }
+          else
+          {
+            ret = FilterEncodeWriteFrame(frame, stream_index);
+            av_frame_free(&frame);
+          }
+          if (ret < 0)
+            goto end;
+        }
+        else
+        {
+          av_frame_free(&frame);
+        }
+      }
+      else
+      {
+        /* remux this frame without reencoding */
+        av_packet_rescale_ts(&packet,
+          ifmt_ctx->streams[stream_index]->time_base,
+          ofmt_ctx->streams[stream_index]->time_base);
+
+        ret = av_interleaved_write_frame(ofmt_ctx, &packet);
+        if (ret < 0)
+          goto end;
+      }
+      av_free_packet(&packet);
+    }
+
+    // Done reading input file
+    return;
+  }
+
+  // HTTP single file
+  CLog::Log(LOGDEBUG, "CTranscoder::Run(): Output file: %s", pathOut.c_str());
+
   if ((ret = OpenInputFile(path.c_str())) < 0)
+  {
+    goto end;
+  }
+  if ((ret = InitSwsContext()) < 0)
   {
     goto end;
   }
@@ -694,10 +959,6 @@ void CTranscoder::Run()
     goto end;
   }
   if ((ret = InitFilters()) < 0)
-  {
-    goto end;
-  }
-  if ((ret = InitSwsContext()) < 0)
   {
     goto end;
   }
@@ -799,30 +1060,6 @@ void CTranscoder::Run()
     }
     av_free_packet(&packet);
   }
-
-  /* flush filters and encoders */
-  for (i = 0; i < ifmt_ctx->nb_streams; i++)
-  {
-    /* flush filter */
-    if (!filter_ctx[i].filter_graph)
-    {
-      continue;
-    }
-    if ((ret = FilterEncodeWriteFrame(NULL, i)) < 0)
-    {
-      CLog::Log(LOGERROR, "CTranscoder::Run(): Flushing filter failed\n");
-      goto end;
-    }
-
-    /* flush encoder */
-    if ((ret = FlushEncoder(i)) < 0)
-    {
-      CLog::Log(LOGERROR, "CTranscoder::Run(): Flushing encoder failed\n");
-      goto end;
-    }
-  }
-
-  av_write_trailer(ofmt_ctx);
 
 end:
   if (ret < 0)

@@ -13,19 +13,23 @@ public:
 
   TranscodingOptions();
   virtual ~TranscodingOptions();
-
   std::string GetFileExtension() const;
-  AVPixelFormat GetPixelFormat() const;
+  std::string GetStreamingMethod() const;
   int GetWidth() const;
   int GetHeight() const;
+  float GetSegmentDuration() const;
+  AVPixelFormat GetPixelFormat() const;
   int GetSwsInterpolationMethod() const;
 
 protected:
 
   std::string m_sContainerFormat;
-  AVPixelFormat m_ePixelFormat;
+  std::string m_sStreamingMethod;
+  void SetStreamingMethod(std::string streamingMethod);
   int m_iWidth;
   int m_iHeight;
+  int m_fSegmentDuration;
+  AVPixelFormat m_ePixelFormat;
   int m_iSwsInterpolationMethod;
 
 };
