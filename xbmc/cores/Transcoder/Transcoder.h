@@ -28,7 +28,7 @@ public:
   int Transcode(std::string path);
   std::string TranscodePath(const std::string &path) const;
   std::string TranscodePlaylistPath(const std::string &path) const;
-  std::string TranscodeSegmentPath(const std::string &path) const;
+  std::string TranscodeSegmentPath(const std::string &path, int segment = 0) const;
 
   void SetTranscodingOptions(TranscodingOptions transOpts);
 

@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 
+#include <filesystem\File.h>
 #include <utils/log.h>
 
 CTranscoder::CTranscoder()
@@ -123,7 +124,41 @@ int CTranscoder::SwsScaleVideo(const AVFrame *src_frame, AVFrame **scaled_frame)
 int CTranscoder::HLS_CreatePlaylist(const char* filename)
 {
   int ret = 0;
+  if (XFILE::CFile::Exists(filename))
+  {
+    CLog::Log(LOGWARNING, "CTranscoder::HLS_CreatePlaylist(): Playlist already exists: %s", filename);
+    return -1;
+  }
+  XFILE::CFile file;
+  if (!file.OpenForWrite(filename, false))
+  {
+    CLog::Log(LOGWARNING, "CTranscoder::HLS_CreatePlaylist(): Playlist could not be created: %s", filename);
+    return -2;
+  }
 
+  // Precompute number of total segments
+  int segments = (m_iDuration / AV_TIME_BASE) / m_TransOpts.GetSegmentDuration();
+
+  // Write contents
+  std::string playlistHeader = "#EXTM3U\n";
+  file.Write(playlistHeader.c_str(), playlistHeader.length());
+  std::string playlistTargetDuration = "#EXT-X-TARGETDURATION:" + std::to_string(m_TransOpts.GetSegmentDuration()) + "\n";
+  file.Write(playlistTargetDuration.c_str(), playlistTargetDuration.length());
+  std::string playlistMediaSequence = "#EXT-X-MEDIA-SEQUENCE:0\n";
+  file.Write(playlistMediaSequence.c_str(), playlistMediaSequence.length());
+  for (int s = 1; s <= segments; ++s)
+  {
+    std::string playlistEntry = "#EXTINF:" + std::to_string(s) + ", Description\n";
+    file.Write(playlistEntry.c_str(), playlistEntry.length());
+    
+    std::string playlistEntryFile = TranscodeSegmentPath(path, s) + "\n";
+    file.Write(playlistEntryFile.c_str(), playlistEntryFile.length());
+  }
+  
+  std::string playlistEnd = "#EXT-X-ENDLIST\n";
+  file.Write(playlistEnd.c_str(), playlistEnd.length());
+
+  file.Close();
   return ret;
 }
 
@@ -394,8 +429,11 @@ int CTranscoder::OpenOutputFile(const char *filename)
 int CTranscoder::CloseOutputFile()
 {
   int ret = 0;
-  FlushFiltersAndEncoders();
-  av_write_trailer(ofmt_ctx);
+  if (ifmt_ctx && ofmt_ctx)
+  {
+    FlushFiltersAndEncoders();
+    av_write_trailer(ofmt_ctx);
+  }
   if (packet.data)
   {
     av_free_packet(&packet);
@@ -770,12 +808,11 @@ std::string CTranscoder::TranscodePlaylistPath(const std::string &path) const
     + std::string("-transcoded.") + std::string("m3u8");
 }
 
-std::string CTranscoder::TranscodeSegmentPath(const std::string &path) const
+std::string CTranscoder::TranscodeSegmentPath(const std::string &path, int segment /* = 0 */) const
 {
-  char segment[10];
-  itoa(m_iHLS_Segment, segment, 10);
-  return path.substr(0, path.find_last_of('.'))
-    + std::string("-transcoded") + std::string(segment) + std::string(".") + m_TransOpts.GetFileExtension();
+  int s = (segment == 0) ? m_iHLS_Segment : segment;
+  return path.substr(0, path.find_last_of('.')) + std::string("-transcoded")
+    + std::to_string(s) + std::string(".") + m_TransOpts.GetFileExtension();
 }
 
 void CTranscoder::Run()
@@ -799,9 +836,6 @@ void CTranscoder::Run()
   // HTTP Live Streaming
   if (m_TransOpts.GetStreamingMethod() == "hls")
   {
-    std::string pathPlaylist = TranscodePlaylistPath(path);
-    CLog::Log(LOGDEBUG, "CTranscoder::Run(): Output file: %s", pathPlaylist.c_str());
-
     // Input file and sws context are only created once
     if ((ret = OpenInputFile(path.c_str())) < 0)
     {
@@ -822,6 +856,10 @@ void CTranscoder::Run()
     {
       goto end;
     }
+
+    std::string pathPlaylist = TranscodePlaylistPath(path);
+    CLog::Log(LOGDEBUG, "CTranscoder::Run(): Output file: %s", pathPlaylist.c_str());
+    HLS_CreatePlaylist(pathPlaylist.c_str());
 
     unsigned int stream_index;
     unsigned int i;

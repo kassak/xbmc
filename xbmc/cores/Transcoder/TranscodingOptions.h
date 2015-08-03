@@ -17,7 +17,7 @@ public:
   std::string GetStreamingMethod() const;
   int GetWidth() const;
   int GetHeight() const;
-  float GetSegmentDuration() const;
+  int GetSegmentDuration() const;
   AVPixelFormat GetPixelFormat() const;
   int GetSwsInterpolationMethod() const;
 

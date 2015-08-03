@@ -51,17 +51,36 @@ JSONRPC_STATUS CTranscoderOperations::Transcode(const std::string &method, ITran
     CTranscoder* transcoder = new CTranscoder();
     JSONTranscodingOptions transOpts(parameterObject["options"]);
     transcoder->SetTranscodingOptions(transOpts);
-    std::string transpath = transcoder->TranscodePath(moviepath);
 
-    if (XFILE::CFile::Exists(transpath))
+    std::string transpath;
+    CVariant streaming = parameterObject["options"]["streaming"];
+    if (!streaming.isNull() && streaming.asString().compare("hls") == 0)
     {
-      CLog::Log(LOGDEBUG, "Transcoded movie already exists.");
-      delete transcoder;
+      transpath = transcoder->TranscodePlaylistPath(moviepath);
+      if (XFILE::CFile::Exists(transpath))
+      {
+        CLog::Log(LOGDEBUG, "Transcoded movie already exists.");
+        delete transcoder;
+      }
+      else
+      {
+        CLog::Log(LOGDEBUG, "Transcoding movie with playlist: %s", transpath);
+        transcoder->Transcode(moviepath);
+      }
     }
     else
     {
-      CLog::Log(LOGDEBUG, "Transcoding movie to: %s", transpath);
-      transcoder->Transcode(moviepath);
+      transpath = transcoder->TranscodePath(moviepath);
+      if (XFILE::CFile::Exists(transpath))
+      {
+        CLog::Log(LOGDEBUG, "Transcoded movie already exists.");
+        delete transcoder;
+      }
+      else
+      {
+        CLog::Log(LOGDEBUG, "Transcoding movie to: %s", transpath);
+        transcoder->Transcode(moviepath);
+      }
     }
 
     result["protocol"] = "http";

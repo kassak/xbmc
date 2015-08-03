@@ -8,8 +8,8 @@ extern "C" {
 
 TranscodingOptions::TranscodingOptions()
 {
-  m_sContainerFormat = "flv";
-  SetStreamingMethod("hls");
+  m_sContainerFormat = "mp4";
+  SetStreamingMethod("http");
   m_iWidth = 0;
   m_iHeight = 0;
   m_fSegmentDuration = 10;
@@ -36,9 +36,9 @@ void TranscodingOptions::SetStreamingMethod(std::string streamingMethod)
 {
   m_sStreamingMethod = streamingMethod;
   // In case of HLS as streaming method an MPEG transport stream is required
-  if (m_sStreamingMethod == "hls")
+  if (m_sStreamingMethod.compare("hls") == 0)
   {
-    if (m_sContainerFormat != "ts")
+    if (m_sContainerFormat.compare("ts") != 0)
     {
       CLog::Log(LOGWARNING, "TranscodingOptions::SetStreamingMethod(): HTTP Live Streaming doesn't support the chosen container format. Using .ts instead");
       m_sContainerFormat = "ts";
@@ -56,7 +56,7 @@ int TranscodingOptions::GetHeight() const
   return m_iHeight;
 }
 
-float TranscodingOptions::GetSegmentDuration() const
+int TranscodingOptions::GetSegmentDuration() const
 {
   return m_fSegmentDuration;
 }
