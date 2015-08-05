@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include <filesystem\File.h>
+#include <URL.h>
 #include <utils/log.h>
 
 CTranscoder::CTranscoder()
@@ -142,16 +143,27 @@ int CTranscoder::HLS_CreatePlaylist(const char* filename)
   // Write contents
   std::string playlistHeader = "#EXTM3U\n";
   file.Write(playlistHeader.c_str(), playlistHeader.length());
+  //std::string playlistType = "#EXT-X-PLAYLIST-TYPE:VOD\n";
+  //file.Write(playlistType.c_str(), playlistType.length());
   std::string playlistTargetDuration = "#EXT-X-TARGETDURATION:" + std::to_string(m_TransOpts.GetSegmentDuration()) + "\n";
   file.Write(playlistTargetDuration.c_str(), playlistTargetDuration.length());
-  std::string playlistMediaSequence = "#EXT-X-MEDIA-SEQUENCE:0\n";
+  //std::string playlistVersion = "#EXT-X-VERSION:3\n";
+  //file.Write(playlistVersion.c_str(), playlistVersion.length());
+  std::string playlistMediaSequence = "#EXT-X-MEDIA-SEQUENCE:1\n";
   file.Write(playlistMediaSequence.c_str(), playlistMediaSequence.length());
   for (int s = 1; s <= segments; ++s)
   {
-    std::string playlistEntry = "#EXTINF:" + std::to_string(s) + ", Description\n";
+    std::string playlistEntry = "#EXTINF:" + std::to_string(m_TransOpts.GetSegmentDuration()) + ", Description\n";
     file.Write(playlistEntry.c_str(), playlistEntry.length());
     
-    std::string playlistEntryFile = TranscodeSegmentPath(path, s) + "\n";
+    std::string playlistEntryFile = TranscodeSegmentPath(path, s);
+    //std::string::size_type beginning = playlistEntryFile.find_last_of("/");
+    //if (beginning == std::string::npos)
+    //  beginning = playlistEntryFile.find_last_of("\\");
+    //if (beginning == std::string::npos)
+    //  beginning = -1;
+    //beginning++;
+    playlistEntryFile = CURL::Encode(playlistEntryFile.c_str()) + "\n";
     file.Write(playlistEntryFile.c_str(), playlistEntryFile.length());
   }
   
