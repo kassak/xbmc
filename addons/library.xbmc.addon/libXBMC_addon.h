@@ -27,57 +27,65 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#ifdef _WIN32
+  #ifndef _SSIZE_T_DEFINED
+    typedef intptr_t ssize_t;
+    #define _SSIZE_T_DEFINED
+  #endif // !_SSIZE_T_DEFINED
+#endif // _WIN32
+
 #ifdef _WIN32                   // windows
-#ifndef _SSIZE_T_DEFINED
-typedef intptr_t      ssize_t;
-#define _SSIZE_T_DEFINED
-#endif // !_SSIZE_T_DEFINED
-#include "dlfcn-win32.h"
-#define ADDON_DLL               "\\library.xbmc.addon\\libXBMC_addon" ADDON_HELPER_EXT
-#define ADDON_HELPER_EXT        ".dll"
+  #include "dlfcn-win32.h"
 #else
-#if defined(__APPLE__)          // osx
-#if defined(__POWERPC__)
-#define ADDON_HELPER_ARCH       "powerpc-osx"
-#elif defined(__arm__)
-#define ADDON_HELPER_ARCH       "arm-osx"
-#elif defined(__x86_64__)
-#define ADDON_HELPER_ARCH       "x86-osx"
+  #include <dlfcn.h>              // linux+osx
+#endif
+
+#ifdef _WIN32                   // windows
+  #define ADDON_DLL               "\\library.xbmc.addon\\libXBMC_addon" ADDON_HELPER_EXT
+  #define ADDON_HELPER_EXT        ".dll"
 #else
-#define ADDON_HELPER_ARCH       "x86-osx"
-#endif
-#else                           // linux
-#if defined(__x86_64__)
-#define ADDON_HELPER_ARCH       "x86_64-linux"
-#elif defined(_POWERPC)
-#define ADDON_HELPER_ARCH       "powerpc-linux"
-#elif defined(_POWERPC64)
-#define ADDON_HELPER_ARCH       "powerpc64-linux"
-#elif defined(__ARMEL__)
-#define ADDON_HELPER_ARCH       "arm"
-#elif defined(__mips__)
-#define ADDON_HELPER_ARCH       "mips"
-#else
-#define ADDON_HELPER_ARCH       "i486-linux"
-#endif
-#endif
-#include <dlfcn.h>              // linux+osx
-#define ADDON_HELPER_EXT        ".so"
-#define ADDON_DLL_NAME "libXBMC_addon-" ADDON_HELPER_ARCH ADDON_HELPER_EXT
-#define ADDON_DLL "/library.xbmc.addon/" ADDON_DLL_NAME
+  #if defined(__APPLE__)          // osx
+    #if defined(__POWERPC__)
+      #define ADDON_HELPER_ARCH       "powerpc-osx"
+    #elif defined(__arm__)
+      #define ADDON_HELPER_ARCH       "arm-osx"
+    #elif defined(__x86_64__)
+      #define ADDON_HELPER_ARCH       "x86-osx"
+    #else
+      #define ADDON_HELPER_ARCH       "x86-osx"
+    #endif
+  #else                           // linux
+    #if defined(__x86_64__)
+      #define ADDON_HELPER_ARCH       "x86_64-linux"
+    #elif defined(_POWERPC)
+      #define ADDON_HELPER_ARCH       "powerpc-linux"
+    #elif defined(_POWERPC64)
+      #define ADDON_HELPER_ARCH       "powerpc64-linux"
+    #elif defined(__ARMEL__)
+      #define ADDON_HELPER_ARCH       "arm"
+    #elif defined(__mips__)
+      #define ADDON_HELPER_ARCH       "mips"
+    #else
+      #define ADDON_HELPER_ARCH       "i486-linux"
+    #endif
+  #endif
+
+  #define ADDON_HELPER_EXT        ".so"
+  #define ADDON_DLL_NAME "libXBMC_addon-" ADDON_HELPER_ARCH ADDON_HELPER_EXT
+  #define ADDON_DLL "/library.xbmc.addon/" ADDON_DLL_NAME
 #endif
 
 #ifdef LOG_DEBUG
-#undef LOG_DEBUG
+  #undef LOG_DEBUG
 #endif
 #ifdef LOG_INFO
-#undef LOG_INFO
+  #undef LOG_INFO
 #endif
 #ifdef LOG_NOTICE
-#undef LOG_NOTICE
+  #undef LOG_NOTICE
 #endif
 #ifdef LOG_ERROR
-#undef LOG_ERROR
+  #undef LOG_ERROR
 #endif
 
 #include <sys/stat.h>
