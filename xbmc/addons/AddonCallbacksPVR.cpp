@@ -20,6 +20,7 @@
 
 #include "Application.h"
 #include "AddonCallbacksPVR.h"
+#include "cores/dvdplayer/DVDDemuxers/DVDDemuxUtils.h"
 #include "utils/log.h"
 #include "utils/StringUtils.h"
 #include "dialogs/GUIDialogKaiToast.h"
@@ -113,7 +114,7 @@ void CAddonCallbacksPVR::PVRTransferChannelGroupMember(void *addonData, const AD
     CLog::Log(LOGERROR, "PVR - %s - invalid handler data", __FUNCTION__);
     return;
   }
-  
+
   CPVRClient *client      = GetPVRClient(addonData);
   CPVRChannelGroup *group = static_cast<CPVRChannelGroup *>(handle->dataAddress);
   if (!member || !client || !group)
