@@ -3,7 +3,9 @@
 JSONTranscodingOptions::JSONTranscodingOptions(const CVariant &options)
   : TranscodingOptions()
 {
-  m_sContainerFormat = options["container"].asString();
+  CVariant containerFormat = options["container"];
+  if (!containerFormat.isNull() && containerFormat.asString().compare("") != 0)
+    m_sContainerFormat = containerFormat.asString();
   CVariant streamingMethod = options["streaming"];
   if (!streamingMethod.isNull() && streamingMethod.asString().compare("") != 0)
   {
@@ -14,8 +16,12 @@ JSONTranscodingOptions::JSONTranscodingOptions(const CVariant &options)
       SetStreamingMethod(streamingMethod.asString());
     }
   }
-  m_iWidth = options["width"].asInteger();
-  m_iHeight = options["height"].asInteger();
+  CVariant width = options["width"];
+  if (!width.isNull() && width.asInteger() != 0)
+    m_iWidth = width.asInteger();
+  CVariant height = options["height"];
+  if (!height.isNull() && height.asInteger() != 0)
+  m_iHeight = height.asInteger();
   CVariant videoBitrate = options["videobitrate"];
   if (!videoBitrate.isNull() && videoBitrate.asInteger() != 0)
     m_iVideoBitrate = videoBitrate.asInteger();

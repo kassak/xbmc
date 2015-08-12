@@ -61,7 +61,8 @@ private:
   int InitSwsContext();
   int CloseSwsContext();
   int SwsScaleVideo(const AVFrame *src_frame, AVFrame **scaled_frame);
-
+  int GetTargetWidth() const;
+  int GetTargetHeight() const;
   int HLS_CreatePlaylist(const char* filename);
   int m_iHLS_Segment;
   int m_iDuration;

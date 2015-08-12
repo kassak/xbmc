@@ -59,8 +59,8 @@ int CTranscoder::InitSwsContext()
   sws_video_ctx = sws_getContext(m_iVideoWidth,
     m_iVideoHeight,
     m_eVideoPixelFormat,
-    m_TransOpts.GetWidth(),
-    m_TransOpts.GetHeight(),
+    GetTargetWidth(),
+    GetTargetHeight(),
     m_TransOpts.GetPixelFormat(),
     m_TransOpts.GetSwsInterpolationMethod(),
     NULL, NULL, NULL);
@@ -98,7 +98,7 @@ int CTranscoder::SwsScaleVideo(const AVFrame *src_frame, AVFrame **scaled_frame)
 
   // Allocate space for the picture data
   if ((ret = avpicture_alloc((AVPicture *)*scaled_frame, m_TransOpts.GetPixelFormat(),
-    m_TransOpts.GetWidth(), m_TransOpts.GetHeight())) < 0)
+    GetTargetWidth(), GetTargetHeight())) < 0)
   {
     CLog::Log(LOGERROR, "CTranscoder::SwsScaleVideo(): Could not allocate picture.");
     return ret;
@@ -107,8 +107,8 @@ int CTranscoder::SwsScaleVideo(const AVFrame *src_frame, AVFrame **scaled_frame)
   sws_scale(sws_video_ctx, (uint8_t const * const *)src_frame->data, src_frame->linesize,
     0, m_iVideoHeight, (*scaled_frame)->data, (*scaled_frame)->linesize);
   // TODO: Find out which of the following properties need to be set at all
-  (*scaled_frame)->width = m_TransOpts.GetWidth();
-  (*scaled_frame)->height = m_TransOpts.GetHeight();
+  (*scaled_frame)->width = GetTargetWidth();
+  (*scaled_frame)->height = GetTargetHeight();
   (*scaled_frame)->format = m_TransOpts.GetPixelFormat();
   (*scaled_frame)->sample_aspect_ratio = src_frame->sample_aspect_ratio;
   (*scaled_frame)->pts = src_frame->pts;
@@ -120,6 +120,22 @@ int CTranscoder::SwsScaleVideo(const AVFrame *src_frame, AVFrame **scaled_frame)
   (*scaled_frame)->coded_picture_number = src_frame->coded_picture_number;
 
   return 0;
+}
+
+int CTranscoder::GetTargetWidth() const
+{
+  int result = m_TransOpts.GetWidth();
+  if (result != 0)
+    return result;
+  return m_iVideoWidth;
+}
+
+int CTranscoder::GetTargetHeight() const
+{
+  int result = m_TransOpts.GetHeight();
+  if (result != 0)
+    return result;
+  return m_iVideoHeight;
 }
 
 int CTranscoder::HLS_CreatePlaylist(const char* filename)
@@ -332,8 +348,8 @@ int CTranscoder::OpenOutputFile(const char *filename)
       av_opt_set(enc_ctx->priv_data, "profile", "high", AV_OPT_SEARCH_CHILDREN);
 
       enc_ctx->profile = FF_PROFILE_H264_HIGH;
-      enc_ctx->height = m_TransOpts.GetHeight();
-      enc_ctx->width = m_TransOpts.GetWidth();
+      enc_ctx->height = GetTargetHeight();
+      enc_ctx->width = GetTargetWidth();
       enc_ctx->pix_fmt = m_TransOpts.GetPixelFormat();
       AVRational sar; sar.num = 1; sar.den = 1;
       enc_ctx->sample_aspect_ratio = sar;
@@ -518,7 +534,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 
 		_snprintf(args, sizeof(args),
 			"video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
-      m_TransOpts.GetWidth(), m_TransOpts.GetHeight(), m_TransOpts.GetPixelFormat(),
+      GetTargetWidth(), GetTargetHeight(), m_TransOpts.GetPixelFormat(),
 			dec_ctx->time_base.num, dec_ctx->time_base.den,
 			dec_ctx->sample_aspect_ratio.num,
 			dec_ctx->sample_aspect_ratio.den);
@@ -1021,10 +1037,17 @@ void CTranscoder::Run()
   {
     if (m_bStop)
     {
-      CLog::Log(LOGDEBUG, "CTranscoder::Run(): Transcoder asked to stop!\n");
+      CLog::Log(LOGDEBUG, "CTranscoder::Run(): Transcoder asked to stop!");
     }
     if ((ret = av_read_frame(ifmt_ctx, &packet)) < 0)
+    {
+      if (ret == AVERROR_EOF)
+      {
+        CLog::Log(LOGDEBUG, "CTranscoder::Run(): Reached end of file!");
+        ret = 0;
+      }
       break;
+    }
     stream_index = packet.stream_index;
     AVStream *stream = ifmt_ctx->streams[stream_index];
     AVCodecContext *codec_ctx = stream->codec;

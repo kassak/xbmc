@@ -2346,12 +2346,12 @@
       { "name": "movieid", "$ref": "Library.Id", "required": true },
       { "name": "options", "type": "object", "required": true,
         "properties": {
-          "container": { "type": "string", "required": true, "description": "Container format to use for the transcoded data" },
-          "width": { "type": "integer", "required": true, "description": "Width of the transcoded video" },
-          "height": { "type": "integer", "required": true, "description": "Height of the transcoded video" },
-		  "videobitrate": { "type": "integer", "required": false, "description": "Bitrate of the transcoded video stream" },
-          "streaming": { "type": "string", "required": false, "description": "Streaming method"},
-          "segmentduration": { "type": "integer", "required": false, "description": "Duration of an HTTP Live Streaming media segment file" }
+          "container": { "type": "string", "required": false, "default": "mp4", "description": "Container format to use for the transcoded data" },
+          "width": { "type": "integer", "required": false, "default": 0, "description": "Width of the transcoded video" },
+          "height": { "type": "integer", "required": false, "default": 0, "description": "Height of the transcoded video" },
+		  "videobitrate": { "type": "integer", "required": false, "default": 500000, "description": "Bitrate of the transcoded video stream" },
+          "streaming": { "type": "string", "required": false, "default": "http", "description": "Streaming method"},
+          "segmentduration": { "type": "integer", "required": false, "default": 10, "description": "Duration of an HTTP Live Streaming media segment file" }
         }
       }
     ],
