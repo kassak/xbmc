@@ -12,6 +12,7 @@ TranscodingOptions::TranscodingOptions()
   SetStreamingMethod("http");
   m_iWidth = 0;
   m_iHeight = 0;
+  m_iVideoBitrate = 500 * 1000;
   m_fSegmentDuration = 10;
   m_ePixelFormat = AV_PIX_FMT_YUV420P;
   m_iSwsInterpolationMethod = SWS_BILINEAR;
@@ -54,6 +55,11 @@ int TranscodingOptions::GetWidth() const
 int TranscodingOptions::GetHeight() const
 {
   return m_iHeight;
+}
+
+int TranscodingOptions::GetVideoBitrate() const
+{
+  return m_iVideoBitrate;
 }
 
 int TranscodingOptions::GetSegmentDuration() const

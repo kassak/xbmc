@@ -153,7 +153,7 @@ int CTranscoder::HLS_CreatePlaylist(const char* filename)
   file.Write(playlistMediaSequence.c_str(), playlistMediaSequence.length());
   for (int s = 1; s <= segments; ++s)
   {
-    std::string playlistEntry = "#EXTINF:" + std::to_string(m_TransOpts.GetSegmentDuration()) + ", Description\n";
+    std::string playlistEntry = "#EXTINF:" + std::to_string(m_TransOpts.GetSegmentDuration()) + ",Description\n";
     file.Write(playlistEntry.c_str(), playlistEntry.length());
     
     std::string playlistEntryFile = TranscodeSegmentPath(path, s);
@@ -340,9 +340,9 @@ int CTranscoder::OpenOutputFile(const char *filename)
       CLog::Log(LOGDEBUG, "CTranscoder::OpenOutputFile: Video framerate: %u/%u", dec_ctx->framerate.num, dec_ctx->framerate.den);
       enc_ctx->time_base = dec_ctx->time_base;
       enc_ctx->max_b_frames = 0;
-      enc_ctx->bit_rate = 500 * 1000;
-      enc_ctx->bit_rate_tolerance = 4 * 1000 * 1000;
-      enc_ctx->rc_max_rate = 500 * 1000;
+      enc_ctx->bit_rate = m_TransOpts.GetVideoBitrate();
+      enc_ctx->bit_rate_tolerance = 4 * m_TransOpts.GetVideoBitrate();
+      enc_ctx->rc_max_rate = 2 * m_TransOpts.GetVideoBitrate();
       enc_ctx->rc_min_rate = 0;
       enc_ctx->rc_buffer_size = 1 * 1000 * 1000;
       // TODO: Some of the following settings are needed for a correctly working encoder.

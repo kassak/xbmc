@@ -17,6 +17,7 @@ public:
   std::string GetStreamingMethod() const;
   int GetWidth() const;
   int GetHeight() const;
+  int GetVideoBitrate() const;
   int GetSegmentDuration() const;
   AVPixelFormat GetPixelFormat() const;
   int GetSwsInterpolationMethod() const;
@@ -28,6 +29,7 @@ protected:
   void SetStreamingMethod(std::string streamingMethod);
   int m_iWidth;
   int m_iHeight;
+  int m_iVideoBitrate;
   int m_fSegmentDuration;
   AVPixelFormat m_ePixelFormat;
   int m_iSwsInterpolationMethod;
