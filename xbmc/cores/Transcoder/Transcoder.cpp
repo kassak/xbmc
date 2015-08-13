@@ -28,6 +28,7 @@
 
 CTranscoder::CTranscoder()
   : CThread(this, "Transcoder")
+  , m_TransOpts()
 {
   CLog::Log(LOGDEBUG, "CTranscoder::CTranscoder() was called.\n");
   packet.data = NULL;
@@ -37,12 +38,15 @@ CTranscoder::CTranscoder()
   ofmt_ctx = NULL;
   filter_ctx = NULL;
   sws_video_ctx = NULL;
+  m_bTranscodingOptionsSet = false;
   m_bFoundVideoStream = false;
+  m_iVideoStreamIndex = 0;
   m_bFoundAudioStream = false;
+  m_iAudioStreamIndex = 0;
   m_iVideoWidth = 0;
   m_iVideoHeight = 0;
   AVPixelFormat m_eVideoPixelFormat = AV_PIX_FMT_NONE;
-  m_iHLS_Segment = 1;
+  m_iCurrentHLSSegmentNumber = 1;
   m_iDuration = 0;
 }
 
@@ -138,23 +142,23 @@ int CTranscoder::GetTargetHeight() const
   return m_iVideoHeight;
 }
 
-int CTranscoder::HLS_CreatePlaylist(const char* filename)
+int CTranscoder::CreateMediaPlaylist(const char* filename)
 {
   int ret = 0;
   if (XFILE::CFile::Exists(filename))
   {
-    CLog::Log(LOGWARNING, "CTranscoder::HLS_CreatePlaylist(): Playlist already exists: %s", filename);
+    CLog::Log(LOGWARNING, "CTranscoder::CreateMediaPlaylist(): Playlist already exists: %s", filename);
     return -1;
   }
   XFILE::CFile file;
   if (!file.OpenForWrite(filename, false))
   {
-    CLog::Log(LOGWARNING, "CTranscoder::HLS_CreatePlaylist(): Playlist could not be created: %s", filename);
+    CLog::Log(LOGWARNING, "CTranscoder::CreateMediaPlaylist(): Playlist could not be created: %s", filename);
     return -2;
   }
 
   // Precompute number of total segments
-  int segments = (m_iDuration / AV_TIME_BASE) / m_TransOpts.GetSegmentDuration();
+  m_iTotalHLSSegmentNumber = (m_iDuration / AV_TIME_BASE) / m_TransOpts.GetSegmentDuration();
 
   // Write contents
   std::string playlistHeader = "#EXTM3U\n";
@@ -167,9 +171,18 @@ int CTranscoder::HLS_CreatePlaylist(const char* filename)
   //file.Write(playlistVersion.c_str(), playlistVersion.length());
   std::string playlistMediaSequence = "#EXT-X-MEDIA-SEQUENCE:1\n";
   file.Write(playlistMediaSequence.c_str(), playlistMediaSequence.length());
-  for (int s = 1; s <= segments; ++s)
+  for (int s = 1; s <= m_iTotalHLSSegmentNumber; ++s)
   {
-    std::string playlistEntry = "#EXTINF:" + std::to_string(m_TransOpts.GetSegmentDuration()) + ",Description\n";
+    int segmentDuration;
+    if (s == m_iTotalHLSSegmentNumber)
+    {
+      segmentDuration = (m_iDuration / AV_TIME_BASE) % m_TransOpts.GetSegmentDuration();
+    }
+    else
+    {
+      segmentDuration = m_TransOpts.GetSegmentDuration();
+    }
+    std::string playlistEntry = "#EXTINF:" + std::to_string(segmentDuration) + ",Description\n";
     file.Write(playlistEntry.c_str(), playlistEntry.length());
     
     std::string playlistEntryFile = TranscodeSegmentPath(path, s);
@@ -193,9 +206,15 @@ int CTranscoder::HLS_CreatePlaylist(const char* filename)
 int CTranscoder::ShouldStartNewSegment(int64_t time_stamp, const AVRational& time_base)
 {
   int ret = 0;
-  if (time_stamp * time_base.num / time_base.den > m_iHLS_Segment * m_TransOpts.GetSegmentDuration())
+  if (m_iCurrentHLSSegmentNumber >= m_iTotalHLSSegmentNumber)
   {
-    m_iHLS_Segment++;
+    // The last segment is currently being created. Don't start a new one!
+    ret = 0;
+  }
+  else if (time_stamp * time_base.num / time_base.den
+    > m_iCurrentHLSSegmentNumber * m_TransOpts.GetSegmentDuration())
+  {
+    m_iCurrentHLSSegmentNumber++;
     ret = 1;
   }
   return ret;
@@ -204,7 +223,7 @@ int CTranscoder::ShouldStartNewSegment(int64_t time_stamp, const AVRational& tim
 void CTranscoder::LogError(int errnum)
 {
 	char* buf = (char*) malloc(AV_ERROR_MAX_STRING_SIZE * sizeof(char));
-	CLog::Log(LOGERROR, "Error occurred: %s\n", av_make_error_string(buf, AV_ERROR_MAX_STRING_SIZE, errnum));
+	CLog::Log(LOGERROR, "AVERROR 0x%08x: %s", errnum, av_make_error_string(buf, AV_ERROR_MAX_STRING_SIZE, errnum));
 	free(buf);
 }
 
@@ -267,6 +286,7 @@ int CTranscoder::OpenInputFile(const char *filename)
       if (!m_bFoundVideoStream && codec_type == AVMEDIA_TYPE_VIDEO)
       {
         m_bFoundVideoStream = true;
+        m_iVideoStreamIndex = i;
         m_iVideoWidth = codec_ctx->width;
         m_iVideoHeight = codec_ctx->height;
         m_eVideoPixelFormat = codec_ctx->pix_fmt;
@@ -274,6 +294,7 @@ int CTranscoder::OpenInputFile(const char *filename)
       if (!m_bFoundAudioStream && codec_type == AVMEDIA_TYPE_AUDIO)
       {
         m_bFoundAudioStream = true;
+        m_iAudioStreamIndex = i;
       }
 		}
 	}
@@ -314,13 +335,12 @@ int CTranscoder::OpenOutputFile(const char *filename)
   AVCodecContext *enc_ctx;
 	AVCodec *encoder;
 
-	AVDictionary *dict = NULL;
-	int ret;
+	int ret = 0;
 	unsigned int i;
   for (i = 0; i < ifmt_ctx->nb_streams; i++)
   {
-    out_stream = avformat_new_stream(ofmt_ctx, NULL);
-    if (!out_stream) {
+    if (!(out_stream = avformat_new_stream(ofmt_ctx, NULL)))
+    {
       CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile: Failed allocating output stream\n");
       return AVERROR_UNKNOWN;
     }
@@ -332,94 +352,30 @@ int CTranscoder::OpenOutputFile(const char *filename)
     AVMediaType codec_type = dec_ctx->codec_type;
     if (codec_type == AVMEDIA_TYPE_VIDEO)
     {
-      // Use H.264 for video encoding
-      encoder = avcodec_find_encoder(AV_CODEC_ID_H264);
-
-      if (!encoder)
+      if ((ret = OpenVideoEncoder(enc_ctx, dec_ctx)) != 0)
       {
-        CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile: Neccessary video encoder not found\n");
-        return AVERROR_INVALIDDATA;
-      }
-
-      ResetAVDictionary(&dict);
-      av_dict_set(&dict, "preset", "slow", 0);
-      av_dict_set(&dict, "vprofile", "high", 0);
-
-      av_opt_set(enc_ctx->priv_data, "profile", "high", AV_OPT_SEARCH_CHILDREN);
-
-      enc_ctx->profile = FF_PROFILE_H264_HIGH;
-      enc_ctx->height = GetTargetHeight();
-      enc_ctx->width = GetTargetWidth();
-      enc_ctx->pix_fmt = m_TransOpts.GetPixelFormat();
-      AVRational sar; sar.num = 1; sar.den = 1;
-      enc_ctx->sample_aspect_ratio = sar;
-      CLog::Log(LOGDEBUG, "CTranscoder::OpenOutputFile: Video framerate: %u/%u", dec_ctx->framerate.num, dec_ctx->framerate.den);
-      enc_ctx->time_base = dec_ctx->time_base;
-      enc_ctx->max_b_frames = 0;
-      enc_ctx->bit_rate = m_TransOpts.GetVideoBitrate();
-      enc_ctx->bit_rate_tolerance = 4 * m_TransOpts.GetVideoBitrate();
-      enc_ctx->rc_max_rate = 2 * m_TransOpts.GetVideoBitrate();
-      enc_ctx->rc_min_rate = 0;
-      enc_ctx->rc_buffer_size = 1 * 1000 * 1000;
-      // TODO: Some of the following settings are needed for a correctly working encoder.
-      // Find out which one or which combination of them!
-      enc_ctx->flags = 2143289344;
-      enc_ctx->gop_size = -1;
-      enc_ctx->b_frame_strategy = -1;
-      enc_ctx->coder_type = -1;
-      enc_ctx->me_method = -1;
-      enc_ctx->me_subpel_quality = -1;
-      enc_ctx->me_cmp = -1;
-      enc_ctx->me_range = -1;
-      enc_ctx->scenechange_threshold = -1;
-      enc_ctx->i_quant_factor = -1;
-      enc_ctx->qcompress = -1;
-      enc_ctx->qmin = -1;
-      enc_ctx->qmax = -1;
-      enc_ctx->max_qdiff = -1;
-
-      if ((ret = avcodec_open2(enc_ctx, encoder, &dict)) < 0)
-      {
-        CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Cannot open video encoder for stream #%u\n", i);
+        CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Can't open video encoder for stream #%d", i);
         return ret;
       }
     }
     else if (codec_type == AVMEDIA_TYPE_AUDIO)
     {
-      // Use AAC for audio encoding
-      encoder = avcodec_find_encoder(AV_CODEC_ID_AAC);
-
-      if (!encoder)
+      if ((ret = OpenAudioEncoder(enc_ctx, dec_ctx)) != 0)
       {
-        CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Neccessary audio encoder not found\n");
-        return AVERROR_INVALIDDATA;
-      }
-
-      enc_ctx->sample_rate = dec_ctx->sample_rate;
-      enc_ctx->channel_layout = dec_ctx->channel_layout;
-      enc_ctx->channels = av_get_channel_layout_nb_channels(enc_ctx->channel_layout);
-      enc_ctx->sample_fmt = encoder->sample_fmts[0];
-      enc_ctx->time_base = dec_ctx->time_base;
-      enc_ctx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
-
-      if ((ret = avcodec_open2(enc_ctx, encoder, NULL)) < 0)
-      {
-        CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Cannot open audio encoder for stream #%u\n", i);
+        CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Can't open audio encoder for stream #%d", i);
         return ret;
       }
     }
 		else if (codec_type == AVMEDIA_TYPE_UNKNOWN)
     {
-      CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Elementary stream #%d is of unknown type, cannot proceed\n", i);
+      CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Elementary stream #%d is of unknown type, cannot proceed!", i);
 			return AVERROR_INVALIDDATA;
 		}
 		else
     {
-			/* Simply remux other streams */
-			ret = avcodec_copy_context(ofmt_ctx->streams[i]->codec,
-				ifmt_ctx->streams[i]->codec);
-			if (ret < 0) {
-        CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Copying stream context failed\n");
+			if ((ret = avcodec_copy_context(enc_ctx, dec_ctx)) < 0)
+      {
+        CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Copying stream context failed!");
 				return ret;
 			}
 		}
@@ -429,7 +385,6 @@ int CTranscoder::OpenOutputFile(const char *filename)
       enc_ctx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     }
 	}
-	av_dump_format(ofmt_ctx, 0, filename, 1);
 
 	if (!(ofmt_ctx->oformat->flags & AVFMT_NOFILE))
   {
@@ -443,15 +398,109 @@ int CTranscoder::OpenOutputFile(const char *filename)
   // TODO: Set metadata of the ofmt_ctx, i.e. output file
 
 	/* init muxer, write output file header */
-  ResetAVDictionary(&dict);
-	av_dict_set(&dict, "movflags", "faststart", 0);
-  if ((ret = avformat_write_header(ofmt_ctx, &dict)) < 0)
-  {
-    CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Error occurred when opening output file\n");
-		return ret;
-	}
 
-	return 0;
+  AVDictionary *dictionary = NULL;
+  if (strcmp(ofmt_ctx->oformat->name, "mp4") == 0)
+  {
+    av_dict_set(&dictionary, "movflags", "faststart", 0);
+  }
+  if ((ret = avformat_write_header(ofmt_ctx, &dictionary)) < 0)
+  {
+    CLog::Log(LOGERROR, "CTranscoder::OpenOutputFile(): Error occurred when opening output file:");
+    LogError(ret);
+	}
+  if (dictionary)
+  {
+    av_dict_free(&dictionary);
+  }
+	return ret;
+}
+
+int CTranscoder::OpenVideoEncoder(AVCodecContext* encodingContext, AVCodecContext* decodingContext)
+{
+  int ret = 0;
+
+  // Use H.264 for video encoding
+  AVCodec* encoder = NULL;
+  encoder = avcodec_find_encoder(AV_CODEC_ID_H264);
+
+  if (!encoder)
+  {
+    CLog::Log(LOGERROR, "CTranscoder::OpenVideoEncoder: Neccessary video encoder not found!");
+    return AVERROR_ENCODER_NOT_FOUND;
+  }
+  av_opt_set(encodingContext->priv_data, "profile", "high", AV_OPT_SEARCH_CHILDREN);
+
+  encodingContext->profile = FF_PROFILE_H264_HIGH;
+  encodingContext->height = GetTargetHeight();
+  encodingContext->width = GetTargetWidth();
+  encodingContext->pix_fmt = m_TransOpts.GetPixelFormat();
+  AVRational sar; sar.num = 1; sar.den = 1;
+  encodingContext->sample_aspect_ratio = sar;
+  encodingContext->time_base = decodingContext->time_base;
+  encodingContext->max_b_frames = 0;
+  encodingContext->bit_rate = m_TransOpts.GetVideoBitrate();
+  encodingContext->bit_rate_tolerance = 4 * m_TransOpts.GetVideoBitrate();
+  encodingContext->rc_max_rate = 2 * m_TransOpts.GetVideoBitrate();
+  encodingContext->rc_min_rate = 0;
+  encodingContext->rc_buffer_size = 1 * 1000 * 1000;
+  // TODO: Some of the following settings are needed for a correctly working encoder.
+  // Find out which one or which combination of them!
+  encodingContext->flags = 2143289344;
+  encodingContext->gop_size = -1;
+  encodingContext->b_frame_strategy = -1;
+  encodingContext->coder_type = -1;
+  encodingContext->me_method = -1;
+  encodingContext->me_subpel_quality = -1;
+  encodingContext->me_cmp = -1;
+  encodingContext->me_range = -1;
+  encodingContext->scenechange_threshold = -1;
+  encodingContext->i_quant_factor = -1;
+  encodingContext->qcompress = -1;
+  encodingContext->qmin = -1;
+  encodingContext->qmax = -1;
+  encodingContext->max_qdiff = -1;
+
+  AVDictionary* dictionary = NULL;
+  av_dict_set(&dictionary, "preset", "slow", 0);
+  av_dict_set(&dictionary, "vprofile", "high", 0);
+  if ((ret = avcodec_open2(encodingContext, encoder, &dictionary)) < 0)
+  {
+    CLog::Log(LOGERROR, "CTranscoder::OpenVideoEncoder(): Cannot open video encoder!");
+    LogError(ret);
+  }
+  av_dict_free(&dictionary);
+  return ret;
+}
+
+int CTranscoder::OpenAudioEncoder(AVCodecContext* encodingContext, AVCodecContext* decodingContext)
+{
+  int ret = 0;
+
+  // Use AAC for audio encoding
+  AVCodec* encoder = NULL;
+  encoder = avcodec_find_encoder(AV_CODEC_ID_AAC);
+
+  if (!encoder)
+  {
+    CLog::Log(LOGERROR, "CTranscoder::OpenAudioEncoder(): Neccessary audio encoder not found!");
+    return AVERROR_ENCODER_NOT_FOUND;
+  }
+
+  encodingContext->sample_rate = decodingContext->sample_rate;
+  encodingContext->channel_layout = decodingContext->channel_layout;
+  encodingContext->channels = av_get_channel_layout_nb_channels(encodingContext->channel_layout);
+  encodingContext->sample_fmt = encoder->sample_fmts[0];
+  encodingContext->time_base = decodingContext->time_base;
+  encodingContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+
+  if ((ret = avcodec_open2(encodingContext, encoder, NULL)) < 0)
+  {
+    CLog::Log(LOGERROR, "CTranscoder::OpenAudioEncoder(): Cannot open audio encoder!");
+    LogError(ret);
+  }
+
+  return ret;
 }
 
 int CTranscoder::CloseOutputFile()
@@ -461,10 +510,6 @@ int CTranscoder::CloseOutputFile()
   {
     FlushFiltersAndEncoders();
     av_write_trailer(ofmt_ctx);
-  }
-  if (packet.data)
-  {
-    av_free_packet(&packet);
   }
   if (frame)
   {
@@ -670,11 +715,11 @@ int CTranscoder::InitFilters()
 		filter_ctx[i].buffersrc_ctx = NULL;
 		filter_ctx[i].buffersink_ctx = NULL;
 		filter_ctx[i].filter_graph = NULL;
-    AVMediaType type = ifmt_ctx->streams[i]->codec->codec_type;
+    AVMediaType codec_type = ifmt_ctx->streams[i]->codec->codec_type;
 	  const char *filter_spec;
-		if (type == AVMEDIA_TYPE_VIDEO)
+    if (codec_type == AVMEDIA_TYPE_VIDEO)
 			filter_spec = "null"; /* passthrough (dummy) filter for video */
-    else if (type == AVMEDIA_TYPE_AUDIO)
+    else if (codec_type == AVMEDIA_TYPE_AUDIO)
       filter_spec = "anull"; /* passthrough (dummy) filter for audio */
     else
       continue;
@@ -818,6 +863,10 @@ int CTranscoder::FlushFiltersAndEncoders()
 
 int CTranscoder::Transcode(std::string path)
 {
+  if (!m_bTranscodingOptionsSet)
+  {
+    CLog::Log(LOGWARNING, "CTranscoder::Transcode(): No transcoding options were set.");
+  }
   this->path = path;
   bool autoDelete = true;
   this->Create(autoDelete);
@@ -838,7 +887,7 @@ std::string CTranscoder::TranscodePlaylistPath(const std::string &path) const
 
 std::string CTranscoder::TranscodeSegmentPath(const std::string &path, int segment /* = 0 */) const
 {
-  int s = (segment == 0) ? m_iHLS_Segment : segment;
+  int s = (segment == 0) ? m_iCurrentHLSSegmentNumber : segment;
   return path.substr(0, path.find_last_of('.')) + std::string("-transcoded")
     + std::to_string(s) + std::string(".") + m_TransOpts.GetFileExtension();
 }
@@ -860,7 +909,7 @@ void CTranscoder::Run()
   av_register_all();
 
   std::string pathOut = TranscodePath(path);
-
+  // TODO: Get rid of code duplication for HTTP and HLS transcoding
   // HTTP Live Streaming
   if (m_TransOpts.GetStreamingMethod() == "hls")
   {
@@ -887,7 +936,7 @@ void CTranscoder::Run()
 
     std::string pathPlaylist = TranscodePlaylistPath(path);
     CLog::Log(LOGDEBUG, "CTranscoder::Run(): Output file: %s", pathPlaylist.c_str());
-    HLS_CreatePlaylist(pathPlaylist.c_str());
+    CreateMediaPlaylist(pathPlaylist.c_str());
 
     unsigned int stream_index;
     unsigned int i;
@@ -900,11 +949,18 @@ void CTranscoder::Run()
         CLog::Log(LOGDEBUG, "CTranscoder::Run(): Transcoder asked to stop!\n");
       }
       if ((ret = av_read_frame(ifmt_ctx, &packet)) < 0)
+      {
+        if (ret == AVERROR_EOF)
+        {
+          CLog::Log(LOGDEBUG, "CTranscoder::Run(): Reached end of file!");
+          ret = 0;
+        }
         break;
+      }
       stream_index = packet.stream_index;
       AVStream *stream = ifmt_ctx->streams[stream_index];
       AVCodecContext *codec_ctx = stream->codec;
-      type = codec_ctx->codec_type;
+      AVMediaType codec_type = codec_ctx->codec_type;
       //CLog::Log(LOGDEBUG, "CTranscoder::Run(): Demuxer gave frame of stream_index %u\n", stream_index);
 
       if (filter_ctx[stream_index].filter_graph)
@@ -916,11 +972,11 @@ void CTranscoder::Run()
           break;
         }
         av_packet_rescale_ts(&packet, stream->time_base, codec_ctx->time_base);
-        if (type == AVMEDIA_TYPE_VIDEO)
+        if (codec_type == AVMEDIA_TYPE_VIDEO)
         {
           ret = avcodec_decode_video2(codec_ctx, frame, &got_frame, &packet);
         }
-        else if (type == AVMEDIA_TYPE_AUDIO)
+        else if (codec_type == AVMEDIA_TYPE_AUDIO)
         {
           ret = avcodec_decode_audio4(codec_ctx, frame, &got_frame, &packet);
         }
@@ -939,8 +995,9 @@ void CTranscoder::Run()
         {
           frame->pts = av_frame_get_best_effort_timestamp(frame);
           int64_t last_pts = frame->pts;
-          if (type == AVMEDIA_TYPE_VIDEO)
+          if (codec_type == AVMEDIA_TYPE_VIDEO)
           {
+            m_iLastVideoPTS = last_pts;
             // Rescale the video frame
             AVFrame *scaledFrame;
             if ((ret = SwsScaleVideo(frame, &scaledFrame)) == 0)
@@ -964,7 +1021,7 @@ void CTranscoder::Run()
             // See if it's time to start a new segment
             if (ShouldStartNewSegment(last_pts, codec_ctx->time_base))
             {
-              CLog::Log(LOGDEBUG, "CTranscoder::Run(): Time to start segment %d.", m_iHLS_Segment);
+              CLog::Log(LOGDEBUG, "CTranscoder::Run(): Time to start segment %d.", m_iCurrentHLSSegmentNumber);
               CloseOutputFile();
 
               pathSegment = TranscodeSegmentPath(path);
@@ -978,10 +1035,16 @@ void CTranscoder::Run()
               }
             }
           }
-          else
+          else if (codec_type == AVMEDIA_TYPE_AUDIO)
           {
+            m_iLastAudioPTS = last_pts;
             ret = FilterEncodeWriteFrame(frame, stream_index);
             av_frame_free(&frame);
+          }
+          // This should not happen
+          else
+          {
+            CLog::Log(LOGERROR, "CTranscoder::Run(): Only video and audio frames are sent to the filter graph.");
           }
           if (ret < 0)
             goto end;
@@ -1051,7 +1114,7 @@ void CTranscoder::Run()
     stream_index = packet.stream_index;
     AVStream *stream = ifmt_ctx->streams[stream_index];
     AVCodecContext *codec_ctx = stream->codec;
-    type = codec_ctx->codec_type;
+    AVMediaType codec_type = codec_ctx->codec_type;
     //CLog::Log(LOGDEBUG, "CTranscoder::Run(): Demuxer gave frame of stream_index %u\n", stream_index);
 
     if (filter_ctx[stream_index].filter_graph)
@@ -1063,11 +1126,11 @@ void CTranscoder::Run()
         break;
       }
       av_packet_rescale_ts(&packet, stream->time_base, codec_ctx->time_base);
-      if (type == AVMEDIA_TYPE_VIDEO)
+      if (codec_type == AVMEDIA_TYPE_VIDEO)
       {
         ret = avcodec_decode_video2(codec_ctx, frame, &got_frame, &packet);
       }
-      else if (type == AVMEDIA_TYPE_AUDIO)
+      else if (codec_type == AVMEDIA_TYPE_AUDIO)
       {
         ret = avcodec_decode_audio4(codec_ctx, frame, &got_frame, &packet);
       }
@@ -1085,7 +1148,7 @@ void CTranscoder::Run()
       if (got_frame)
       {
         frame->pts = av_frame_get_best_effort_timestamp(frame);
-        if (type == AVMEDIA_TYPE_VIDEO)
+        if (codec_type == AVMEDIA_TYPE_VIDEO)
         {
           // Rescale the video frame
           AVFrame *scaledFrame;
@@ -1154,4 +1217,5 @@ void CTranscoder::OnExit()
 void CTranscoder::SetTranscodingOptions(TranscodingOptions transOpts)
 {
   m_TransOpts = transOpts;
+  m_bTranscodingOptionsSet = true;
 }
