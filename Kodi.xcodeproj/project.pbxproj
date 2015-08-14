@@ -315,6 +315,18 @@
 		687AAF571B2CA51D00C16152 /* SerialState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 687AAF4C1B2CA51D00C16152 /* SerialState.cpp */; };
 		687AAF581B2CA51D00C16152 /* SerialState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 687AAF4C1B2CA51D00C16152 /* SerialState.cpp */; };
 		687AAF591B2CA51D00C16152 /* SerialState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 687AAF4C1B2CA51D00C16152 /* SerialState.cpp */; };
+		68923A3A1B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A341B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp */; };
+		68923A3B1B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A341B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp */; };
+		68923A3C1B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A341B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp */; };
+		68923A3D1B7E5FE4001DDBB6 /* Transcoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A361B7E5FE4001DDBB6 /* Transcoder.cpp */; };
+		68923A3E1B7E5FE4001DDBB6 /* Transcoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A361B7E5FE4001DDBB6 /* Transcoder.cpp */; };
+		68923A3F1B7E5FE4001DDBB6 /* Transcoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A361B7E5FE4001DDBB6 /* Transcoder.cpp */; };
+		68923A401B7E5FE4001DDBB6 /* TranscodingOptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A381B7E5FE4001DDBB6 /* TranscodingOptions.cpp */; };
+		68923A411B7E5FE4001DDBB6 /* TranscodingOptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A381B7E5FE4001DDBB6 /* TranscodingOptions.cpp */; };
+		68923A421B7E5FE4001DDBB6 /* TranscodingOptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A381B7E5FE4001DDBB6 /* TranscodingOptions.cpp */; };
+		68923A451B7E6018001DDBB6 /* TranscoderOperations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A431B7E6018001DDBB6 /* TranscoderOperations.cpp */; };
+		68923A461B7E6018001DDBB6 /* TranscoderOperations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A431B7E6018001DDBB6 /* TranscoderOperations.cpp */; };
+		68923A471B7E6018001DDBB6 /* TranscoderOperations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68923A431B7E6018001DDBB6 /* TranscoderOperations.cpp */; };
 		68A587661B2A8342002D3F53 /* GameController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68A587601B2A8342002D3F53 /* GameController.cpp */; };
 		68A587671B2A8342002D3F53 /* GameController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68A587601B2A8342002D3F53 /* GameController.cpp */; };
 		68A587681B2A8342002D3F53 /* GameController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68A587601B2A8342002D3F53 /* GameController.cpp */; };
@@ -3794,6 +3806,14 @@
 		687AAF4B1B2CA51D00C16152 /* GameSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameSettings.h; path = games/GameSettings.h; sourceTree = "<group>"; };
 		687AAF4C1B2CA51D00C16152 /* SerialState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SerialState.cpp; path = games/SerialState.cpp; sourceTree = "<group>"; };
 		687AAF4D1B2CA51D00C16152 /* SerialState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerialState.h; path = games/SerialState.h; sourceTree = "<group>"; };
+		68923A341B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JSONTranscodingOptions.cpp; path = Transcoder/JSONTranscodingOptions.cpp; sourceTree = "<group>"; };
+		68923A351B7E5FE4001DDBB6 /* JSONTranscodingOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSONTranscodingOptions.h; path = Transcoder/JSONTranscodingOptions.h; sourceTree = "<group>"; };
+		68923A361B7E5FE4001DDBB6 /* Transcoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Transcoder.cpp; path = Transcoder/Transcoder.cpp; sourceTree = "<group>"; };
+		68923A371B7E5FE4001DDBB6 /* Transcoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Transcoder.h; path = Transcoder/Transcoder.h; sourceTree = "<group>"; };
+		68923A381B7E5FE4001DDBB6 /* TranscodingOptions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TranscodingOptions.cpp; path = Transcoder/TranscodingOptions.cpp; sourceTree = "<group>"; };
+		68923A391B7E5FE4001DDBB6 /* TranscodingOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TranscodingOptions.h; path = Transcoder/TranscodingOptions.h; sourceTree = "<group>"; };
+		68923A431B7E6018001DDBB6 /* TranscoderOperations.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TranscoderOperations.cpp; sourceTree = "<group>"; };
+		68923A441B7E6018001DDBB6 /* TranscoderOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TranscoderOperations.h; sourceTree = "<group>"; };
 		68A587601B2A8342002D3F53 /* GameController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameController.cpp; path = games/addons/GameController.cpp; sourceTree = "<group>"; };
 		68A587611B2A8342002D3F53 /* GameController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameController.h; path = games/addons/GameController.h; sourceTree = "<group>"; };
 		68A587621B2A8342002D3F53 /* GameControllerFeature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameControllerFeature.cpp; path = games/addons/GameControllerFeature.cpp; sourceTree = "<group>"; };
@@ -7123,6 +7143,19 @@
 			name = tags;
 			sourceTree = "<group>";
 		};
+		68923A331B7E5F91001DDBB6 /* Transcoder */ = {
+			isa = PBXGroup;
+			children = (
+				68923A341B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp */,
+				68923A351B7E5FE4001DDBB6 /* JSONTranscodingOptions.h */,
+				68923A361B7E5FE4001DDBB6 /* Transcoder.cpp */,
+				68923A371B7E5FE4001DDBB6 /* Transcoder.h */,
+				68923A381B7E5FE4001DDBB6 /* TranscodingOptions.cpp */,
+				68923A391B7E5FE4001DDBB6 /* TranscodingOptions.h */,
+			);
+			name = Transcoder;
+			sourceTree = "<group>";
+		};
 		68A5875C1B2A82F1002D3F53 /* games */ = {
 			isa = PBXGroup;
 			children = (
@@ -8667,6 +8700,7 @@
 				E38E15D20D25F9FA00618676 /* paplayer */,
 				F5E56B11108284E6006E788A /* playercorefactory */,
 				68DC87E61B2CACAF00EFB049 /* RetroPlayer */,
+				68923A331B7E5F91001DDBB6 /* Transcoder */,
 				E38E16580D25F9FA00618676 /* VideoRenderers */,
 				DF923E5B1A11536A008CDB0C /* DataCacheCore.cpp */,
 				DF923E5C1A11536A008CDB0C /* DataCacheCore.h */,
@@ -9983,6 +10017,8 @@
 				F5AE409713415D9E0004BD79 /* SystemOperations.h */,
 				7C920CF7181669FF00DA1477 /* TextureOperations.cpp */,
 				7C920CF8181669FF00DA1477 /* TextureOperations.h */,
+				68923A431B7E6018001DDBB6 /* TranscoderOperations.cpp */,
+				68923A441B7E6018001DDBB6 /* TranscoderOperations.h */,
 				F5AE409813415D9E0004BD79 /* VideoLibrary.cpp */,
 				F5AE409913415D9E0004BD79 /* VideoLibrary.h */,
 				F5AE409A13415D9E0004BD79 /* XBMCOperations.cpp */,
@@ -10897,6 +10933,7 @@
 				F5AD1EA80F488A1A0065EB5D /* GUIWindowKaraokeLyrics.cpp in Sources */,
 				F56A084B0F4A18FB003F9F87 /* karaokewindowbackground.cpp in Sources */,
 				F51CEEEF0F5C5D20004F4602 /* OSXGNUReplacements.c in Sources */,
+				68923A401B7E5FE4001DDBB6 /* TranscodingOptions.cpp in Sources */,
 				687AAF391B2CA4D700C16152 /* AddonCallbacksGame.cpp in Sources */,
 				F5EA02260F6DA990005C2EC5 /* CocoaPowerSyscall.cpp in Sources */,
 				F5EA02270F6DA9A5005C2EC5 /* PowerManager.cpp in Sources */,
@@ -10939,6 +10976,7 @@
 				7CCF7FC9106A0DF500992676 /* TimeUtils.cpp in Sources */,
 				F57B6F801071B8B500079ACB /* JobManager.cpp in Sources */,
 				F5E55B5D10741272006E788A /* DVDPlayerTeletext.cpp in Sources */,
+				68923A3A1B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp in Sources */,
 				F5E55B66107412DE006E788A /* GUIDialogTeletext.cpp in Sources */,
 				F5E55B7010741340006E788A /* Teletext.cpp in Sources */,
 				43348AA4107747CD00F859CF /* Edl.cpp in Sources */,
@@ -11374,6 +11412,7 @@
 				DF404A3A16B9896C00D8023E /* imagefactory.cpp in Sources */,
 				DFD5812516C828500008EEA0 /* DAVCommon.cpp in Sources */,
 				DFD5812616C828500008EEA0 /* DAVFile.cpp in Sources */,
+				68923A451B7E6018001DDBB6 /* TranscoderOperations.cpp in Sources */,
 				1DAFDB7C16DFDCA7007F8C68 /* PeripheralBusCEC.cpp in Sources */,
 				F563529616E53FAB00D21BAD /* UPnPSettings.cpp in Sources */,
 				F56352AA16E5402100D21BAD /* GUIDialogContentSettings.cpp in Sources */,
@@ -11413,6 +11452,7 @@
 				820023DB171A28A300667D1C /* OSXTextInputResponder.mm in Sources */,
 				DF529BAE1741697B00523FB4 /* Environment.cpp in Sources */,
 				DFE4095B17417FDF00473BD9 /* LegacyPathTranslation.cpp in Sources */,
+				68923A3D1B7E5FE4001DDBB6 /* Transcoder.cpp in Sources */,
 				0E3036EC1760F68A00D93596 /* FavouritesDirectory.cpp in Sources */,
 				551C3A45175A12010051AAAD /* VDA.cpp in Sources */,
 				DFBB431B178B5E6F006CC20A /* CompileInfo.cpp in Sources */,
@@ -12499,10 +12539,12 @@
 				DFF0F48317528350002DA3A4 /* DVDCodecUtils.cpp in Sources */,
 				DFF0F48417528350002DA3A4 /* DVDFactoryCodec.cpp in Sources */,
 				DFF0F48717528350002DA3A4 /* DVDVideoCodecVideoToolBox.cpp in Sources */,
+				68923A3F1B7E5FE4001DDBB6 /* Transcoder.cpp in Sources */,
 				DFF0F48817528350002DA3A4 /* fstrcmp.c in Sources */,
 				DFF0F48A17528350002DA3A4 /* yuv2rgb.neon.S in Sources */,
 				DF3C3C0E1752A7EE000989C3 /* IOSEAGLView.mm in Sources */,
 				DF3C3C0F1752A7EE000989C3 /* IOSExternalTouchController.mm in Sources */,
+				68923A3C1B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp in Sources */,
 				DF3C3C101752A7EE000989C3 /* IOSScreenManager.mm in Sources */,
 				0E3036EE1760F68A00D93596 /* FavouritesDirectory.cpp in Sources */,
 				DFBB431A178B5E6F006CC20A /* CompileInfo.cpp in Sources */,
@@ -12553,6 +12595,7 @@
 				F5CC22EA1814FF3B006B5E91 /* ActiveAEStream.cpp in Sources */,
 				F5CC22FE18150065006B5E91 /* ActorProtocol.cpp in Sources */,
 				68F2DA141B2A608B006E297B /* AddonJoystickButtonMapRO.cpp in Sources */,
+				68923A421B7E5FE4001DDBB6 /* TranscodingOptions.cpp in Sources */,
 				F5CC2304181500B1006B5E91 /* EndianSwap.cpp in Sources */,
 				F5CC230D18150118006B5E91 /* AESinkFactory.cpp in Sources */,
 				F5CC234818150277006B5E91 /* AESinkNULL.cpp in Sources */,
@@ -12616,6 +12659,7 @@
 				7CCDA7A5192756250074CF51 /* NptCrypto.cpp in Sources */,
 				7CCDA7A8192756250074CF51 /* NptDataBuffer.cpp in Sources */,
 				7CCDA7B1192756250074CF51 /* NptDebug.cpp in Sources */,
+				68923A471B7E6018001DDBB6 /* TranscoderOperations.cpp in Sources */,
 				7CCDA7BA192756250074CF51 /* NptDigest.cpp in Sources */,
 				7CCDA7BD192756250074CF51 /* NptDynamicLibraries.cpp in Sources */,
 				7CCDA7C0192756250074CF51 /* NptFile.cpp in Sources */,
@@ -12731,6 +12775,7 @@
 				E499117D174E5CE000741B6D /* AddonCallbacksPVR.cpp in Sources */,
 				E499117E174E5CE000741B6D /* AddonDatabase.cpp in Sources */,
 				E499117F174E5CE000741B6D /* AddonInstaller.cpp in Sources */,
+				68923A411B7E5FE4001DDBB6 /* TranscodingOptions.cpp in Sources */,
 				E4991180174E5CE000741B6D /* AddonManager.cpp in Sources */,
 				E4991181174E5CE000741B6D /* AddonStatusHandler.cpp in Sources */,
 				E4991182174E5CE000741B6D /* AddonVersion.cpp in Sources */,
@@ -12851,6 +12896,7 @@
 				E499120C174E5D5A00741B6D /* DVDPlayerCodec.cpp in Sources */,
 				E4991213174E5D5A00741B6D /* PAPlayer.cpp in Sources */,
 				E499121B174E5D5A00741B6D /* PlayerCoreFactory.cpp in Sources */,
+				68923A3B1B7E5FE4001DDBB6 /* JSONTranscodingOptions.cpp in Sources */,
 				E499121C174E5D5A00741B6D /* PlayerSelectionRule.cpp in Sources */,
 				E499121D174E5D5A00741B6D /* ConvolutionKernels.cpp in Sources */,
 				E499121E174E5D5A00741B6D /* VideoFilterShader.cpp in Sources */,
@@ -13472,6 +13518,7 @@
 				E4991494174E606600741B6D /* Teletext.cpp in Sources */,
 				E4991495174E606600741B6D /* VideoDatabase.cpp in Sources */,
 				E4991496174E606600741B6D /* VideoDbUrl.cpp in Sources */,
+				68923A3E1B7E5FE4001DDBB6 /* Transcoder.cpp in Sources */,
 				E4991497174E606600741B6D /* VideoInfoDownloader.cpp in Sources */,
 				E4991498174E606600741B6D /* VideoInfoScanner.cpp in Sources */,
 				E4991499174E606600741B6D /* VideoInfoTag.cpp in Sources */,
@@ -13570,6 +13617,7 @@
 				E4991582174E682F00741B6D /* AutoPool.mm in Sources */,
 				E4991583174E684000741B6D /* CocoaInterface.mm in Sources */,
 				E4991584174E684000741B6D /* DarwinUtils.mm in Sources */,
+				68923A461B7E6018001DDBB6 /* TranscoderOperations.cpp in Sources */,
 				E4991586174E684000741B6D /* OSXGNUReplacements.c in Sources */,
 				E499158A174E68D800741B6D /* LinuxRendererGLES.cpp in Sources */,
 				E499158B174E68EE00741B6D /* DVDCodecUtils.cpp in Sources */,
