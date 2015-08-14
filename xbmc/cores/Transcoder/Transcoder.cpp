@@ -22,9 +22,15 @@
 
 #include <stdio.h>
 
-#include <filesystem\File.h>
+#include "filesystem/File.h"
 #include <URL.h>
 #include <utils/log.h>
+
+#include <stdio.h>
+
+#if !defined(TARGET_WINDOWS)
+#define _snprintf snprintf
+#endif
 
 CTranscoder::CTranscoder()
   : CThread(this, "Transcoder")
@@ -619,7 +625,7 @@ int CTranscoder::InitFilter(FilteringContext* fctx, AVCodecContext *dec_ctx,
 			dec_ctx->channel_layout =
 			av_get_default_channel_layout(dec_ctx->channels);
 		_snprintf(args, sizeof(args),
-			"time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%"PRIx64,
+			"time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%" PRIx64,
 			dec_ctx->time_base.num, dec_ctx->time_base.den, dec_ctx->sample_rate,
 			av_get_sample_fmt_name(dec_ctx->sample_fmt),
 			dec_ctx->channel_layout);

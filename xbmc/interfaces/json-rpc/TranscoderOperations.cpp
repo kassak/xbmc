@@ -64,7 +64,7 @@ JSONRPC_STATUS CTranscoderOperations::Transcode(const std::string &method, ITran
       }
       else
       {
-        CLog::Log(LOGDEBUG, "Transcoding movie with playlist: %s", transpath);
+        CLog::Log(LOGDEBUG, "Transcoding movie with playlist: %s", transpath.c_str());
         transcoder->Transcode(moviepath);
       }
     }
@@ -78,7 +78,7 @@ JSONRPC_STATUS CTranscoderOperations::Transcode(const std::string &method, ITran
       }
       else
       {
-        CLog::Log(LOGDEBUG, "Transcoding movie to: %s", transpath);
+        CLog::Log(LOGDEBUG, "Transcoding movie to: %s", transpath.c_str());
         transcoder->Transcode(moviepath);
       }
     }
