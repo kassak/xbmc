@@ -21,6 +21,7 @@
 #include "Application.h"
 #include "Addon.h"
 #include "AddonCallbacksAddon.h"
+#include "addons/include/kodi_vfs_types.h"
 #include "utils/log.h"
 #include "LangInfo.h"
 #include "dialogs/GUIDialogKaiToast.h"
